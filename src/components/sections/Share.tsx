@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Share2, Calendar, User, Link2, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Section, SectionTitle } from '@/components/common/Section';
-import { Button } from '@/components/ui/Button';
 import { WEDDING_INFO } from '@/lib/constants';
 import { saveToCalendar, saveContact, copyToClipboard, shareUrl } from '@/lib/utils';
 
@@ -13,11 +12,11 @@ export function Share() {
 
   const handleSaveCalendar = () => {
     const startDate = new Date(date);
-    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2시간 후
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
 
     saveToCalendar(
-      `${groom.name} ♥ ${bride.name} 결혼식`,
-      `${venue.name} ${venue.hall}에서 결혼식이 있습니다.`,
+      `${groom.name} & ${bride.name} Wedding`,
+      `Wedding ceremony at ${venue.name} ${venue.hall}`,
       venue.roadAddress,
       startDate,
       endDate
@@ -30,7 +29,7 @@ export function Share() {
     saveContact(
       `${groom.name} (신랑)`,
       groom.phone,
-      `${dateDisplay.year}년 ${dateDisplay.month}월 ${dateDisplay.day}일 결혼`
+      `결혼식: ${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day}`
     );
     toast.success('연락처가 저장되었습니다');
   };
@@ -39,7 +38,7 @@ export function Share() {
     saveContact(
       `${bride.name} (신부)`,
       bride.phone,
-      `${dateDisplay.year}년 ${dateDisplay.month}월 ${dateDisplay.day}일 결혼`
+      `결혼식: ${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day}`
     );
     toast.success('연락처가 저장되었습니다');
   };
@@ -55,22 +54,21 @@ export function Share() {
 
   const handleShare = async () => {
     await shareUrl();
-    toast.success('공유 창이 열렸습니다');
+    toast.success('공유하기');
   };
 
   const handleKakaoShare = () => {
-    // 카카오 SDK가 로드되지 않았을 경우 대비
     if (typeof window !== 'undefined' && window.Kakao) {
       if (!window.Kakao.isInitialized()) {
-        // 카카오 앱 키로 초기화 필요
+        // Initialize with your Kakao App Key
         // window.Kakao.init('YOUR_KAKAO_APP_KEY');
       }
 
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
-          title: `${groom.name} ♥ ${bride.name} 결혼합니다`,
-          description: `${dateDisplay.year}년 ${dateDisplay.month}월 ${dateDisplay.day}일 ${dateDisplay.dayOfWeek} ${dateDisplay.time}\n${venue.name} ${venue.hall}`,
+          title: `${groom.name} & ${bride.name} Wedding`,
+          description: `${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day} ${dateDisplay.dayOfWeek} ${dateDisplay.time}\n${venue.name} ${venue.hall}`,
           imageUrl: `${window.location.origin}/images/og-image.jpg`,
           link: {
             mobileWebUrl: window.location.href,
@@ -88,102 +86,133 @@ export function Share() {
         ],
       });
     } else {
-      toast.info('카카오 공유를 사용하려면 카카오 SDK 설정이 필요합니다');
+      toast.info('카카오 SDK 설정이 필요합니다');
     }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as const },
+    },
   };
 
   return (
     <Section id="share" background="white">
-      <SectionTitle title="공유하기" subtitle="SHARE" />
+      <SectionTitle title="공유하기" subtitle="저장 및 공유" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
         className="space-y-4"
       >
         {/* Calendar Save */}
-        <div className="rounded-xl bg-[var(--color-secondary)] p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-                <Calendar className="h-5 w-5 text-[var(--color-primary)]" />
+        <motion.div
+          variants={itemVariants}
+          className="group rounded-lg border border-[var(--color-border-light)] bg-[var(--color-secondary)]/50 p-4 min-[375px]:p-5 transition-all hover:border-[var(--color-botanical)] hover:shadow-md"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-[375px]:gap-4">
+              <div className="flex h-10 w-10 min-[375px]:h-12 min-[375px]:w-12 items-center justify-center rounded-full bg-white shadow-sm transition-transform group-hover:scale-105 flex-shrink-0">
+                <Calendar className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-primary)]" />
               </div>
-              <div>
-                <p className="font-medium">캘린더에 저장</p>
-                <p className="text-xs text-[var(--color-text-light)]">
-                  결혼식 일정을 저장해요
-                </p>
+              <div className="min-w-0">
+                <p className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">캘린더에 저장</p>
+                <p className="text-[10px] min-[375px]:text-xs text-[var(--color-text-muted)] truncate">결혼식 일정을 캘린더에 추가</p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleSaveCalendar}>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSaveCalendar}
+              className="rounded-md bg-[var(--color-primary)] px-3 min-[375px]:px-4 py-1.5 min-[375px]:py-2 text-xs min-[375px]:text-sm font-medium text-white shadow-sm transition-all hover:bg-[var(--color-primary-dark)] hover:shadow-md flex-shrink-0"
+            >
               저장
-            </Button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Contact Save */}
-        <div className="rounded-xl bg-[var(--color-secondary)] p-4">
-          <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-              <User className="h-5 w-5 text-[var(--color-primary)]" />
+        <motion.div
+          variants={itemVariants}
+          className="overflow-hidden rounded-lg border border-[var(--color-border-light)] bg-[var(--color-secondary)]/50 p-4 min-[375px]:p-5"
+        >
+          <div className="mb-3 min-[375px]:mb-4 flex items-center gap-3 min-[375px]:gap-4">
+            <div className="flex h-10 w-10 min-[375px]:h-12 min-[375px]:w-12 items-center justify-center rounded-full bg-white shadow-sm flex-shrink-0">
+              <User className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-primary)]" />
             </div>
             <div>
-              <p className="font-medium">연락처 저장</p>
-              <p className="text-xs text-[var(--color-text-light)]">
-                연락처를 저장해요
-              </p>
+              <p className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">연락처 저장</p>
+              <p className="text-[10px] min-[375px]:text-xs text-[var(--color-text-muted)]">휴대폰 연락처에 저장</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
+          <div className="flex gap-2 min-[375px]:gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleSaveGroomContact}
-              className="flex-1"
+              className="flex-1 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2.5 min-[375px]:py-3 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] transition-all hover:border-[var(--color-primary)] hover:shadow-sm"
             >
               신랑 {groom.name}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleSaveBrideContact}
-              className="flex-1"
+              className="flex-1 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2.5 min-[375px]:py-3 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] transition-all hover:border-[var(--color-rose)] hover:shadow-sm"
             >
               신부 {bride.name}
-            </Button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Share Buttons */}
-        <div className="grid grid-cols-3 gap-3">
+        <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 min-[375px]:gap-3">
           {/* Kakao */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleKakaoShare}
-            className="flex flex-col items-center gap-2 rounded-xl bg-[#FEE500] p-4 transition-transform hover:scale-105"
+            className="flex flex-col items-center gap-2 min-[375px]:gap-3 rounded-lg bg-[#FEE500] p-4 min-[375px]:p-5 shadow-sm transition-shadow hover:shadow-md"
           >
-            <MessageCircle className="h-6 w-6 text-[#3C1E1E]" />
-            <span className="text-xs font-medium text-[#3C1E1E]">카카오톡</span>
-          </button>
+            <MessageCircle className="h-5 w-5 min-[375px]:h-6 min-[375px]:w-6 text-[#3C1E1E]" />
+            <span className="text-[10px] min-[375px]:text-xs font-medium text-[#3C1E1E]">카카오톡</span>
+          </motion.button>
 
           {/* Link Copy */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleCopyLink}
-            className="flex flex-col items-center gap-2 rounded-xl bg-[var(--color-secondary)] p-4 transition-transform hover:scale-105"
+            className="flex flex-col items-center gap-2 min-[375px]:gap-3 rounded-lg border border-[var(--color-border-light)] bg-white p-4 min-[375px]:p-5 shadow-sm transition-all hover:border-[var(--color-primary)] hover:shadow-md"
           >
-            <Link2 className="h-6 w-6 text-[var(--color-primary)]" />
-            <span className="text-xs font-medium">링크 복사</span>
-          </button>
+            <Link2 className="h-5 w-5 min-[375px]:h-6 min-[375px]:w-6 text-[var(--color-primary)]" />
+            <span className="text-[10px] min-[375px]:text-xs font-medium text-[var(--color-text)]">링크 복사</span>
+          </motion.button>
 
           {/* Native Share */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleShare}
-            className="flex flex-col items-center gap-2 rounded-xl bg-[var(--color-secondary)] p-4 transition-transform hover:scale-105"
+            className="flex flex-col items-center gap-2 min-[375px]:gap-3 rounded-lg border border-[var(--color-border-light)] bg-white p-4 min-[375px]:p-5 shadow-sm transition-all hover:border-[var(--color-primary)] hover:shadow-md"
           >
-            <Share2 className="h-6 w-6 text-[var(--color-primary)]" />
-            <span className="text-xs font-medium">공유하기</span>
-          </button>
-        </div>
+            <Share2 className="h-5 w-5 min-[375px]:h-6 min-[375px]:w-6 text-[var(--color-primary)]" />
+            <span className="text-[10px] min-[375px]:text-xs font-medium text-[var(--color-text)]">공유</span>
+          </motion.button>
+        </motion.div>
       </motion.div>
     </Section>
   );

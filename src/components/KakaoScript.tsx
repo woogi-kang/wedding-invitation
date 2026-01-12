@@ -3,15 +3,6 @@
 import Script from 'next/script';
 import { KAKAO_CONFIG } from '@/lib/constants';
 
-declare global {
-  interface Window {
-    Kakao: {
-      init: (key: string) => void;
-      isInitialized: () => boolean;
-    };
-  }
-}
-
 export default function KakaoScript() {
   return (
     <Script

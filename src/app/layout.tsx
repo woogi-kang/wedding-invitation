@@ -1,30 +1,15 @@
 import type { Metadata, Viewport } from 'next';
-import { Noto_Serif_KR, Noto_Sans_KR } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { OG_METADATA } from '@/lib/constants';
 import KakaoScript from '@/components/KakaoScript';
 import './globals.css';
-
-const notoSerifKR = Noto_Serif_KR({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-serif',
-  display: 'swap',
-});
-
-const notoSansKR = Noto_Sans_KR({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '700'],
-  variable: '--font-sans',
-  display: 'swap',
-});
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#FFFCF9',
+  themeColor: '#FAF9F6',
 };
 
 export const metadata: Metadata = {
@@ -63,12 +48,24 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
         <meta name="format-detection" content="telephone=no" />
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        />
       </head>
-      <body
-        className={`${notoSerifKR.variable} ${notoSansKR.variable} font-sans antialiased`}
-      >
+      <body className="font-sans antialiased">
         {children}
-        <Toaster position="bottom-center" richColors />
+        <Toaster
+          position="bottom-center"
+          richColors
+          toastOptions={{
+            style: {
+              fontFamily: 'var(--font-sans)',
+            },
+          }}
+        />
         <KakaoScript />
       </body>
     </html>

@@ -25,13 +25,13 @@ export function Section({
   return (
     <motion.section
       id={id}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={cn('section', bgColors[background], className)}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+      className={cn('section relative', bgColors[background], className)}
     >
-      <div className="mx-auto max-w-lg">{children}</div>
+      <div className="mx-auto w-full max-w-[340px] sm:max-w-md md:max-w-lg lg:max-w-xl">{children}</div>
     </motion.section>
   );
 }
@@ -44,17 +44,41 @@ interface SectionTitleProps {
 
 export function SectionTitle({ title, subtitle, className }: SectionTitleProps) {
   return (
-    <div className={cn('mb-10', className)}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+      className={cn('mb-12 text-center', className)}
+    >
       <h2 className="section-title">{title}</h2>
-      {subtitle && <p className="section-subtitle">{subtitle}</p>}
-    </div>
+      {subtitle && (
+        <p className="section-subtitle">{subtitle}</p>
+      )}
+    </motion.div>
   );
 }
 
 export function Divider({ className }: { className?: string }) {
-  return <div className={cn('divider', className)} />;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scaleY: 0 }}
+      whileInView={{ opacity: 1, scaleY: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className={cn('divider', className)}
+    />
+  );
 }
 
 export function HorizontalDivider({ className }: { className?: string }) {
-  return <div className={cn('divider-horizontal', className)} />;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scaleX: 0 }}
+      whileInView={{ opacity: 1, scaleX: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className={cn('divider-horizontal', className)}
+    />
+  );
 }
