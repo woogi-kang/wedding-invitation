@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Noto_Serif_KR, Noto_Sans_KR } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { OG_METADATA } from '@/lib/constants';
+import KakaoScript from '@/components/KakaoScript';
 import './globals.css';
 
 const notoSerifKR = Noto_Serif_KR({
@@ -68,6 +69,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster position="bottom-center" richColors />
+        <KakaoScript />
       </body>
     </html>
   );

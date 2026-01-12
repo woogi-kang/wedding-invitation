@@ -4,8 +4,8 @@
 export const WEDDING_INFO = {
   // 신랑 정보
   groom: {
-    name: '김민준',
-    englishName: 'Minjun',
+    name: '강태욱',
+    englishName: 'Taewook',
     father: '김철수',
     mother: '박영희',
     fatherDeceased: false,
@@ -14,7 +14,7 @@ export const WEDDING_INFO = {
     account: {
       bank: '신한은행',
       number: '110-123-456789',
-      holder: '김민준',
+      holder: '강태욱',
     },
     fatherAccount: {
       bank: '국민은행',
@@ -30,8 +30,8 @@ export const WEDDING_INFO = {
 
   // 신부 정보
   bride: {
-    name: '이서연',
-    englishName: 'Seoyeon',
+    name: '김선경',
+    englishName: 'Sunkyung',
     father: '이영수',
     mother: '최미경',
     fatherDeceased: false,
@@ -40,7 +40,7 @@ export const WEDDING_INFO = {
     account: {
       bank: '카카오뱅크',
       number: '3333-12-3456789',
-      holder: '이서연',
+      holder: '김선경',
     },
     fatherAccount: {
       bank: '하나은행',
@@ -55,30 +55,30 @@ export const WEDDING_INFO = {
   },
 
   // 결혼식 날짜/시간
-  date: '2025-05-17T14:00:00+09:00',
+  date: '2026-04-05T14:15:00+09:00',
   dateDisplay: {
-    year: 2025,
-    month: 5,
-    day: 17,
-    dayOfWeek: '토요일',
-    time: '오후 2시',
-    timeDetail: '14:00',
+    year: 2026,
+    month: 4,
+    day: 5,
+    dayOfWeek: '일요일',
+    time: '오후 2시 15분',
+    timeDetail: '14:15',
   },
 
   // 예식장 정보
   venue: {
-    name: '더채플앳청담',
-    hall: '5층 그랜드홀',
-    address: '서울특별시 강남구 청담동 123-45',
-    roadAddress: '서울특별시 강남구 도산대로 123',
-    tel: '02-1234-5678',
+    name: '라마다 서울 신도림 호텔',
+    hall: '웨딩홀',
+    address: '서울특별시 구로구 경인로 624',
+    roadAddress: '서울특별시 구로구 경인로 624',
+    tel: '02-2162-2100',
     coordinates: {
-      lat: 37.5234,
-      lng: 127.0456,
+      lat: 37.5064,
+      lng: 126.8853,
     },
-    parking: '건물 내 지하주차장 이용 가능 (2시간 무료)',
-    subway: '압구정로데오역 5번 출구에서 도보 5분',
-    bus: '청담사거리 정류장 하차 (340, 143, 463)',
+    parking: '건물 내 주차장 800대 이용 가능',
+    subway: '지하철 1호선, 2호선 신도림역 1번 출구 도보 5분',
+    bus: '간선: 160, 503, 600, 662 / 지선: 6513, 6515, 6516',
   },
 
   // 셔틀버스 정보
@@ -86,16 +86,10 @@ export const WEDDING_INFO = {
     available: true,
     routes: [
       {
-        name: '강남역 출발',
-        departure: '강남역 11번 출구 앞',
-        times: ['12:30', '13:00', '13:30'],
-        duration: '약 20분 소요',
-      },
-      {
-        name: '잠실역 출발',
-        departure: '잠실역 8번 출구 앞',
-        times: ['12:30', '13:00'],
-        duration: '약 25분 소요',
+        name: '신도림역 출발',
+        departure: '신도림역 1번 출구 앞',
+        times: ['13:00', '13:30', '14:00'],
+        duration: '약 5분 소요',
       },
     ],
   },
@@ -113,15 +107,15 @@ export const WEDDING_INFO = {
 더없는 기쁨으로 간직하겠습니다.`,
   },
 
-  // 갤러리 이미지
+  // 갤러리 이미지 (실제 웨딩 사진으로 교체 필요)
   gallery: {
     images: [
-      { src: '/images/gallery/1.jpg', alt: '웨딩 사진 1' },
-      { src: '/images/gallery/2.jpg', alt: '웨딩 사진 2' },
-      { src: '/images/gallery/3.jpg', alt: '웨딩 사진 3' },
-      { src: '/images/gallery/4.jpg', alt: '웨딩 사진 4' },
-      { src: '/images/gallery/5.jpg', alt: '웨딩 사진 5' },
-      { src: '/images/gallery/6.jpg', alt: '웨딩 사진 6' },
+      { src: 'https://picsum.photos/seed/wedding1/600/800', alt: '웨딩 사진 1' },
+      { src: 'https://picsum.photos/seed/wedding2/600/800', alt: '웨딩 사진 2' },
+      { src: 'https://picsum.photos/seed/wedding3/600/800', alt: '웨딩 사진 3' },
+      { src: 'https://picsum.photos/seed/wedding4/600/800', alt: '웨딩 사진 4' },
+      { src: 'https://picsum.photos/seed/wedding5/600/800', alt: '웨딩 사진 5' },
+      { src: 'https://picsum.photos/seed/wedding6/600/800', alt: '웨딩 사진 6' },
     ],
   },
 
@@ -132,9 +126,9 @@ export const WEDDING_INFO = {
     title: '우리의 이야기',
   },
 
-  // 배경음악
+  // 배경음악 (실제 음악 파일 추가 후 enabled: true로 변경)
   music: {
-    enabled: true,
+    enabled: false,
     src: '/music/bgm.mp3',
     title: 'Beautiful in White',
     artist: 'Shane Filan',
@@ -162,7 +156,12 @@ export const OG_METADATA = {
   title: `${WEDDING_INFO.groom.name} ♥ ${WEDDING_INFO.bride.name} 결혼합니다`,
   description: `${WEDDING_INFO.dateDisplay.year}년 ${WEDDING_INFO.dateDisplay.month}월 ${WEDDING_INFO.dateDisplay.day}일 ${WEDDING_INFO.dateDisplay.dayOfWeek} ${WEDDING_INFO.dateDisplay.time}`,
   image: '/images/og-image.jpg',
-  url: 'https://your-wedding-invitation.vercel.app',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-wedding-invitation.vercel.app',
+};
+
+// 카카오 설정 (환경변수에서 로드)
+export const KAKAO_CONFIG = {
+  javascriptKey: process.env.NEXT_PUBLIC_KAKAO_JS_KEY || '',
 };
 
 // 디자인 테마

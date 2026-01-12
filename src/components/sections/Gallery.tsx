@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,6 +35,33 @@ export function Gallery() {
     setSelectedIndex(null);
     document.body.style.overflow = 'unset';
   };
+
+  // 라이트박스 열릴 때 줌 방지
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    const preventZoom = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    const preventGestureStart = (e: Event) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener('touchmove', preventZoom, { passive: false });
+    document.addEventListener('gesturestart', preventGestureStart);
+    document.addEventListener('gesturechange', preventGestureStart);
+    document.addEventListener('gestureend', preventGestureStart);
+
+    return () => {
+      document.removeEventListener('touchmove', preventZoom);
+      document.removeEventListener('gesturestart', preventGestureStart);
+      document.removeEventListener('gesturechange', preventGestureStart);
+      document.removeEventListener('gestureend', preventGestureStart);
+    };
+  }, [selectedIndex]);
 
   const goToPrev = () => {
     if (selectedIndex !== null) {
@@ -127,7 +154,7 @@ export function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 touch-none"
             onClick={closeLightbox}
           >
             {/* Close Button */}

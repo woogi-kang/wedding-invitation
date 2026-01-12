@@ -15,7 +15,7 @@ export function Hero() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url(/images/hero-bg.jpg)',
+          backgroundImage: 'url(https://picsum.photos/seed/hero/1080/1920)',
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40" />
