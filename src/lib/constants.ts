@@ -164,6 +164,115 @@ export const KAKAO_CONFIG = {
   javascriptKey: process.env.NEXT_PUBLIC_KAKAO_JS_KEY || '',
 };
 
+// Guest Snap 설정
+export const GUEST_SNAP_CONFIG = {
+  enabled: true,
+
+  // Wedding date for activation check
+  weddingDate: '2026-04-05',
+
+  // Upload limits
+  limits: {
+    maxFilesPerSession: 50,
+    maxImageSizeMB: 30,
+    maxVideoSizeMB: 500,
+    maxConcurrentUploads: 3,
+  },
+
+  // UI Messages (Korean) - expressing gratitude
+  messages: {
+    // Section title & description
+    sectionTitle: '게스트스냅',
+    sectionSubtitle: '저희의 순간을 함께 담아주세요',
+    uploadButtonText: '사진 공유하기',
+
+    // Name input modal
+    nameModalTitle: '소중한 사진을 공유해주시는 분은 누구신가요?',
+    nameModalPlaceholder: '존함을 입력해주세요',
+    nameModalSubmit: '사진 공유하러 가기',
+
+    // File selection modal
+    uploadModalTitle: '저희를 예쁘게 찍어주셨나요?',
+    uploadModalSubtitle: '소중한 순간을 공유해주시면 평생 간직하겠습니다',
+    uploadModalSelectButton: '사진/영상 선택하기',
+    uploadModalCameraButton: '지금 촬영하기',
+    uploadModalDragText: '여기에 파일을 끌어다 놓으세요',
+
+    // Upload progress
+    uploadingTitle: '소중한 추억을 전달받고 있어요',
+    uploadingProgress: '{{current}}/{{total}} 업로드 중...',
+    uploadingPleaseWait: '잠시만 기다려주세요',
+
+    // Retry
+    retryingText: '다시 시도하고 있어요... ({{attempt}}/3)',
+    retryButton: '다시 시도',
+    retryAllButton: '모두 다시 시도',
+
+    // Complete
+    uploadComplete: '예쁘게 찍어주셔서 정말 감사합니다 :)',
+    uploadCompleteSubtitle: '공유해주신 사진은 평생 소중히 간직할게요',
+    uploadMoreButton: '더 공유하기',
+    closeButton: '닫기',
+
+    // Failed
+    uploadFailed: '앗, 전송이 잘 안됐어요',
+    uploadFailedSubtitle: '다시 시도해주시겠어요?',
+
+    // Limit reached
+    limitReached: '최대 50장까지 공유하실 수 있어요',
+    limitReachedSubtitle: '이미 많은 추억을 공유해주셨네요, 감사합니다!',
+
+    // Offline
+    offlineTitle: '인터넷 연결이 끊어졌어요',
+    offlineSubtitle: '연결되면 자동으로 업로드를 이어갈게요',
+
+    // File validation
+    invalidFileType: '사진과 영상 파일만 공유하실 수 있어요',
+    fileTooLarge: '파일이 너무 커요 (사진 30MB, 영상 500MB 이하)',
+
+    // Not yet open (before wedding date)
+    notYetOpen: '결혼식 당일부터 사진을 공유하실 수 있어요!',
+    notYetOpenSubtitle: '조금만 기다려주세요 :)',
+
+    // Pending uploads recovery
+    pendingUploadsFound: '이전에 업로드하지 못한 사진이 있어요',
+    pendingUploadsResume: '이어서 업로드하기',
+    pendingUploadsDiscard: '새로 시작하기',
+
+    // Leave confirmation
+    confirmLeave: '업로드 중입니다. 정말 나가시겠어요?',
+    confirmLeaveSubtitle: '나가시면 진행 중인 업로드가 중단될 수 있어요',
+  },
+
+  // Allowed file types
+  allowedTypes: {
+    images: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'],
+    videos: ['video/mp4', 'video/quicktime', 'video/hevc'],
+  },
+
+  // File extensions mapping
+  allowedExtensions: ['.jpg', '.jpeg', '.png', '.heic', '.webp', '.mp4', '.mov'],
+
+  // Retry configuration
+  retry: {
+    maxAttempts: 3,
+    baseDelayMs: 1000,
+    maxDelayMs: 10000,
+  },
+
+  // Session configuration
+  session: {
+    durationHours: 24,
+    cookieName: 'guestsnap_session',
+  },
+
+  // NAS configuration (actual values from env vars)
+  nas: {
+    basePath: '/GuestSnap',
+    createFolderIfNotExists: true,
+  },
+};
+
 // 디자인 테마
 export const THEME = {
   colors: {
