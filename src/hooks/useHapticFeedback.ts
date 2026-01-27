@@ -43,24 +43,28 @@ interface UseHapticFeedbackReturn {
   vibrate: (pattern: number | number[]) => void;
 }
 
+// Helper to check if we're in browser environment
+const isBrowser = typeof window !== 'undefined' && typeof navigator !== 'undefined';
+
+// Get initial values safely (for SSR)
+const getInitialSupported = () => isBrowser && 'vibrate' in navigator;
+const getInitialReducedMotion = () =>
+  isBrowser ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+
 /**
  * Hook for providing haptic feedback on mobile devices
  * Automatically respects user's reduced motion preference
  */
 export function useHapticFeedback(): UseHapticFeedbackReturn {
-  const [isSupported, setIsSupported] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isSupported] = useState(getInitialSupported);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(getInitialReducedMotion);
 
-  // Check for support and user preferences on mount
+  // Listen for changes to reduced motion preference
   useEffect(() => {
-    // Check if vibration API is supported
-    setIsSupported('vibrate' in navigator);
+    if (!isBrowser) return;
 
-    // Check for reduced motion preference
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
 
-    // Listen for changes to reduced motion preference
     const handleChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);
     };
@@ -116,11 +120,12 @@ export function useHapticFeedback(): UseHapticFeedbackReturn {
  * Useful when you don't need haptic feedback
  */
 export function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(getInitialReducedMotion);
 
   useEffect(() => {
+    if (!isBrowser) return;
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
 
     const handleChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);

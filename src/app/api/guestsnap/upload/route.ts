@@ -15,7 +15,6 @@ import {
   uploadFile,
   validateFileServer,
   checkRateLimit,
-  getFileType,
   getGuestUploadCount,
 } from '@/lib/guestsnap';
 import { GUEST_SNAP_CONFIG } from '@/lib/constants';

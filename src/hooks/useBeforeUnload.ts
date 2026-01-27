@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 
 interface UseBeforeUnloadOptions {
   /** Whether to show the warning */
@@ -53,23 +53,31 @@ export function usePageVisibility(
   onVisible?: () => void,
   onHidden?: () => void
 ): boolean {
-  const isVisibleRef = useRef(true);
+  const callbacksRef = useRef({ onVisible, onHidden });
+  const [isVisible, setIsVisible] = useState(() =>
+    typeof document !== 'undefined' ? document.visibilityState === 'visible' : true
+  );
+
+  // Keep callbacks ref updated
+  useEffect(() => {
+    callbacksRef.current = { onVisible, onHidden };
+  });
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      const isVisible = document.visibilityState === 'visible';
-      isVisibleRef.current = isVisible;
+      const visible = document.visibilityState === 'visible';
+      setIsVisible(visible);
 
-      if (isVisible) {
-        onVisible?.();
+      if (visible) {
+        callbacksRef.current.onVisible?.();
       } else {
-        onHidden?.();
+        callbacksRef.current.onHidden?.();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [onVisible, onHidden]);
+  }, []);
 
-  return isVisibleRef.current;
+  return isVisible;
 }

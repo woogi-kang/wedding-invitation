@@ -57,7 +57,6 @@ export function UploadModal({
     session,
     isSessionLoading,
     sessionError,
-    uploadState,
     queueState,
     createSession,
     addFiles,
@@ -98,12 +97,17 @@ export function UploadModal({
     }
   }, [isOpen, guestName, session, isSessionLoading, createSession]);
 
-  // Reset states when modal closes
+  // Reset states when modal closes - valid pattern for modal state reset
+  const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen && prevIsOpenRef.current) {
+      // Modal just closed - reset state
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsUploading(false);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUploadComplete(false);
     }
+    prevIsOpenRef.current = isOpen;
   }, [isOpen]);
 
   // Prevent body scroll when modal is open

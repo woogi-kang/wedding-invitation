@@ -40,12 +40,17 @@ export function GuestNameModal({
     }
   }, [isOpen]);
 
-  // Reset state when modal opens
+  // Reset state when modal opens - valid pattern for modal state reset
+  const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !prevIsOpenRef.current) {
+      // Modal just opened - reset state
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(initialName);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(null);
     }
+    prevIsOpenRef.current = isOpen;
   }, [isOpen, initialName]);
 
   // Prevent body scroll when modal is open

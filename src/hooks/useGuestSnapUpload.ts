@@ -53,7 +53,7 @@ export function useGuestSnapUpload(
   options: UseGuestSnapUploadOptions = {}
 ): UseGuestSnapUploadReturn {
   const { onUploadComplete, onUploadError, onAllComplete } = options;
-  const { limits, retry: retryConfig } = GUEST_SNAP_CONFIG;
+  const { retry: retryConfig } = GUEST_SNAP_CONFIG;
 
   // Session state
   const [session, setSession] = useState<GuestSnapSession | null>(null);
@@ -155,7 +155,7 @@ export function useGuestSnapUpload(
       });
 
       return true;
-    } catch (error) {
+    } catch {
       setSessionError('서버 연결에 실패했어요. 잠시 후 다시 시도해주세요.');
       return false;
     } finally {
