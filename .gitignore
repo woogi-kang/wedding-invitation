@@ -39,3 +39,135 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+ehthumbs.db
+.claude/skills/*/.env*
+*.egg
+# OS Files
+.nuxt/
+.claude/skills/*/secrets/
+*.pyo
+*.tmp
+.ruff_cache/
+.DocumentRevisions-V100
+.VolumeIcon.icns
+# Certificate files
+# MoAI-ADK Package Distribution .gitignore
+# Skill-specific credentials
+.directory
+# Virtual Environments
+*.sw?
+# Claude Code Configuration
+.env.*
+.claude/skills/*/*/*key*
+*-backup/
+.vercel/
+*.pyd
+*.sqlite3
+.cursor/
+# Backups
+api-key-*
+*.njsproj
+Thumbs.db
+.claude/.env.local*
+.claude/plans/
+.env/
+__pycache__/
+*.log
+# ===========================================
+*-key.*
+.Trashes
+# Mac
+.tscache/
+*.egg-info/
+*.dbm
+node_modules/
+coverage.json
+*-secret-key.*
+.next/
+.LSOverride
+.fseventsd
+*.sqlite
+# Node.js (for docs/Nextra)
+.claude/local/
+# Purpose: Essential patterns for user projects
+*.sublime-project
+# Logs & Temporary Files
+.claude/settings.local.*.json
+*.key.*
+*.sublime-workspace
+*-secret.*
+secret-key-*
+env/
+.uv_cache/
+*.backup
+!.env.example
+!.env.local.example
+# IDE & Editors
+# Version: 0.33.0
+.netlify/
+.coverage
+dist/
+*.temp
+# Deployment & CI/CD
+.firebase/
+*.swp
+dist-ssr/
+.env
+.aws/config
+.claude/settings.local.json
+*_key.*
+*_backup_*/
+out/
+.TemporaryItems
+# ============================================
+*.db
+htmlcov/
+# Cloud provider credentials
+*.rdb
+build/
+*.sln
+*.p12
+[Dd]esktop.ini
+venv/
+.moai-backups/
+*.swo
+*.backup/
+*_token=*
+# Private keys (specific patterns to avoid false positives)
+.claude/skills/*/*/*token*
+# Environment files
+.idea/
+.#*
+# FIXED: Issue #237 - Replaced overly broad *key* and *secret* patterns
+.pytest_cache/
+.Spotlight-V100
+.turbo/
+private-key*
+*.pyc
+# Secrets and Credentials (CRITICAL)
+*.suo
+# Build Tools & Frameworks
+.venv/
+# Updated: 2026-01-10
+# Windows
+*-api-key.*
+# Test Coverage
+.vscode/
+*.jks
+logs/
+.uv-cache/
+.aws/credentials
+# Python Cache & Bytecode
+*~
+# Build Artifacts & Distribution
+*.bak
+*_secret=*
+secret-*.*
+*_secret.*
+*.pfx
+# Credential patterns in environment files
+.mypy_cache/
+.claude/skills/*/*/*secret*
+.AppleDouble
+# Linux
+*.secret.*
