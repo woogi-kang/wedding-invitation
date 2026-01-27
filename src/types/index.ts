@@ -59,4 +59,19 @@ export interface SectionProps {
   id?: string;
 }
 
+// Guest Snap 타입 내보내기
+export type {
+  GuestSnapFileType,
+  GuestSnapFileStatus,
+  GuestSnapFile,
+  GuestSnapSession,
+  UploadQueueState,
+  UploadState,
+  GuestSnapModalState,
+  UploadResponse,
+  SessionResponse,
+  StatusResponse,
+  FileValidationResult,
+} from './guestsnap';
+
 export {};

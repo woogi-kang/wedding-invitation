@@ -8,6 +8,7 @@ import {
   Video,
   RSVP,
   Guestbook,
+  GuestSnap,
   Share,
   Footer,
 } from '@/components/sections';
@@ -57,6 +58,11 @@ export default function Home() {
 
       {/* Guestbook - 방명록 */}
       <Guestbook />
+
+      <Divider />
+
+      {/* GuestSnap - 게스트 사진 업로드 */}
+      <GuestSnap />
 
       <Divider />
 

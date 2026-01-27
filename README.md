@@ -19,6 +19,7 @@
 - **RSVP**: Google Forms 연동 참석 의사 확인
 - **방명록**: Giscus (GitHub Discussions) 기반
 - **모바일 저장**: 연락처 저장 (vCard), 일정 저장 (ICS)
+- **Guest Snap**: 하객 사진/영상 업로드 (Synology NAS 연동)
 
 ## Tech Stack
 
@@ -162,6 +163,33 @@ npx serve out
      formUrl: 'https://forms.gle/your-form-id',
    },
    ```
+
+### Guest Snap (하객 사진 업로드)
+
+하객들이 결혼식 사진/영상을 Synology NAS에 직접 업로드할 수 있는 기능입니다.
+
+1. Synology NAS에서 WebDAV 서비스 활성화
+2. 환경 변수 설정:
+   ```bash
+   SYNOLOGY_HOST=your-nas-ip-or-domain
+   SYNOLOGY_WEBDAV_PORT=5006
+   SYNOLOGY_USERNAME=webdav-user
+   SYNOLOGY_PASSWORD=webdav-password
+   SYNOLOGY_BASE_PATH=/wedding-photos
+   ```
+
+3. `src/lib/constants.ts`에서 Guest Snap 설정:
+   ```typescript
+   guestSnap: {
+     enabled: true,
+     maxFileSizeMB: 50,
+     maxUploadsPerGuest: 20,
+     allowedImageTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'],
+     allowedVideoTypes: ['video/mp4', 'video/quicktime', 'video/webm'],
+   },
+   ```
+
+자세한 설정 및 사용법은 [Guest Snap 문서](docs/GUEST-SNAP.md)를 참조하세요.
 
 ## Project Structure
 

@@ -7,5 +7,6 @@ export { Account } from './Account';
 export { Video } from './Video';
 export { RSVP } from './RSVP';
 export { Guestbook } from './Guestbook';
+export { GuestSnap } from './GuestSnap';
 export { Share } from './Share';
 export { Footer } from './Footer';
