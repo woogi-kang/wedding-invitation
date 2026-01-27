@@ -132,7 +132,7 @@ export function validateFileSize(
   size: number,
   fileType: GuestSnapFileType
 ): { valid: boolean; error?: string } {
-  const { limits, messages } = GUEST_SNAP_CONFIG;
+  const { limits } = GUEST_SNAP_CONFIG;
 
   if (size === 0) {
     return { valid: false, error: '파일이 비어있어요' };

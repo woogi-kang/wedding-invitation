@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
 
 // Mock BroadcastChannel for multi-tab tests
 class MockBroadcastChannel {
@@ -32,8 +32,7 @@ class MockBroadcastChannel {
   }
 }
 
-// @ts-expect-error - Mock for testing
-globalThis.BroadcastChannel = MockBroadcastChannel;
+globalThis.BroadcastChannel = MockBroadcastChannel as typeof BroadcastChannel;
 
 // Mock window object for browser-only code
 Object.defineProperty(globalThis, 'window', {
