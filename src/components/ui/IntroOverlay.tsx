@@ -1,11 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Vara from 'vara';
 
 // Floating petal types
 type PetalType = 'sakura' | 'rose' | 'heart';
+
+interface PetalData {
+  id: number;
+  delay: number;
+  duration: number;
+  left: string;
+  size: number;
+  type: PetalType;
+  rotation: number;
+  swayDuration: number;
+}
 
 interface PetalProps {
   delay: number;
@@ -68,6 +79,8 @@ function FloatingPetal({
         top: '-40px',
         animation: `petal-fall ${duration}s ease-in-out ${delay}s infinite`,
         opacity: 0,
+        willChange: 'transform, opacity',
+        contain: 'layout style',
       }}
     >
       {renderPetal()}
@@ -75,10 +88,40 @@ function FloatingPetal({
   );
 }
 
+// Mulberry32 PRNG for better randomness with deterministic seed
+function mulberry32(seed: number) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Generate petals data outside component to avoid hydration mismatch
+function generatePetals(): PetalData[] {
+  const types: PetalType[] = ['sakura', 'rose', 'heart'];
+  return Array.from({ length: 70 }, (_, i) => {
+    // Use mulberry32 PRNG with unique seed per petal for true random distribution
+    const rng = mulberry32(i * 12345 + 67890);
+
+    return {
+      id: i,
+      delay: rng() * 12, // 0-12초 범위로 확장
+      duration: 10 + rng() * 10, // 10-20초
+      left: `${rng() * 100}%`,
+      size: 14 + rng() * 18,
+      type: types[Math.floor(rng() * 3)],
+      rotation: rng() * 360,
+      swayDuration: 2 + rng() * 3,
+    };
+  });
+}
+
+const PETALS_DATA = generatePetals();
+
 export function IntroOverlay() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [varaComplete, setVaraComplete] = useState(false);
   const [showHeart, setShowHeart] = useState(false);
   const [showNames, setShowNames] = useState(false);
   const [showDate, setShowDate] = useState(false);
@@ -87,32 +130,21 @@ export function IntroOverlay() {
 
   const varaContainerRef = useRef<HTMLDivElement>(null);
   const varaInstanceRef = useRef<Vara | null>(null);
-
-  // Generate petals with variety (100 petals for rich effect)
-  const petals = useMemo(() => {
-    const types: PetalType[] = ['sakura', 'rose', 'heart'];
-    return Array.from({ length: 100 }, (_, i) => ({
-      id: i,
-      delay: Math.random() * 10,
-      duration: 10 + Math.random() * 10,
-      left: `${Math.random() * 100}%`,
-      size: 14 + Math.random() * 20,
-      type: types[Math.floor(Math.random() * 3)],
-      rotation: Math.random() * 360,
-      swayDuration: 2 + Math.random() * 3,
-    }));
-  }, []);
+  const isMountedRef = useRef(false);
 
   // Check sessionStorage on mount and manage body classes
   useEffect(() => {
-    setIsMounted(true);
+    isMountedRef.current = true;
     const hasSeenIntro = sessionStorage.getItem('wedding-intro-seen');
 
     // Remove pending class as we're now mounted
     document.body.classList.remove('intro-pending');
 
     if (!hasSeenIntro) {
-      setIsVisible(true);
+      // Use microtask to batch state updates
+      queueMicrotask(() => {
+        setIsVisible(true);
+      });
       document.body.style.overflow = 'hidden';
       // Add active class to keep main content hidden
       document.body.classList.add('intro-active');
@@ -148,7 +180,6 @@ export function IntroOverlay() {
         );
 
         varaInstanceRef.current.ready(() => {
-          setVaraComplete(true);
           // Sequence the other elements after Vara completes
           setTimeout(() => setShowHeart(true), 400);
           setTimeout(() => setShowNames(true), 1000);
@@ -158,7 +189,6 @@ export function IntroOverlay() {
       } catch (error) {
         console.error('Vara.js error:', error);
         // Fallback if Vara fails
-        setVaraComplete(true);
         setTimeout(() => setShowHeart(true), 400);
         setTimeout(() => setShowNames(true), 1000);
         setTimeout(() => setShowDate(true), 1600);
@@ -173,15 +203,28 @@ export function IntroOverlay() {
     setIsExiting(true);
     sessionStorage.setItem('wedding-intro-seen', 'true');
 
+    // Reset scroll position immediately and after transition
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     setTimeout(() => {
       setIsVisible(false);
       document.body.style.overflow = '';
       // Remove active class to show main content
       document.body.classList.remove('intro-active');
+
+      // Ensure scroll is at top after overlay is removed
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
     }, 800);
   }, []);
 
-  if (!isMounted || !isVisible) return null;
+  // Only render on client after mount check
+  if (!isVisible) return null;
 
   return (
     <AnimatePresence>
@@ -231,16 +274,11 @@ export function IntroOverlay() {
 
         {/* Floating petals */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {petals.map((petal) => (
+          {PETALS_DATA.map((petal) => (
             <FloatingPetal key={petal.id} {...petal} />
           ))}
         </div>
 
-        {/* Corner decorations */}
-        <CornerDecoration position="top-left" />
-        <CornerDecoration position="top-right" />
-        <CornerDecoration position="bottom-left" />
-        <CornerDecoration position="bottom-right" />
 
         {/* Main content */}
         <motion.div
@@ -379,30 +417,6 @@ export function IntroOverlay() {
         </motion.div>
       </motion.div>
     </AnimatePresence>
-  );
-}
-
-// Corner decoration component
-function CornerDecoration({
-  position,
-}: {
-  position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-}) {
-  const positionClasses = {
-    'top-left': 'top-6 left-6',
-    'top-right': 'top-6 right-6 -scale-x-100',
-    'bottom-left': 'bottom-6 left-6 -scale-y-100',
-    'bottom-right': 'bottom-6 right-6 scale-[-1]',
-  };
-
-  return (
-    <div className={`absolute w-16 h-16 sm:w-20 sm:h-20 ${positionClasses[position]}`}>
-      <svg viewBox="0 0 100 100" className="w-full h-full opacity-40">
-        <path d="M0 40 Q0 0 40 0" stroke="rgba(255, 255, 255, 0.8)" strokeWidth="1" fill="none" />
-        <circle cx="40" cy="0" r="2" fill="rgba(255, 255, 255, 0.8)" />
-        <path d="M0 60 Q0 20 20 10" stroke="rgba(248, 180, 180, 0.6)" strokeWidth="0.5" fill="none" opacity="0.5" />
-      </svg>
-    </div>
   );
 }
 

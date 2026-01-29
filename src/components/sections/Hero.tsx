@@ -12,11 +12,10 @@ export function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const { scrollY } = useScroll();
 
-  // Parallax effects
-  const leftImageY = useTransform(scrollY, [0, 500], [0, 100]);
-  const rightImageY = useTransform(scrollY, [0, 500], [0, 150]);
-  const textY = useTransform(scrollY, [0, 500], [0, -50]);
-  const opacity = useTransform(scrollY, [0, 400], [1, 0]);
+  // Simplified parallax - only for text overlay, not images
+  // Images stay fixed to prevent zoom/distortion effect
+  const textY = useTransform(scrollY, [0, 500], [0, -30]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -35,36 +34,36 @@ export function Hero() {
 
       {/* Split Screen Photo Reveal */}
       <div className="absolute inset-0 flex">
-        {/* Left Panel - Groom */}
+        {/* Left Panel - Groom - No parallax to prevent zoom effect */}
         <motion.div
           className="relative w-1/2 overflow-hidden"
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={isLoaded ? { clipPath: 'inset(0 0% 0 0)' } : {}}
           transition={{ duration: 1.5, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
-          style={{ y: leftImageY }}
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage: 'url(/images/hero/groom.jpg)',
+              willChange: 'auto',
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#FFFBF9]/80" />
           <div className="absolute inset-0 bg-[#C8A4A5]/10" />
         </motion.div>
 
-        {/* Right Panel - Bride */}
+        {/* Right Panel - Bride - No parallax to prevent zoom effect */}
         <motion.div
           className="relative w-1/2 overflow-hidden"
           initial={{ clipPath: 'inset(0 0 0 100%)' }}
           animate={isLoaded ? { clipPath: 'inset(0 0 0 0%)' } : {}}
           transition={{ duration: 1.5, delay: 0.5, ease: [0.76, 0, 0.24, 1] }}
-          style={{ y: rightImageY }}
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage: 'url(/images/hero/bride.jpg)',
+              willChange: 'auto',
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[#FFFBF9]/80" />

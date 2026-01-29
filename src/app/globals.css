@@ -50,7 +50,15 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Use smooth scroll only for anchor links, not JS scroll */
+  scroll-behavior: auto;
+}
+
+/* Enable smooth scroll only for anchor navigation */
+@media (prefers-reduced-motion: no-preference) {
+  html:focus-within {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -61,6 +69,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   letter-spacing: 0.01em;
+  /* Prevent scroll position issues */
+  scroll-behavior: auto;
 }
 
 /* Custom Scrollbar */
@@ -1039,4 +1049,62 @@ body.intro-pending .intro-overlay,
 body.intro-active .intro-overlay {
   visibility: visible;
   pointer-events: auto;
+}
+
+/* ===== Performance Optimizations ===== */
+
+/* GPU acceleration hints for animated elements */
+.intro-overlay {
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize petal animations */
+@keyframes petal-fall {
+  0% {
+    transform: translateY(0) translateZ(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh) translateZ(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Content visibility optimization for off-screen sections */
+.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay,
+  .intro-overlay * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Keep essential fade transition */
+  .intro-overlay {
+    transition: opacity 0.3s ease !important;
+  }
+}
+
+/* Optimize scroll performance */
+.main-content {
+  overflow-anchor: auto;
+}
+
+/* Force hardware acceleration for hero section images */
+.hero-image-panel {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
