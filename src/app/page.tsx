@@ -14,68 +14,121 @@ import {
   Footer,
 } from '@/components/sections';
 import { MusicPlayer } from '@/components/ui/MusicPlayer';
-import { Divider } from '@/components/common/Section';
+import { IntroOverlay } from '@/components/ui/IntroOverlay';
+import { StoryTransition } from '@/components/common/StoryTransition';
+import { AudioPreloader } from '@/components/ui/AudioPreloader';
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Hero - 메인 커버 */}
+      {/* Preload audio as early as possible */}
+      <AudioPreloader />
+
+      {/* Intro Overlay - appears on first visit */}
+      <IntroOverlay />
+
+      {/* Hero - Cinematic Split Screen */}
       <Hero />
 
-      {/* Greeting - 인사말 */}
+      {/* Greeting - Message from the couple */}
       <Greeting />
 
-      <Divider />
+      {/* Story Transition: After greeting, before memories */}
+      <StoryTransition
+        text="함께한 순간들"
+        subtitle="Our Precious Moments"
+        variant="brush"
+      />
 
-      {/* Gallery - 갤러리 */}
+      {/* Gallery - Polaroid Memory Collection */}
       <Gallery />
 
-      <Divider />
+      {/* Story Transition: The journey continues */}
+      <StoryTransition
+        text="그리고 우리는"
+        variant="vertical"
+      />
 
-      {/* Wedding Info - 예식 정보 + 캘린더 + D-Day */}
+      {/* Wedding Info - Date & Calendar */}
       <WeddingInfo />
 
-      <Divider />
+      {/* Story Transition: The special day */}
+      <StoryTransition
+        text="소중한 그 날"
+        subtitle="The Day"
+        variant="minimal"
+      />
 
-      {/* Location - 오시는 길 + 셔틀버스 */}
+      {/* Location - Venue & Directions */}
       <Location />
 
-      <Divider />
+      {/* Story Transition: Information */}
+      <StoryTransition
+        text="안내"
+        variant="minimal"
+      />
 
-      {/* Information - 예식정보 및 안내사항 */}
+      {/* Information - Wedding ceremony details */}
       <Information />
 
-      <Divider />
+      {/* Story Transition: Share your heart */}
+      <StoryTransition
+        text="마음을 전해주세요"
+        subtitle="With Love"
+        variant="poetic"
+      />
 
-      {/* Account - 계좌 정보 */}
+      {/* Account - Gift registry */}
       <Account />
 
-      <Divider />
+      {/* Story Transition: Our story */}
+      <StoryTransition
+        text="우리의 이야기"
+        variant="minimal"
+      />
 
-      {/* Video - 영상 */}
+      {/* Video - Wedding video */}
       <Video />
 
-      <Divider />
+      {/* Story Transition: Please join us */}
+      <StoryTransition
+        text="함께해 주세요"
+        subtitle="RSVP"
+        variant="brush"
+      />
 
-      {/* RSVP - 참석 의사 */}
+      {/* RSVP - Attendance confirmation */}
       <RSVP />
 
-      <Divider />
+      {/* Story Transition: Blessings */}
+      <StoryTransition
+        text="축복의 말씀"
+        subtitle="Your Blessings"
+        variant="poetic"
+      />
 
-      {/* Guestbook - 방명록 */}
+      {/* Guestbook - Messages from guests */}
       <Guestbook />
 
-      <Divider />
+      {/* Story Transition: Share moments */}
+      <StoryTransition
+        text="추억을 나눠주세요"
+        variant="minimal"
+      />
 
-      {/* GuestSnap - 게스트 사진 업로드 */}
+      {/* GuestSnap - Guest photo upload */}
       <GuestSnap />
 
-      <Divider />
+      {/* Story Transition: Share this invitation */}
+      <StoryTransition
+        text="공유하기"
+        variant="minimal"
+      />
 
-      {/* Share - 공유하기 */}
+      {/* Share - Social sharing */}
       <Share />
 
-      {/* Footer */}
+      {/* Footer - Final thank you */}
       <Footer />
 
       {/* Music Player - Fixed Button */}
