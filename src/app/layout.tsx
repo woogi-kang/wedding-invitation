@@ -54,6 +54,20 @@ export default function RootLayout({
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
         />
+        {/* Preload background music for faster playback */}
+        <link
+          rel="preload"
+          href="/music/bgm-quick.m4a"
+          as="audio"
+          type="audio/mp4"
+        />
+        {/* Korean Calligraphy Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Nanum+Pen+Script&family=Gowun+Batang:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="font-sans antialiased">
         {children}

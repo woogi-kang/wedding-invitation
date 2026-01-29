@@ -125,15 +125,15 @@ export const WEDDING_INFO = {
 따뜻한 축복을 보내주시기 바랍니다.`,
   },
 
-  // 갤러리 이미지 (실제 웨딩 사진으로 교체 필요)
+  // 갤러리 이미지
   gallery: {
     images: [
-      { src: 'https://picsum.photos/seed/wedding1/600/800', alt: '웨딩 사진 1' },
-      { src: 'https://picsum.photos/seed/wedding2/600/800', alt: '웨딩 사진 2' },
-      { src: 'https://picsum.photos/seed/wedding3/600/800', alt: '웨딩 사진 3' },
-      { src: 'https://picsum.photos/seed/wedding4/600/800', alt: '웨딩 사진 4' },
-      { src: 'https://picsum.photos/seed/wedding5/600/800', alt: '웨딩 사진 5' },
-      { src: 'https://picsum.photos/seed/wedding6/600/800', alt: '웨딩 사진 6' },
+      { src: '/images/gallery/photo1.jpg', alt: '웨딩 사진 1' },
+      { src: '/images/gallery/photo2.jpg', alt: '웨딩 사진 2' },
+      { src: '/images/gallery/photo3.jpg', alt: '웨딩 사진 3' },
+      { src: '/images/gallery/photo4.jpg', alt: '웨딩 사진 4' },
+      { src: '/images/gallery/photo5.jpg', alt: '웨딩 사진 5' },
+      { src: '/images/gallery/photo6.jpg', alt: '웨딩 사진 6' },
     ],
   },
 
@@ -144,12 +144,12 @@ export const WEDDING_INFO = {
     title: '우리의 이야기',
   },
 
-  // 배경음악 (실제 음악 파일 추가 후 enabled: true로 변경)
+  // 배경음악
   music: {
-    enabled: false,
-    src: '/music/bgm.mp3',
-    title: 'Beautiful in White',
-    artist: 'Shane Filan',
+    enabled: true,
+    src: '/music/dancing_in_the_moonlight.mp3',
+    title: 'Dancing in the Moonlight',
+    artist: 'Toploader',
   },
 
   // RSVP Google Forms URL
@@ -291,16 +291,22 @@ export const GUEST_SNAP_CONFIG = {
   },
 };
 
-// 디자인 테마
+// 디자인 테마 - Soft Romantic
 export const THEME = {
   colors: {
-    primary: '#8B7355', // 따뜻한 브라운
-    secondary: '#F5F0EB', // 아이보리
-    accent: '#C9A961', // 골드
-    text: '#2C3E50', // 다크 네이비
-    textLight: '#7F8C8D', // 그레이
-    background: '#FFFCF9', // 웜 화이트
+    primary: '#C8A4A5', // Dusty Rose
+    primaryLight: '#DBBFC0',
+    primaryDark: '#B08A8B',
+    secondary: '#FDF8F6', // Blush Cream
+    accent: '#D4C4A8', // Soft Gold
+    accentLight: '#E5DACA',
+    text: '#4A4245', // Warm Charcoal
+    textLight: '#7D7578', // Muted Mauve
+    textMuted: '#A9A3A5',
+    background: '#FFFBF9', // Warm White
     white: '#FFFFFF',
+    rose: '#E8B4B8', // Soft Pink
+    roseLight: '#FADCDE',
   },
   fonts: {
     title: 'var(--font-serif)',
