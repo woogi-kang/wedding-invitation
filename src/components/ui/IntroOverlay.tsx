@@ -166,15 +166,15 @@ export function IntroOverlay() {
           [
             {
               text: "We're getting married",
-              fontSize: 36,
-              strokeWidth: 1.2,
+              fontSize: 64,
+              strokeWidth: 1.8,
               color: '#FFFFFF',
-              duration: 2500,
+              duration: 3000,
               textAlign: 'center',
             },
           ],
           {
-            strokeWidth: 1.2,
+            strokeWidth: 1.5,
             color: '#FFFFFF',
           }
         );
@@ -298,11 +298,11 @@ export function IntroOverlay() {
             }}
           />
 
-          {/* Vara.js handwriting container */}
+          {/* Vara.js handwriting container - emphasized "We're getting married" */}
           <div
             id="vara-container"
             ref={varaContainerRef}
-            className="vara-container mb-8 min-h-[60px] flex items-center justify-center"
+            className="vara-container mb-10 min-h-[100px] flex items-center justify-center"
             style={{ width: '100%' }}
           />
 
@@ -343,7 +343,7 @@ export function IntroOverlay() {
               <span
                 className="mx-3 sm:mx-5"
                 style={{
-                  fontFamily: 'var(--font-calligraphy)',
+                  fontFamily: 'var(--font-heading)',
                   color: '#F8B4B4',
                   fontSize: '1.1em',
                 }}

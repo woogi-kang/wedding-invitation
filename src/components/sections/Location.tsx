@@ -1,26 +1,27 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import Image from 'next/image';
-import { Car, Bus, Train, MapPin, Clock, Map } from 'lucide-react';
+import { Car, Bus, Train, MapPin } from 'lucide-react';
 import { NaverMapIcon, KakaoMapIcon, TmapIcon } from '@/components/icons/NavigationIcons';
-import { Section, SectionTitle, HorizontalDivider } from '@/components/common/Section';
-import { Button } from '@/components/ui/Button';
+import { Section } from '@/components/common/Section';
 import { WEDDING_INFO } from '@/lib/constants';
 
 export function Location() {
   const { venue, shuttle } = WEDDING_INFO;
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   const openNaverMap = () => {
-    window.open(venue.navigation?.naver || 'https://map.naver.com/p/search/라마다%20서울%20신도림%20호텔', '_blank');
+    window.open(venue.navigation?.naver || 'https://map.naver.com', '_blank');
   };
 
   const openKakaoMap = () => {
-    window.open(venue.navigation?.kakao || 'https://map.kakao.com/link/search/라마다서울신도림호텔', '_blank');
+    window.open(venue.navigation?.kakao || 'https://map.kakao.com', '_blank');
   };
 
   const openTmap = () => {
-    // 모바일에서는 앱으로, 웹에서는 티맵 웹으로 연결
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (isMobile) {
       window.location.href = `tmap://route?goalname=${encodeURIComponent(venue.name)}&goalx=${venue.coordinates.lng}&goaly=${venue.coordinates.lat}`;
@@ -29,45 +30,49 @@ export function Location() {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as const },
-    },
-  };
-
   return (
     <Section id="location" background="secondary">
-      <SectionTitle title="오시는 길" subtitle="장소 안내" />
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-50px' }}
-      >
-        {/* 네이버 지도 프리뷰 - 클릭하면 네이버 지도로 이동 */}
+      <div ref={sectionRef} className="max-w-lg mx-auto">
+        {/* Section Title */}
         <motion.div
-          variants={itemVariants}
-          className="mb-6 min-[375px]:mb-8 overflow-hidden rounded-lg shadow-lg cursor-pointer"
-          onClick={openNaverMap}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="mb-10 text-center"
         >
-          <div className="relative aspect-[4/3] bg-[var(--color-botanical-light)]">
+          <p
+            className="mb-4 text-xs tracking-[0.3em] uppercase"
+            style={{
+              fontFamily: 'var(--font-accent)',
+              color: 'var(--color-text-muted)',
+              fontStyle: 'italic',
+            }}
+          >
+            Location
+          </p>
+          <h2
+            className="text-2xl min-[375px]:text-3xl"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text)',
+            }}
+          >
+            오시는 길
+          </h2>
+        </motion.div>
+
+        {/* Map Preview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="mb-6 overflow-hidden rounded-sm cursor-pointer"
+          onClick={openNaverMap}
+        >
+          <div className="relative aspect-[4/3] bg-[var(--color-border-light)]">
             <Image
               src="/images/map-preview.png"
-              alt="네이버 지도 - 라마다 서울 신도림 호텔"
+              alt="지도"
               fill
               className="object-cover"
               priority
@@ -75,165 +80,247 @@ export function Location() {
           </div>
         </motion.div>
 
-        {/* Venue Address */}
+        {/* Venue Info */}
         <motion.div
-          variants={itemVariants}
-          className="mb-5 min-[375px]:mb-6 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-6 text-center"
         >
-          <div className="mb-2 min-[375px]:mb-3 inline-flex items-center gap-1.5 min-[375px]:gap-2">
-            <MapPin className="h-3.5 w-3.5 min-[375px]:h-4 min-[375px]:w-4 text-[var(--color-primary)]" />
-            <span className="font-serif text-base min-[375px]:text-lg font-medium text-[var(--color-text)]">{venue.name}</span>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+            <span
+              className="text-base"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                color: 'var(--color-text)',
+              }}
+            >
+              {venue.name}
+            </span>
           </div>
-          <p className="text-xs min-[375px]:text-sm text-[var(--color-text)]">{venue.roadAddress}</p>
-          <p className="text-[10px] min-[375px]:text-xs text-[var(--color-text-muted)]">({venue.address})</p>
-        </motion.div>
-
-        {/* 약도 이미지 보기 버튼 */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-4 min-[375px]:mb-5 flex justify-center"
-        >
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => window.open('/images/map.png', '_blank')}
-            className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-full border border-[var(--color-border)] bg-white px-4 min-[375px]:px-5 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[var(--color-primary)] hover:shadow-md"
+          <p
+            className="text-sm"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text-light)',
+            }}
           >
-            <Map className="h-3.5 w-3.5 min-[375px]:h-4 min-[375px]:w-4 text-[var(--color-primary)]" />
-            약도 이미지 보기
-          </motion.button>
-        </motion.div>
-
-        {/* 네비게이션 버튼 */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-6 min-[375px]:mb-8"
-        >
-          <p className="mb-3 text-center text-xs text-[var(--color-text-muted)]">
-            원하시는 앱을 선택하시면 길안내가 시작됩니다.
+            {venue.roadAddress}
           </p>
-          <div className="flex flex-wrap justify-center gap-2 min-[375px]:gap-3">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={openNaverMap}
-              className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[#03C75A] hover:shadow-md"
-            >
-              <NaverMapIcon className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5" />
-              네이버지도
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={openTmap}
-              className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[#EF4123] hover:shadow-md"
-            >
-              <TmapIcon className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5" />
-              티맵
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={openKakaoMap}
-              className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[#FEE500] hover:shadow-md"
-            >
-              <KakaoMapIcon className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5" />
-              카카오내비
-            </motion.button>
-          </div>
         </motion.div>
 
-        <HorizontalDivider />
+        {/* Navigation Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mb-10 flex justify-center gap-6"
+        >
+          <button
+            onClick={openNaverMap}
+            className="flex flex-col items-center gap-2 transition-opacity hover:opacity-70"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-[var(--color-border)]">
+              <NaverMapIcon className="h-6 w-6" />
+            </div>
+            <span
+              className="text-xs"
+              style={{ color: 'var(--color-text-light)' }}
+            >
+              네이버
+            </span>
+          </button>
+          <button
+            onClick={openKakaoMap}
+            className="flex flex-col items-center gap-2 transition-opacity hover:opacity-70"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-[var(--color-border)]">
+              <KakaoMapIcon className="h-6 w-6" />
+            </div>
+            <span
+              className="text-xs"
+              style={{ color: 'var(--color-text-light)' }}
+            >
+              카카오
+            </span>
+          </button>
+          <button
+            onClick={openTmap}
+            className="flex flex-col items-center gap-2 transition-opacity hover:opacity-70"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-[var(--color-border)]">
+              <TmapIcon className="h-6 w-6" />
+            </div>
+            <span
+              className="text-xs"
+              style={{ color: 'var(--color-text-light)' }}
+            >
+              티맵
+            </span>
+          </button>
+        </motion.div>
+
+        {/* Divider */}
+        <div
+          className="mx-auto mb-10 h-px w-16"
+          style={{ backgroundColor: 'var(--color-border)' }}
+        />
 
         {/* Transportation Info */}
-        <motion.div variants={itemVariants} className="space-y-3 min-[375px]:space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="space-y-4"
+        >
           {/* Subway */}
-          <div className="group rounded-lg border border-[var(--color-border-light)] bg-white p-4 min-[375px]:p-5 transition-all hover:border-[var(--color-botanical)] hover:shadow-md">
-            <div className="mb-2 min-[375px]:mb-3 flex items-center gap-2 min-[375px]:gap-3">
-              <div className="flex h-8 w-8 min-[375px]:h-10 min-[375px]:w-10 items-center justify-center rounded-full bg-[var(--color-botanical-light)]">
-                <Train className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-primary)]" />
-              </div>
-              <span className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">지하철</span>
+          <div className="flex gap-4 p-4 bg-white rounded-sm border border-[var(--color-border-light)]">
+            <div
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: 'var(--color-botanical-light)' }}
+            >
+              <Train className="h-5 w-5" style={{ color: 'var(--color-botanical)' }} />
             </div>
-            <p className="text-xs min-[375px]:text-sm leading-relaxed text-[var(--color-text-light)]">{venue.subway}</p>
+            <div>
+              <p
+                className="text-sm font-medium mb-1"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: 'var(--color-text)',
+                }}
+              >
+                지하철
+              </p>
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: 'var(--color-text-light)' }}
+              >
+                {venue.subway}
+              </p>
+            </div>
           </div>
 
           {/* Bus */}
-          <div className="group rounded-lg border border-[var(--color-border-light)] bg-white p-4 min-[375px]:p-5 transition-all hover:border-[var(--color-botanical)] hover:shadow-md">
-            <div className="mb-2 min-[375px]:mb-3 flex items-center gap-2 min-[375px]:gap-3">
-              <div className="flex h-8 w-8 min-[375px]:h-10 min-[375px]:w-10 items-center justify-center rounded-full bg-[var(--color-botanical-light)]">
-                <Bus className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-primary)]" />
-              </div>
-              <span className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">버스</span>
+          <div className="flex gap-4 p-4 bg-white rounded-sm border border-[var(--color-border-light)]">
+            <div
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: 'var(--color-botanical-light)' }}
+            >
+              <Bus className="h-5 w-5" style={{ color: 'var(--color-botanical)' }} />
             </div>
-            <p className="text-xs min-[375px]:text-sm leading-relaxed text-[var(--color-text-light)]">{venue.bus}</p>
+            <div>
+              <p
+                className="text-sm font-medium mb-1"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: 'var(--color-text)',
+                }}
+              >
+                버스
+              </p>
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: 'var(--color-text-light)' }}
+              >
+                {venue.bus}
+              </p>
+            </div>
           </div>
 
           {/* Parking */}
-          <div className="group rounded-lg border border-[var(--color-border-light)] bg-white p-4 min-[375px]:p-5 transition-all hover:border-[var(--color-botanical)] hover:shadow-md">
-            <div className="mb-2 min-[375px]:mb-3 flex items-center gap-2 min-[375px]:gap-3">
-              <div className="flex h-8 w-8 min-[375px]:h-10 min-[375px]:w-10 items-center justify-center rounded-full bg-[var(--color-botanical-light)]">
-                <Car className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-primary)]" />
-              </div>
-              <span className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">주차</span>
+          <div className="flex gap-4 p-4 bg-white rounded-sm border border-[var(--color-border-light)]">
+            <div
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: 'var(--color-botanical-light)' }}
+            >
+              <Car className="h-5 w-5" style={{ color: 'var(--color-botanical)' }} />
             </div>
-            <p className="text-xs min-[375px]:text-sm leading-relaxed text-[var(--color-text-light)]">{venue.parking}</p>
+            <div>
+              <p
+                className="text-sm font-medium mb-1"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: 'var(--color-text)',
+                }}
+              >
+                주차
+              </p>
+              <p
+                className="text-sm leading-relaxed whitespace-pre-line"
+                style={{ color: 'var(--color-text-light)' }}
+              >
+                {venue.parking}
+              </p>
+            </div>
           </div>
         </motion.div>
 
-        {/* Shuttle Bus Info */}
+        {/* Shuttle Info */}
         {shuttle.available && (
-          <>
-            <HorizontalDivider className="my-8 min-[375px]:my-10" />
-
-            <motion.div variants={itemVariants}>
-              <h3 className="mb-5 min-[375px]:mb-6 text-center font-serif text-lg min-[375px]:text-xl font-medium text-[var(--color-primary)]">
-                셔틀버스 안내
-              </h3>
-
-              <div className="space-y-3 min-[375px]:space-y-4">
-                {shuttle.routes.map((route, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="relative overflow-hidden rounded-lg border border-[var(--color-border-light)] bg-white p-4 min-[375px]:p-5"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mt-8"
+          >
+            <h3
+              className="mb-4 text-center text-lg"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                color: 'var(--color-text)',
+              }}
+            >
+              셔틀버스 안내
+            </h3>
+            <div className="space-y-3">
+              {shuttle.routes.map((route, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-white rounded-sm border-l-2"
+                  style={{ borderColor: 'var(--color-gold)' }}
+                >
+                  <p
+                    className="text-sm font-medium mb-2"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      color: 'var(--color-text)',
+                    }}
                   >
-                    {/* Accent bar */}
-                    <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent-light)]" />
-
-                    <div className="mb-2 min-[375px]:mb-3 flex items-center gap-2 min-[375px]:gap-3">
-                      <Bus className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-accent)]" />
-                      <span className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">{route.name}</span>
-                    </div>
-
-                    <div className="mb-2 min-[375px]:mb-3 flex items-start gap-1.5 min-[375px]:gap-2 text-xs min-[375px]:text-sm text-[var(--color-text)]">
-                      <MapPin className="mt-0.5 h-3.5 w-3.5 min-[375px]:h-4 min-[375px]:w-4 flex-shrink-0 text-[var(--color-text-muted)]" />
-                      <span>{route.departure}</span>
-                    </div>
-
-                    <div className="mb-2 min-[375px]:mb-3 flex flex-wrap gap-1.5 min-[375px]:gap-2">
-                      {route.times.map((time, i) => (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-1 min-[375px]:gap-1.5 rounded-full bg-[var(--color-secondary)] px-2.5 min-[375px]:px-3 py-1 min-[375px]:py-1.5 text-[10px] min-[375px]:text-xs font-medium text-[var(--color-text)]"
-                        >
-                          <Clock className="h-2.5 w-2.5 min-[375px]:h-3 min-[375px]:w-3 text-[var(--color-accent)]" />
-                          {time}
-                        </span>
-                      ))}
-                    </div>
-
-                    <p className="text-[10px] min-[375px]:text-xs text-[var(--color-text-muted)]">{route.duration}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </>
+                    {route.name}
+                  </p>
+                  <p
+                    className="text-sm mb-2"
+                    style={{ color: 'var(--color-text-light)' }}
+                  >
+                    {route.departure}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {route.times.map((time, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 text-xs rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-secondary)',
+                          color: 'var(--color-text)',
+                        }}
+                      >
+                        {time}
+                      </span>
+                    ))}
+                  </div>
+                  <p
+                    className="mt-2 text-xs"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
+                    {route.duration}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         )}
-      </motion.div>
+      </div>
     </Section>
   );
 }

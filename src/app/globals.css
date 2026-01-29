@@ -1,32 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* Soft Romantic Color Palette */
-  --color-primary: #C8A4A5; /* Dusty Rose */
-  --color-primary-light: #DBBFC0;
-  --color-primary-dark: #B08A8B;
-  --color-secondary: #FDF8F6; /* Blush Cream */
-  --color-accent: #D4C4A8; /* Soft Gold */
-  --color-accent-light: #E5DACA;
-  --color-text: #4A4245; /* Warm Charcoal */
-  --color-text-light: #7D7578; /* Muted Mauve */
-  --color-text-muted: #A9A3A5;
-  --color-background: #FFFBF9; /* Warm White */
+  /* Letter-Style Elegant Color Palette */
+  --color-primary: #6b5933; /* Warm Brown */
+  --color-primary-light: #8a7854;
+  --color-primary-dark: #4d3f24;
+  --color-secondary: #faf8f5; /* Light Cream */
+  --color-accent: #43573a; /* Forest Green */
+  --color-accent-light: #5a6f50;
+  --color-text: #3d3d3d; /* Dark Charcoal */
+  --color-text-light: #6b6b6b;
+  --color-text-muted: #999999;
+  --color-background: #f5f3ed; /* Ivory Cream */
   --color-white: #FFFFFF;
-  --color-border: #EBE4E1;
-  --color-border-light: #F5F0ED;
+  --color-border: #e5e0d8;
+  --color-border-light: #f0ebe4;
 
-  /* Romantic Accents */
-  --color-botanical: #C8A4A5; /* Dusty Rose */
-  --color-botanical-light: #F2E4E4;
-  --color-rose: #E8B4B8; /* Soft Pink */
-  --color-rose-light: #FADCDE;
+  /* Couple Colors */
+  --color-groom: #5f8b9b; /* Soft Blue */
+  --color-groom-light: #8fb3c0;
+  --color-bride: #BB7273; /* Dusty Rose */
+  --color-bride-light: #d49a9b;
 
-  /* Fonts */
-  --font-serif: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-calligraphy: 'Nanum Brush Script', 'Nanum Pen Script', cursive;
-  --font-elegant: 'Gowun Batang', 'Nanum Myeongjo', serif;
+  /* Accent Colors */
+  --color-botanical: #43573a; /* Forest Green */
+  --color-botanical-light: #e8ede6;
+  --color-rose: #BB7273;
+  --color-rose-light: #f5e8e8;
+  --color-gold: #b7a989; /* Soft Gold for decorations */
+  --color-wax: #832b33; /* Wax seal color */
+
+  /* Fonts - Classic Korean Elegance */
+  --font-heading: 'Nanum Myeongjo', 'Gowun Batang', serif;
+  --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-accent: 'Cormorant Garamond', 'Nanum Myeongjo', Georgia, serif;
+  --font-caption: 'Nanum Myeongjo', 'Gowun Batang', serif;
+
+  /* Legacy aliases (for compatibility) */
+  --font-serif: var(--font-heading);
+  --font-sans: var(--font-body);
+  --font-elegant: var(--font-heading);
 }
 
 @theme inline {
@@ -41,6 +54,10 @@
   --color-botanical-light: var(--color-botanical-light);
   --color-rose: var(--color-rose);
   --color-rose-light: var(--color-rose-light);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-accent: var(--font-accent);
+  --font-caption: var(--font-caption);
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
 }
@@ -131,11 +148,11 @@ body {
 
 /* Section Title */
 .section-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 0.08em;
-  color: var(--color-primary);
+  color: var(--color-text);
   text-align: center;
   margin-bottom: 0.5rem;
 }
@@ -165,14 +182,15 @@ body {
 }
 
 .section-subtitle {
-  font-family: var(--font-serif);
+  font-family: var(--font-accent);
   font-size: 0.6875rem;
   font-weight: 300;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
   color: var(--color-text-muted);
   text-align: center;
   margin-bottom: 2rem;
   text-transform: uppercase;
+  font-style: italic;
 }
 
 @media (min-width: 375px) {
@@ -546,15 +564,46 @@ body {
 
 /* Text Styles */
 .text-elegant {
-  font-family: var(--font-serif);
+  font-family: var(--font-heading);
   font-weight: 400;
   letter-spacing: 0.05em;
 }
 
-.text-body {
-  font-family: var(--font-sans);
+.text-heading {
+  font-family: var(--font-heading);
   font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+
+.text-accent {
+  font-family: var(--font-accent);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  font-style: italic;
+}
+
+.text-caption {
+  font-family: var(--font-caption);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+}
+
+.text-body {
+  font-family: var(--font-body);
+  font-weight: 300;
   letter-spacing: 0.01em;
+  line-height: 1.9;
+}
+
+.text-body-light {
+  font-family: var(--font-body);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 2;
+  color: var(--color-text-light);
 }
 
 /* Loading Spinner */
@@ -921,9 +970,11 @@ input:focus, textarea:focus, select:focus {
   transform: scaleX(1);
 }
 
-/* Calligraphy text enhancement */
+/* Calligraphy text enhancement - now uses elegant serif */
 .calligraphy-text {
-  font-family: var(--font-calligraphy);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: 0.06em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

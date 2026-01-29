@@ -51,7 +51,7 @@ export function StoryTransition({
             transition={{ duration: 0.8, delay: 0.5 }}
             className="relative px-6 py-8 text-2xl tracking-[0.5em] leading-loose"
             style={{
-              fontFamily: 'var(--font-calligraphy)',
+              fontFamily: 'var(--font-heading)',
               color: 'var(--color-primary-dark)',
               writingMode: 'vertical-rl',
             }}
@@ -103,7 +103,7 @@ export function StoryTransition({
             transition={{ duration: 0.8, delay: 0.3 }}
             className="relative text-xl min-[375px]:text-2xl leading-relaxed whitespace-pre-line"
             style={{
-              fontFamily: 'var(--font-calligraphy)',
+              fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
             }}
           >
@@ -188,20 +188,19 @@ export function StoryTransition({
       transition={{ duration: 0.8 }}
       className="relative py-16 overflow-hidden"
     >
-      {/* Ink splatter background */}
+      {/* Soft floral glow background */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 0.04 }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 0.25 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <svg width="300" height="100" viewBox="0 0 300 100">
-            <ellipse cx="150" cy="50" rx="140" ry="40" fill="var(--color-primary)" />
-            <ellipse cx="50" cy="60" rx="30" ry="15" fill="var(--color-primary)" />
-            <ellipse cx="250" cy="55" rx="25" ry="12" fill="var(--color-primary)" />
-          </svg>
-        </motion.div>
+          className="w-64 h-24 rounded-full"
+          style={{
+            background: 'radial-gradient(ellipse at center, var(--color-rose-light) 0%, transparent 70%)',
+            filter: 'blur(30px)',
+          }}
+        />
       </div>
 
       {/* Main content */}
@@ -226,7 +225,7 @@ export function StoryTransition({
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-2xl min-[375px]:text-3xl leading-relaxed"
           style={{
-            fontFamily: 'var(--font-calligraphy)',
+            fontFamily: 'var(--font-heading)',
             color: 'var(--color-text)',
           }}
         >

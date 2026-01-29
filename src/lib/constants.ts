@@ -291,25 +291,27 @@ export const GUEST_SNAP_CONFIG = {
   },
 };
 
-// 디자인 테마 - Soft Romantic
+// 디자인 테마 - Letter Style Elegant
 export const THEME = {
   colors: {
-    primary: '#C8A4A5', // Dusty Rose
-    primaryLight: '#DBBFC0',
-    primaryDark: '#B08A8B',
-    secondary: '#FDF8F6', // Blush Cream
-    accent: '#D4C4A8', // Soft Gold
-    accentLight: '#E5DACA',
-    text: '#4A4245', // Warm Charcoal
-    textLight: '#7D7578', // Muted Mauve
-    textMuted: '#A9A3A5',
-    background: '#FFFBF9', // Warm White
+    primary: '#6b5933', // Warm Brown
+    primaryLight: '#8a7854',
+    primaryDark: '#4d3f24',
+    secondary: '#faf8f5', // Light Cream
+    accent: '#43573a', // Forest Green
+    accentLight: '#5a6f50',
+    text: '#3d3d3d', // Dark Charcoal
+    textLight: '#6b6b6b',
+    textMuted: '#999999',
+    background: '#f5f3ed', // Ivory Cream
     white: '#FFFFFF',
-    rose: '#E8B4B8', // Soft Pink
-    roseLight: '#FADCDE',
+    groom: '#5f8b9b', // Soft Blue
+    bride: '#BB7273', // Dusty Rose
+    gold: '#b7a989', // Soft Gold
+    wax: '#832b33', // Wax Seal
   },
   fonts: {
-    title: 'var(--font-serif)',
-    body: 'var(--font-sans)',
+    title: 'var(--font-heading)',
+    body: 'var(--font-body)',
   },
 };
