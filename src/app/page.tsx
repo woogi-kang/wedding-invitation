@@ -4,6 +4,7 @@ import {
   Gallery,
   WeddingInfo,
   Location,
+  Information,
   Account,
   Video,
   RSVP,
@@ -38,6 +39,11 @@ export default function Home() {
 
       {/* Location - 오시는 길 + 셔틀버스 */}
       <Location />
+
+      <Divider />
+
+      {/* Information - 예식정보 및 안내사항 */}
+      <Information />
 
       <Divider />
 

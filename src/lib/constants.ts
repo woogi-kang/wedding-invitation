@@ -6,25 +6,25 @@ export const WEDDING_INFO = {
   groom: {
     name: '강태욱',
     englishName: 'Taewook',
-    father: '김철수',
-    mother: '박영희',
+    father: '강승호',
+    mother: '이지순',
     fatherDeceased: false,
     motherDeceased: false,
-    phone: '010-1234-5678',
+    phone: '010-1234-5678', // TODO: 실제 연락처로 변경
     account: {
-      bank: '신한은행',
-      number: '110-123-456789',
+      bank: '카카오뱅크',
+      number: '3333-01-4259-709',
       holder: '강태욱',
     },
     fatherAccount: {
-      bank: '국민은행',
-      number: '123-456-789012',
-      holder: '김철수',
+      bank: '토스뱅크',
+      number: '1001-2370-2666',
+      holder: '강승호',
     },
     motherAccount: {
-      bank: '우리은행',
-      number: '1002-123-456789',
-      holder: '박영희',
+      bank: '농협',
+      number: '302-1189-5494-11',
+      holder: '이지순',
     },
   },
 
@@ -32,53 +32,62 @@ export const WEDDING_INFO = {
   bride: {
     name: '김선경',
     englishName: 'Sunkyung',
-    father: '이영수',
-    mother: '최미경',
+    father: '김종태',
+    mother: '신현임',
     fatherDeceased: false,
     motherDeceased: false,
-    phone: '010-9876-5432',
+    phone: '010-9876-5432', // TODO: 실제 연락처로 변경
     account: {
-      bank: '카카오뱅크',
-      number: '3333-12-3456789',
+      bank: '', // TODO: 계좌 정보 입력
+      number: '',
       holder: '김선경',
     },
     fatherAccount: {
-      bank: '하나은행',
-      number: '123-456789-12345',
-      holder: '이영수',
+      bank: '', // TODO: 계좌 정보 입력
+      number: '',
+      holder: '김종태',
     },
     motherAccount: {
-      bank: '농협',
-      number: '123-4567-8901-23',
-      holder: '최미경',
+      bank: '', // TODO: 계좌 정보 입력
+      number: '',
+      holder: '신현임',
     },
   },
 
   // 결혼식 날짜/시간
-  date: '2026-04-05T14:15:00+09:00',
+  date: '2026-04-05T14:10:00+09:00',
   dateDisplay: {
     year: 2026,
     month: 4,
     day: 5,
     dayOfWeek: '일요일',
-    time: '오후 2시 15분',
-    timeDetail: '14:15',
+    time: '오후 2시 10분',
+    timeDetail: '14:10',
   },
 
   // 예식장 정보
   venue: {
     name: '라마다 서울 신도림 호텔',
-    hall: '웨딩홀',
-    address: '서울특별시 구로구 경인로 624',
-    roadAddress: '서울특별시 구로구 경인로 624',
-    tel: '02-2162-2100',
+    hall: '14층 하늘정원(SKY GARDEN)',
+    address: '서울 구로구 경인로 624',
+    roadAddress: '서울 구로구 경인로 624',
+    tel: '02-2162-2000',
     coordinates: {
       lat: 37.5064,
       lng: 126.8853,
     },
-    parking: '건물 내 주차장 800대 이용 가능',
-    subway: '지하철 1호선, 2호선 신도림역 1번 출구 도보 5분',
-    bus: '간선: 160, 503, 600, 662 / 지선: 6513, 6515, 6516',
+    // 네비게이션 링크
+    navigation: {
+      naver: 'https://map.naver.com/p/search/%EB%9D%BC%EB%A7%88%EB%8B%A4%20%EC%84%9C%EC%9A%B8%20%EC%8B%A0%EB%8F%84%EB%A6%BC%20%ED%98%B8%ED%85%94',
+      kakao: 'https://map.kakao.com/link/to/라마다서울신도림호텔,37.5064,126.8853',
+      tmap: 'https://apis.openapi.sk.com/tmap/app/routes?appKey=&name=라마다서울신도림호텔&lon=126.8853&lat=37.5064',
+    },
+    // 네이버 지도 정적 이미지 (썸네일)
+    mapImage: `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=600&h=400&center=126.8853,37.5064&level=16&markers=type:d|size:mid|pos:126.8853%2037.5064|color:red`,
+    parking:
+      '호텔 지하주차장 (B1~B7) 1시간 30분 무료\n주말 웨딩 시 주차 혼잡이 예상되오니 대중교통 이용을 권장드립니다',
+    subway: '1호선, 2호선 신도림역 1번 출구 (셔틀버스 운행)',
+    bus: '간선: 160, 503, 600, 660, 662 / 지선: 6515, 6516, 6637, 6640A, 6640B, 6713 / 직행: 5200, 301, 320',
   },
 
   // 셔틀버스 정보
@@ -86,25 +95,34 @@ export const WEDDING_INFO = {
     available: true,
     routes: [
       {
-        name: '신도림역 출발',
+        name: '신도림역 셔틀',
         departure: '신도림역 1번 출구 앞',
-        times: ['13:00', '13:30', '14:00'],
+        times: ['13:30', '14:00', '14:30'],
         duration: '약 5분 소요',
       },
     ],
   },
 
+  // 예식 정보 및 안내사항
+  information: {
+    meal: {
+      title: '식사 안내',
+      description:
+        '연회장은 예식 시작 30분 전 부터\n이용하실 수 있습니다. (오후 1시 40분~4시)\n식사는 뷔페로 준비되어 있습니다.',
+    },
+  },
+
   // 인사말
   greeting: {
-    title: '결혼합니다',
-    message: `서로 다른 두 사람이 만나
-하나의 사랑을 이루게 되었습니다.
+    title: '소중한 분들을 초대합니다',
+    message: `있는 그대로를 사랑하고
+서로의 존재를 감사하며
+변함없이 서로를 아끼며 살겠습니다.
 
-소중한 분들을 모시고
-사랑의 약속을 하려 합니다.
-
-부디 오셔서 축복해 주시면
-더없는 기쁨으로 간직하겠습니다.`,
+저희의 새로운 시작을
+소중한 분들과 함께 나누고자 하오니
+귀한 걸음으로
+따뜻한 축복을 보내주시기 바랍니다.`,
   },
 
   // 갤러리 이미지 (실제 웨딩 사진으로 교체 필요)

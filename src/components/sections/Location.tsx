@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Car, Bus, Train, MapPin, Navigation, Clock } from 'lucide-react';
+import { Car, Bus, Train, MapPin, Clock, Map } from 'lucide-react';
+import { NaverMapIcon, KakaoMapIcon, TmapIcon } from '@/components/icons/NavigationIcons';
 import { Section, SectionTitle, HorizontalDivider } from '@/components/common/Section';
 import { Button } from '@/components/ui/Button';
 import { WEDDING_INFO } from '@/lib/constants';
@@ -11,11 +12,21 @@ export function Location() {
   const { venue, shuttle } = WEDDING_INFO;
 
   const openNaverMap = () => {
-    window.open('https://naver.me/G9r5RXWh', '_blank');
+    window.open(venue.navigation?.naver || 'https://map.naver.com/p/search/라마다%20서울%20신도림%20호텔', '_blank');
   };
 
   const openKakaoMap = () => {
-    window.open('https://place.map.kakao.com/1212235250', '_blank');
+    window.open(venue.navigation?.kakao || 'https://map.kakao.com/link/search/라마다서울신도림호텔', '_blank');
+  };
+
+  const openTmap = () => {
+    // 모바일에서는 앱으로, 웹에서는 티맵 웹으로 연결
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = `tmap://route?goalname=${encodeURIComponent(venue.name)}&goalx=${venue.coordinates.lng}&goaly=${venue.coordinates.lat}`;
+    } else {
+      window.open('https://www.tmap.co.kr/', '_blank');
+    }
   };
 
   const containerVariants = {
@@ -45,21 +56,22 @@ export function Location() {
         whileInView="visible"
         viewport={{ once: true, margin: '-50px' }}
       >
-        {/* Map Image */}
+        {/* 네이버 지도 프리뷰 - 클릭하면 네이버 지도로 이동 */}
         <motion.div
           variants={itemVariants}
-          className="mb-6 min-[375px]:mb-8 overflow-hidden rounded-lg shadow-lg"
+          className="mb-6 min-[375px]:mb-8 overflow-hidden rounded-lg shadow-lg cursor-pointer"
+          onClick={openNaverMap}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
         >
           <div className="relative aspect-[4/3] bg-[var(--color-botanical-light)]">
             <Image
-              src="/images/map.png"
-              alt="Wedding venue map"
+              src="/images/map-preview.png"
+              alt="네이버 지도 - 라마다 서울 신도림 호텔"
               fill
               className="object-cover"
               priority
             />
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
         </motion.div>
 
@@ -76,29 +88,59 @@ export function Location() {
           <p className="text-[10px] min-[375px]:text-xs text-[var(--color-text-muted)]">({venue.address})</p>
         </motion.div>
 
-        {/* Map Buttons */}
+        {/* 약도 이미지 보기 버튼 */}
         <motion.div
           variants={itemVariants}
-          className="mb-6 min-[375px]:mb-8 flex justify-center gap-2 min-[375px]:gap-3"
+          className="mb-4 min-[375px]:mb-5 flex justify-center"
         >
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={openNaverMap}
-            className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-4 min-[375px]:px-5 py-2.5 min-[375px]:py-3 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[var(--color-primary)] hover:shadow-md"
+            onClick={() => window.open('/images/map.png', '_blank')}
+            className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-full border border-[var(--color-border)] bg-white px-4 min-[375px]:px-5 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[var(--color-primary)] hover:shadow-md"
           >
-            <Navigation className="h-3.5 w-3.5 min-[375px]:h-4 min-[375px]:w-4 text-[#03C75A]" />
-            네이버지도
+            <Map className="h-3.5 w-3.5 min-[375px]:h-4 min-[375px]:w-4 text-[var(--color-primary)]" />
+            약도 이미지 보기
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={openKakaoMap}
-            className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-4 min-[375px]:px-5 py-2.5 min-[375px]:py-3 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[var(--color-primary)] hover:shadow-md"
-          >
-            <Navigation className="h-3.5 w-3.5 min-[375px]:h-4 min-[375px]:w-4 text-[#FEE500]" />
-            카카오맵
-          </motion.button>
+        </motion.div>
+
+        {/* 네비게이션 버튼 */}
+        <motion.div
+          variants={itemVariants}
+          className="mb-6 min-[375px]:mb-8"
+        >
+          <p className="mb-3 text-center text-xs text-[var(--color-text-muted)]">
+            원하시는 앱을 선택하시면 길안내가 시작됩니다.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 min-[375px]:gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={openNaverMap}
+              className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[#03C75A] hover:shadow-md"
+            >
+              <NaverMapIcon className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5" />
+              네이버지도
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={openTmap}
+              className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[#EF4123] hover:shadow-md"
+            >
+              <TmapIcon className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5" />
+              티맵
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={openKakaoMap}
+              className="flex items-center gap-1.5 min-[375px]:gap-2 rounded-md border border-[var(--color-border)] bg-white px-3 min-[375px]:px-4 py-2 min-[375px]:py-2.5 text-xs min-[375px]:text-sm font-medium text-[var(--color-text)] shadow-sm transition-all hover:border-[#FEE500] hover:shadow-md"
+            >
+              <KakaoMapIcon className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5" />
+              카카오내비
+            </motion.button>
+          </div>
         </motion.div>
 
         <HorizontalDivider />
