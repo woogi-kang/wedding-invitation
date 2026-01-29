@@ -31,25 +31,25 @@ export const WEDDING_INFO = {
   // 신부 정보
   bride: {
     name: '김선경',
-    englishName: 'Sunkyung',
+    englishName: 'Seongyeong',
     father: '김종태',
     mother: '신현임',
     fatherDeceased: false,
     motherDeceased: false,
     phone: '010-9876-5432', // TODO: 실제 연락처로 변경
     account: {
-      bank: '', // TODO: 계좌 정보 입력
-      number: '',
+      bank: '국민은행',
+      number: '758002-01-165933',
       holder: '김선경',
     },
     fatherAccount: {
-      bank: '', // TODO: 계좌 정보 입력
-      number: '',
+      bank: '농협',
+      number: '517062-52-003975',
       holder: '김종태',
     },
     motherAccount: {
-      bank: '', // TODO: 계좌 정보 입력
-      number: '',
+      bank: '농협',
+      number: '351-0136-1933-03',
       holder: '신현임',
     },
   },
@@ -84,10 +84,10 @@ export const WEDDING_INFO = {
     },
     // 네이버 지도 정적 이미지 (썸네일)
     mapImage: `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=600&h=400&center=126.8853,37.5064&level=16&markers=type:d|size:mid|pos:126.8853%2037.5064|color:red`,
-    parking:
-      '호텔 지하주차장 (B1~B7) 1시간 30분 무료\n주말 웨딩 시 주차 혼잡이 예상되오니 대중교통 이용을 권장드립니다',
-    subway: '1호선, 2호선 신도림역 1번 출구 (셔틀버스 운행)',
-    bus: '간선: 160, 503, 600, 660, 662 / 지선: 6515, 6516, 6637, 6640A, 6640B, 6713 / 직행: 5200, 301, 320',
+    parking: '호텔 지하주차장 (B1~B7)\n1시간 30분 무료',
+    parkingNotice: '주말 웨딩 시 주차 혼잡이 예상되오니\n대중교통 이용을 권장드립니다',
+    subway: '1호선, 2호선 신도림역 1번 출구\n(셔틀버스 운행)',
+    bus: '간선: 160, 503, 600, 660, 662\n지선: 6515, 6516, 6637, 6640A, 6640B, 6713\n직행: 5200, 301, 320',
   },
 
   // 셔틀버스 정보
@@ -97,7 +97,9 @@ export const WEDDING_INFO = {
       {
         name: '신도림역 셔틀',
         departure: '신도림역 1번 출구 앞',
-        times: ['13:30', '14:00', '14:30'],
+        timeStart: '13:00',
+        timeEnd: '14:00',
+        interval: '5분',
         duration: '약 5분 소요',
       },
     ],
@@ -210,10 +212,14 @@ export const WEDDING_INFO = {
   guestbook: {
     enabled: true,
     // Giscus 설정 - https://giscus.app 에서 생성
-    repo: 'your-username/your-repo',
-    repoId: 'your-repo-id',
-    category: 'Announcements',
-    categoryId: 'your-category-id',
+    repo: 'woogi-kang/wedding-invitation',
+    repoId: 'R_kgDOQ3ukEA',
+    mapping: 'number',
+    term: '1',
+    reactionsEnabled: true,
+    inputPosition: 'bottom',
+    theme: 'light',
+    lang: 'ko',
   },
 };
 

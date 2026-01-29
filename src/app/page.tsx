@@ -5,7 +5,6 @@ import {
   Interview,
   Video,
   Gallery,
-  Timeline,
   WeddingInfo,
   Location,
   Account,
@@ -18,10 +17,14 @@ import {
 import { MusicPlayer } from '@/components/ui/MusicPlayer';
 import { IntroOverlay } from '@/components/ui/IntroOverlay';
 import { AudioPreloader } from '@/components/ui/AudioPreloader';
+import { MouseTrail } from '@/components/ui/MouseTrail';
 
 export default function Home() {
   return (
     <>
+      {/* Mouse Trail - petal effect following cursor */}
+      <MouseTrail />
+
       {/* Intro Overlay - appears on first visit */}
       <IntroOverlay />
 
@@ -41,14 +44,11 @@ export default function Home() {
         {/* 4. Interview - 웨딩 인터뷰 Q&A */}
         <Interview />
 
-        {/* 5. Video - 영상 */}
-        <Video />
-
-        {/* 6. Gallery - 갤러리 */}
+        {/* 5. Gallery - 갤러리 */}
         <Gallery />
 
-        {/* 6. Timeline - 우리의 시간 */}
-        <Timeline />
+        {/* 6. Video - 영상 */}
+        <Video />
 
         {/* 7. WeddingInfo - 예식 안내 + 캘린더 */}
         <WeddingInfo />

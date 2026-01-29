@@ -5,7 +5,7 @@ interface IconProps extends SVGProps<SVGSVGElement> {
   className?: string;
 }
 
-// 네이버지도 아이콘
+// 네이버지도 아이콘 (공식 스타일 기반)
 export function NaverMapIcon({ className, ...props }: IconProps) {
   return (
     <svg
@@ -15,31 +15,16 @@ export function NaverMapIcon({ className, ...props }: IconProps) {
       className={className}
       {...props}
     >
-      <rect width="24" height="24" rx="4" fill="#03C75A" />
+      <rect width="24" height="24" rx="6" fill="#03C75A" />
       <path
-        d="M14.5 7.5L9.5 12L14.5 16.5"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        transform="rotate(180 12 12)"
-      />
-      <text
-        x="12"
-        y="15"
-        textAnchor="middle"
+        d="M13.87 12.37L10.2 7H7.5V17H10.13V11.63L13.8 17H16.5V7H13.87V12.37Z"
         fill="white"
-        fontSize="8"
-        fontWeight="bold"
-        fontFamily="Arial"
-      >
-        N
-      </text>
+      />
     </svg>
   );
 }
 
-// 카카오맵 아이콘
+// 카카오맵 아이콘 (카카오 말풍선 + 핀 스타일)
 export function KakaoMapIcon({ className, ...props }: IconProps) {
   return (
     <svg
@@ -49,16 +34,23 @@ export function KakaoMapIcon({ className, ...props }: IconProps) {
       className={className}
       {...props}
     >
-      <rect width="24" height="24" rx="4" fill="#FEE500" />
+      <rect width="24" height="24" rx="6" fill="#FEE500" />
       <path
-        d="M12 5C8.13 5 5 7.52 5 10.6C5 12.54 6.3 14.24 8.27 15.2L7.5 18.5C7.45 18.7 7.68 18.87 7.85 18.75L11.5 16.1C11.66 16.11 11.83 16.12 12 16.12C15.87 16.12 19 13.6 19 10.52C19 7.52 15.87 5 12 5Z"
-        fill="#3C1E1E"
+        d="M12 4.5C8.41 4.5 5.5 6.81 5.5 9.62C5.5 11.42 6.73 12.99 8.56 13.88L7.84 16.73C7.79 16.92 8.01 17.08 8.17 16.97L11.56 14.68C11.7 14.69 11.85 14.7 12 14.7C15.59 14.7 18.5 12.39 18.5 9.58C18.5 6.81 15.59 4.5 12 4.5Z"
+        fill="#391B1B"
+      />
+      <circle cx="12" cy="9.5" r="1.2" fill="#FEE500" />
+      <path
+        d="M12 11.5L12 13"
+        stroke="#FEE500"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
     </svg>
   );
 }
 
-// 티맵 아이콘
+// 티맵 아이콘 (그라데이션 T 스타일)
 export function TmapIcon({ className, ...props }: IconProps) {
   return (
     <svg
@@ -68,11 +60,18 @@ export function TmapIcon({ className, ...props }: IconProps) {
       className={className}
       {...props}
     >
-      <rect width="24" height="24" rx="4" fill="#EF4123" />
+      <defs>
+        <linearGradient id="tmapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3A5FCD" />
+          <stop offset="50%" stopColor="#6B5CE7" />
+          <stop offset="100%" stopColor="#E74C8B" />
+        </linearGradient>
+      </defs>
+      <rect width="24" height="24" rx="6" fill="url(#tmapGradient)" />
       <path
-        d="M6 8H18M12 8V17"
+        d="M7 8.5H17M12 8.5V17"
         stroke="white"
-        strokeWidth="2.5"
+        strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

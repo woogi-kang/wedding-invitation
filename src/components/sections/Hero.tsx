@@ -68,14 +68,14 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Center Gradient Blend */}
+      {/* Center Gradient Blend - Semi-transparent */}
       <motion.div
-        className="absolute left-1/2 top-0 bottom-0 w-32 -translate-x-1/2 pointer-events-none"
+        className="absolute left-1/2 top-0 bottom-0 w-24 -translate-x-1/2 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={isLoaded ? { opacity: 1 } : {}}
         transition={{ duration: 2, delay: 1 }}
         style={{
-          background: 'linear-gradient(to right, transparent, var(--color-background) 40%, var(--color-background) 60%, transparent)',
+          background: 'linear-gradient(to right, transparent, rgba(245, 243, 237, 0.5) 35%, rgba(245, 243, 237, 0.6) 50%, rgba(245, 243, 237, 0.5) 65%, transparent)',
         }}
       />
 
