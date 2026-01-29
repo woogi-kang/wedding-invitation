@@ -20,12 +20,13 @@ import { AudioPreloader } from '@/components/ui/AudioPreloader';
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      {/* Preload audio as early as possible */}
-      <AudioPreloader />
-
-      {/* Intro Overlay - appears on first visit */}
+    <>
+      {/* Intro Overlay - appears on first visit, outside main for visibility control */}
       <IntroOverlay />
+
+      <main className="min-h-screen main-content">
+        {/* Preload audio as early as possible */}
+        <AudioPreloader />
 
       {/* Hero - Cinematic Split Screen */}
       <Hero />
@@ -131,8 +132,9 @@ export default function Home() {
       {/* Footer - Final thank you */}
       <Footer />
 
-      {/* Music Player - Fixed Button */}
-      <MusicPlayer />
-    </main>
+        {/* Music Player - Fixed Button */}
+        <MusicPlayer />
+      </main>
+    </>
   );
 }

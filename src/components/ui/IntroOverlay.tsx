@@ -103,14 +103,21 @@ export function IntroOverlay() {
     }));
   }, []);
 
-  // Check sessionStorage on mount
+  // Check sessionStorage on mount and manage body classes
   useEffect(() => {
     setIsMounted(true);
     const hasSeenIntro = sessionStorage.getItem('wedding-intro-seen');
+
+    // Remove pending class as we're now mounted
+    document.body.classList.remove('intro-pending');
+
     if (!hasSeenIntro) {
       setIsVisible(true);
       document.body.style.overflow = 'hidden';
+      // Add active class to keep main content hidden
+      document.body.classList.add('intro-active');
     }
+    // If already seen, main content will be visible (no intro-pending or intro-active)
   }, []);
 
   // Initialize Vara.js for handwriting animation
@@ -169,6 +176,8 @@ export function IntroOverlay() {
     setTimeout(() => {
       setIsVisible(false);
       document.body.style.overflow = '';
+      // Remove active class to show main content
+      document.body.classList.remove('intro-active');
     }, 800);
   }, []);
 
@@ -181,7 +190,7 @@ export function IntroOverlay() {
         exit={{ opacity: 0 }}
         animate={isExiting ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+        className="intro-overlay fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
       >
         {/* Background image with dim overlay */}
         <div

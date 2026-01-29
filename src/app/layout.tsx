@@ -69,7 +69,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased intro-pending">
         {children}
         <Toaster
           position="bottom-center"

@@ -1025,3 +1025,18 @@ a:focus-visible {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(200, 164, 165, 0.2);
 }
+
+/* ===== Intro Overlay Content Visibility ===== */
+/* Hide main content while intro is pending or active */
+body.intro-pending .main-content,
+body.intro-active .main-content {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Ensure intro overlay is always visible */
+body.intro-pending .intro-overlay,
+body.intro-active .intro-overlay {
+  visibility: visible;
+  pointer-events: auto;
+}
