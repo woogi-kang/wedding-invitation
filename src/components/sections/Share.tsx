@@ -108,20 +108,19 @@ export function Share() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="mb-10 text-center"
+          className="mb-12 text-center"
         >
           <p
-            className="mb-4 text-xs tracking-[0.3em] uppercase"
+            className="text-[11px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
-              color: 'var(--color-text-muted)',
-              fontStyle: 'italic',
+              color: 'var(--color-primary)',
             }}
           >
             Share
           </p>
           <h2
-            className="text-2xl min-[375px]:text-3xl"
+            className="text-2xl mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -129,6 +128,11 @@ export function Share() {
           >
             공유하기
           </h2>
+          <div className="flex items-center justify-center gap-3">
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+          </div>
         </motion.div>
 
         {/* Calendar Save */}

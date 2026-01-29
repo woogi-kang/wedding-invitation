@@ -1,12 +1,14 @@
 import {
   Hero,
   Greeting,
+  CoupleIntro,
+  Interview,
+  Video,
   Gallery,
+  Timeline,
   WeddingInfo,
   Location,
-  Information,
   Account,
-  Video,
   RSVP,
   Guestbook,
   GuestSnap,
@@ -15,124 +17,64 @@ import {
 } from '@/components/sections';
 import { MusicPlayer } from '@/components/ui/MusicPlayer';
 import { IntroOverlay } from '@/components/ui/IntroOverlay';
-import { StoryTransition } from '@/components/common/StoryTransition';
 import { AudioPreloader } from '@/components/ui/AudioPreloader';
 
 export default function Home() {
   return (
     <>
-      {/* Intro Overlay - appears on first visit, outside main for visibility control */}
+      {/* Intro Overlay - appears on first visit */}
       <IntroOverlay />
 
       <main className="min-h-screen main-content">
-        {/* Preload audio as early as possible */}
+        {/* Preload audio */}
         <AudioPreloader />
 
-      {/* Hero - Cinematic Split Screen */}
-      <Hero />
+        {/* 1. Hero - 메인 비주얼 */}
+        <Hero />
 
-      {/* Greeting - Message from the couple */}
-      <Greeting />
+        {/* 2. Greeting - 인사말 */}
+        <Greeting />
 
-      {/* Story Transition: After greeting, before memories */}
-      <StoryTransition
-        text="함께한 순간들"
-        subtitle="Our Precious Moments"
-        variant="brush"
-      />
+        {/* 3. CoupleIntro - 신랑신부 소개 */}
+        <CoupleIntro />
 
-      {/* Gallery - Polaroid Memory Collection */}
-      <Gallery />
+        {/* 4. Interview - 웨딩 인터뷰 Q&A */}
+        <Interview />
 
-      {/* Story Transition: The journey continues */}
-      <StoryTransition
-        text="그리고 우리는"
-        variant="vertical"
-      />
+        {/* 5. Video - 영상 */}
+        <Video />
 
-      {/* Wedding Info - Date & Calendar */}
-      <WeddingInfo />
+        {/* 6. Gallery - 갤러리 */}
+        <Gallery />
 
-      {/* Story Transition: The special day */}
-      <StoryTransition
-        text="소중한 그 날"
-        subtitle="The Day"
-        variant="minimal"
-      />
+        {/* 6. Timeline - 우리의 시간 */}
+        <Timeline />
 
-      {/* Location - Venue & Directions */}
-      <Location />
+        {/* 7. WeddingInfo - 예식 안내 + 캘린더 */}
+        <WeddingInfo />
 
-      {/* Story Transition: Information */}
-      <StoryTransition
-        text="안내"
-        variant="minimal"
-      />
+        {/* 8. Location - 오시는 길 */}
+        <Location />
 
-      {/* Information - Wedding ceremony details */}
-      <Information />
+        {/* 9. Account - 마음 전하실 곳 */}
+        <Account />
 
-      {/* Story Transition: Share your heart */}
-      <StoryTransition
-        text="마음을 전해주세요"
-        subtitle="With Love"
-        variant="poetic"
-      />
+        {/* 10. RSVP - 참석 여부 */}
+        <RSVP />
 
-      {/* Account - Gift registry */}
-      <Account />
+        {/* 11. Guestbook - 방명록 */}
+        <Guestbook />
 
-      {/* Story Transition: Our story */}
-      <StoryTransition
-        text="우리의 이야기"
-        variant="minimal"
-      />
+        {/* 12. GuestSnap - 게스트 사진 업로드 */}
+        <GuestSnap />
 
-      {/* Video - Wedding video */}
-      <Video />
+        {/* 13. Share - 공유하기 */}
+        <Share />
 
-      {/* Story Transition: Please join us */}
-      <StoryTransition
-        text="함께해 주세요"
-        subtitle="RSVP"
-        variant="brush"
-      />
+        {/* 13. Footer */}
+        <Footer />
 
-      {/* RSVP - Attendance confirmation */}
-      <RSVP />
-
-      {/* Story Transition: Blessings */}
-      <StoryTransition
-        text="축복의 말씀"
-        subtitle="Your Blessings"
-        variant="poetic"
-      />
-
-      {/* Guestbook - Messages from guests */}
-      <Guestbook />
-
-      {/* Story Transition: Share moments */}
-      <StoryTransition
-        text="추억을 나눠주세요"
-        variant="minimal"
-      />
-
-      {/* GuestSnap - Guest photo upload */}
-      <GuestSnap />
-
-      {/* Story Transition: Share this invitation */}
-      <StoryTransition
-        text="공유하기"
-        variant="minimal"
-      />
-
-      {/* Share - Social sharing */}
-      <Share />
-
-      {/* Footer - Final thank you */}
-      <Footer />
-
-        {/* Music Player - Fixed Button */}
+        {/* Music Player */}
         <MusicPlayer />
       </main>
     </>

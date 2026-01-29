@@ -1,87 +1,118 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Play, Film } from 'lucide-react';
-import { Section, SectionTitle } from '@/components/common/Section';
+import { useState, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Play } from 'lucide-react';
+import { Section } from '@/components/common/Section';
 import { WEDDING_INFO } from '@/lib/constants';
 
 export function Video() {
   const { video } = WEDDING_INFO;
   const [isPlaying, setIsPlaying] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   if (!video.enabled) return null;
 
   return (
-    <Section id="video" background="secondary">
-      <SectionTitle title="우리의 이야기" subtitle="영상" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative overflow-hidden rounded-lg shadow-lg"
-      >
-        {!isPlaying ? (
-          // Thumbnail
-          <div
-            className="group relative aspect-video cursor-pointer"
-            onClick={() => setIsPlaying(true)}
+    <Section id="video" background="white">
+      <div ref={sectionRef} className="max-w-lg mx-auto">
+        {/* Section Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-10"
+        >
+          <p
+            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            style={{
+              fontFamily: 'var(--font-accent)',
+              color: 'var(--color-primary)',
+            }}
           >
-            <img
-              src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-              alt={video.title}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            Our Film
+          </p>
+          <h2
+            className="text-2xl mb-3"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text)',
+            }}
+          >
+            {video.title}
+          </h2>
+          <div className="flex items-center justify-center gap-3">
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+            <div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: 'var(--color-primary)' }}
             />
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary-dark)]/60 via-transparent to-[var(--color-primary-dark)]/30" />
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+          </div>
+        </motion.div>
 
-            {/* Play Button */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative"
-              >
-                {/* Pulse animation */}
+        {/* Video Player */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative overflow-hidden rounded-lg"
+          style={{
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          {!isPlaying ? (
+            // Thumbnail
+            <div
+              className="group relative aspect-video cursor-pointer"
+              onClick={() => setIsPlaying(true)}
+            >
+              <img
+                src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                alt={video.title}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/30" />
+
+              {/* Play Button */}
+              <div className="absolute inset-0 flex items-center justify-center">
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 rounded-full bg-white"
-                />
-                <div className="relative flex h-14 w-14 min-[375px]:h-16 min-[375px]:w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-white/95 shadow-xl backdrop-blur-sm">
-                  <Play className="ml-0.5 h-5 w-5 min-[375px]:h-6 min-[375px]:w-6 sm:h-8 sm:w-8 text-[var(--color-primary)]" fill="currentColor" />
-                </div>
-              </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mt-4 min-[375px]:mt-5 sm:mt-6 font-serif text-xs min-[375px]:text-sm tracking-wider text-white/90"
-              >
-                {video.title}
-              </motion.p>
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative"
+                >
+                  {/* Pulse animation */}
+                  <motion.div
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 rounded-full"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  />
+                  <div
+                    className="relative flex h-16 w-16 items-center justify-center rounded-full shadow-lg"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  >
+                    <Play className="ml-1 h-6 w-6 text-white" fill="currentColor" />
+                  </div>
+                </motion.div>
+              </div>
             </div>
-
-            {/* Film icon decoration */}
-            <div className="absolute bottom-4 right-4">
-              <Film className="h-5 w-5 text-white/40" />
+          ) : (
+            // YouTube Player
+            <div className="aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
+                title={video.title}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
-          </div>
-        ) : (
-          // YouTube Player
-          <div className="aspect-video">
-            <iframe
-              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
-              title={video.title}
-              className="h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        )}
-      </motion.div>
+          )}
+        </motion.div>
+      </div>
     </Section>
   );
 }

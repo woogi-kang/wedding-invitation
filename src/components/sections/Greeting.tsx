@@ -1,59 +1,75 @@
 'use client';
 
 import { useRef } from 'react';
-import { Phone, MessageCircle } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { Section } from '@/components/common/Section';
 import { WEDDING_INFO } from '@/lib/constants';
-import { callPhone, sendSms } from '@/lib/utils';
 
 export function Greeting() {
-  const { groom, bride, greeting } = WEDDING_INFO;
+  const { greeting } = WEDDING_INFO;
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   return (
     <Section id="greeting" background="white">
-      <div ref={sectionRef} className="max-w-lg mx-auto">
+      <div ref={sectionRef} className="max-w-md mx-auto text-center">
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-12 text-center"
+          transition={{ duration: 0.8 }}
+          className="mb-10"
         >
           <p
-            className="mb-4 text-xs tracking-[0.3em] uppercase"
+            className="text-[11px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
-              color: 'var(--color-text-muted)',
-              fontStyle: 'italic',
+              color: 'var(--color-primary)',
             }}
           >
             Invitation
           </p>
-          <h2
-            className="text-2xl min-[375px]:text-3xl"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text)',
-            }}
+          <div className="flex items-center justify-center gap-3">
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+            <div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+            />
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+          </div>
+        </motion.div>
+
+        {/* Decorative Quote */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={isInView ? { opacity: 1, scale: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.15 }}
+          className="mb-10"
+        >
+          <svg
+            className="w-8 h-8 mx-auto mb-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            style={{ color: 'var(--color-gold)' }}
           >
-            {greeting.title}
-          </h2>
+            <path
+              d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"
+              fill="currentColor"
+            />
+          </svg>
         </motion.div>
 
         {/* Greeting Message */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-12 text-center"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mb-10"
         >
           <p
-            className="whitespace-pre-line text-sm min-[375px]:text-base leading-[2.2]"
+            className="whitespace-pre-line text-[15px] leading-[2.4] tracking-wide"
             style={{
-              fontFamily: 'var(--font-heading)',
+              fontFamily: 'var(--font-body)',
               color: 'var(--color-text)',
             }}
           >
@@ -61,151 +77,38 @@ export function Greeting() {
           </p>
         </motion.div>
 
-        {/* Decorative Divider */}
+        {/* Decorative Element */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex items-center justify-center gap-4 mb-12"
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="flex justify-center"
         >
-          <div
-            className="h-px w-12"
-            style={{ backgroundColor: 'var(--color-border)' }}
-          />
-          <div
-            className="w-2 h-2 rotate-45"
-            style={{ backgroundColor: 'var(--color-gold)' }}
-          />
-          <div
-            className="h-px w-12"
-            style={{ backgroundColor: 'var(--color-border)' }}
-          />
-        </motion.div>
-
-        {/* Parents Names */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-12 text-center space-y-4"
-        >
-          {/* Groom's Family */}
-          <div
-            className="text-sm"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text)',
-            }}
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            style={{ color: 'var(--color-primary)' }}
           >
-            <span style={{ color: 'var(--color-text-light)' }}>
-              {groom.fatherDeceased ? '故 ' : ''}{groom.father} · {groom.motherDeceased ? '故 ' : ''}{groom.mother}
-            </span>
-            <span className="mx-2" style={{ color: 'var(--color-text-muted)' }}>의 아들</span>
-            <span style={{ color: 'var(--color-groom)', fontWeight: 500 }}>{groom.name}</span>
-          </div>
-
-          {/* Bride's Family */}
-          <div
-            className="text-sm"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text)',
-            }}
-          >
-            <span style={{ color: 'var(--color-text-light)' }}>
-              {bride.fatherDeceased ? '故 ' : ''}{bride.father} · {bride.motherDeceased ? '故 ' : ''}{bride.mother}
-            </span>
-            <span className="mx-2" style={{ color: 'var(--color-text-muted)' }}>의 딸</span>
-            <span style={{ color: 'var(--color-bride)', fontWeight: 500 }}>{bride.name}</span>
-          </div>
-        </motion.div>
-
-        {/* Contact Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="flex justify-center gap-4"
-        >
-          {/* Groom Contact */}
-          <div className="text-center">
-            <p
-              className="mb-3 text-xs tracking-wider"
-              style={{
-                fontFamily: 'var(--font-accent)',
-                color: 'var(--color-text-muted)',
-              }}
-            >
-              신랑에게 연락하기
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => callPhone(groom.phone)}
-                className="flex items-center justify-center w-10 h-10 rounded-full border transition-all hover:scale-105"
-                style={{
-                  borderColor: 'var(--color-groom)',
-                  color: 'var(--color-groom)',
-                }}
-                aria-label="신랑에게 전화하기"
-              >
-                <Phone className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => sendSms(groom.phone)}
-                className="flex items-center justify-center w-10 h-10 rounded-full border transition-all hover:scale-105"
-                style={{
-                  borderColor: 'var(--color-groom)',
-                  color: 'var(--color-groom)',
-                }}
-                aria-label="신랑에게 문자하기"
-              >
-                <MessageCircle className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div
-            className="w-px h-16 self-center"
-            style={{ backgroundColor: 'var(--color-border)' }}
-          />
-
-          {/* Bride Contact */}
-          <div className="text-center">
-            <p
-              className="mb-3 text-xs tracking-wider"
-              style={{
-                fontFamily: 'var(--font-accent)',
-                color: 'var(--color-text-muted)',
-              }}
-            >
-              신부에게 연락하기
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => callPhone(bride.phone)}
-                className="flex items-center justify-center w-10 h-10 rounded-full border transition-all hover:scale-105"
-                style={{
-                  borderColor: 'var(--color-bride)',
-                  color: 'var(--color-bride)',
-                }}
-                aria-label="신부에게 전화하기"
-              >
-                <Phone className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => sendSms(bride.phone)}
-                className="flex items-center justify-center w-10 h-10 rounded-full border transition-all hover:scale-105"
-                style={{
-                  borderColor: 'var(--color-bride)',
-                  color: 'var(--color-bride)',
-                }}
-                aria-label="신부에게 문자하기"
-              >
-                <MessageCircle className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+            <path
+              d="M12 3C12 3 5 8 5 13C5 17 8.5 20 12 20C15.5 20 19 17 19 13C19 8 12 3 12 3Z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="none"
+            />
+            <path
+              d="M12 7V16"
+              stroke="currentColor"
+              strokeWidth="1"
+            />
+            <path
+              d="M9 10L12 7L15 10"
+              stroke="currentColor"
+              strokeWidth="1"
+              fill="none"
+            />
+          </svg>
         </motion.div>
       </div>
     </Section>

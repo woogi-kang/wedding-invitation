@@ -127,8 +127,31 @@ export function SectionTitle({
       transition={{ duration: 0.5, delay: delay / 1000 }}
       className={cn('mb-12 text-center', className)}
     >
-      <h2 className="section-title">{title}</h2>
-      {subtitle && <p className="section-subtitle">{subtitle}</p>}
+      {subtitle && (
+        <p
+          className="text-[11px] tracking-[0.4em] uppercase mb-3"
+          style={{
+            fontFamily: 'var(--font-accent)',
+            color: 'var(--color-primary)',
+          }}
+        >
+          {subtitle}
+        </p>
+      )}
+      <h2
+        className="text-2xl mb-3"
+        style={{
+          fontFamily: 'var(--font-heading)',
+          color: 'var(--color-text)',
+        }}
+      >
+        {title}
+      </h2>
+      <div className="flex items-center justify-center gap-3">
+        <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
+        <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+      </div>
     </motion.div>
   );
 }

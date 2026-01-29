@@ -153,31 +153,35 @@ export function Account() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="mb-8 text-center"
+          className="mb-10 text-center"
         >
           <p
-            className="mb-4 text-xs tracking-[0.3em] uppercase"
+            className="text-[11px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
-              color: 'var(--color-text-muted)',
-              fontStyle: 'italic',
+              color: 'var(--color-primary)',
             }}
           >
             Gift
           </p>
           <h2
-            className="text-2xl min-[375px]:text-3xl mb-4"
+            className="text-2xl mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
             }}
           >
-            마음 전하기
+            마음 전하실 곳
           </h2>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
+          </div>
           <p
             className="text-sm leading-relaxed"
             style={{
-              fontFamily: 'var(--font-heading)',
+              fontFamily: 'var(--font-body)',
               color: 'var(--color-text-light)',
             }}
           >

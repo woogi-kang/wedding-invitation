@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* Letter-Style Elegant Color Palette */
-  --color-primary: #6b5933; /* Warm Brown */
-  --color-primary-light: #8a7854;
-  --color-primary-dark: #4d3f24;
+  /* Salon de Letter Style 1 - Botanical Elegance */
+  --color-primary: #43573a; /* Olive Green - 메인 포인트 */
+  --color-primary-light: #5a6f50;
+  --color-primary-dark: #2f3d29;
   --color-secondary: #faf8f5; /* Light Cream */
-  --color-accent: #43573a; /* Forest Green */
-  --color-accent-light: #5a6f50;
+  --color-accent: #b7a989; /* Soft Gold - 장식용 */
+  --color-accent-light: #d4c9b0;
   --color-text: #3d3d3d; /* Dark Charcoal */
   --color-text-light: #6b6b6b;
   --color-text-muted: #999999;
@@ -30,11 +30,11 @@
   --color-gold: #b7a989; /* Soft Gold for decorations */
   --color-wax: #832b33; /* Wax seal color */
 
-  /* Fonts - Classic Korean Elegance */
-  --font-heading: 'Nanum Myeongjo', 'Gowun Batang', serif;
-  --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-accent: 'Cormorant Garamond', 'Nanum Myeongjo', Georgia, serif;
-  --font-caption: 'Nanum Myeongjo', 'Gowun Batang', serif;
+  /* Fonts - Soft Handwriting Feel (Sample 1 Style) */
+  --font-heading: 'Gowun Dodum', 'Nanum Myeongjo', serif;
+  --font-body: 'Gowun Dodum', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-accent: 'Cormorant Garamond', 'Gowun Batang', Georgia, serif;
+  --font-caption: 'Gowun Dodum', 'Nanum Myeongjo', serif;
 
   /* Legacy aliases (for compatibility) */
   --font-serif: var(--font-heading);

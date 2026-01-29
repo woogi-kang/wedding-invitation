@@ -79,7 +79,7 @@ export function Footer() {
           className="text-xs tracking-wider"
           style={{ color: 'var(--color-text-muted)' }}
         >
-          © {new Date().getFullYear()} Wedding Invitation
+          © 2026 woogi & looppy. All rights reserved.
         </p>
       </motion.div>
     </footer>

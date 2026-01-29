@@ -1,13 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { WEDDING_INFO } from '@/lib/constants';
 
 export function Hero() {
   const { groom, bride, dateDisplay, venue } = WEDDING_INFO;
   const [isLoaded, setIsLoaded] = useState(false);
+  const { scrollY } = useScroll();
+
+  // Parallax for text overlay only
+  const textY = useTransform(scrollY, [0, 500], [0, -30]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -15,7 +20,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)] px-6 py-20">
+    <section className="relative min-h-screen overflow-hidden bg-[var(--color-background)]">
       {/* Paper texture overlay */}
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -24,24 +29,66 @@ export function Hero() {
         }}
       />
 
-      {/* Decorative corner borders */}
-      <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-[var(--color-primary)]/20" />
-      <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-[var(--color-primary)]/20" />
-      <div className="absolute bottom-8 left-8 w-16 h-16 border-l-2 border-b-2 border-[var(--color-primary)]/20" />
-      <div className="absolute bottom-8 right-8 w-16 h-16 border-r-2 border-b-2 border-[var(--color-primary)]/20" />
+      {/* Split Screen Photo Reveal */}
+      <div className="absolute inset-0 flex">
+        {/* Left Panel - Groom */}
+        <motion.div
+          className="relative w-1/2 overflow-hidden"
+          initial={{ clipPath: 'inset(0 100% 0 0)' }}
+          animate={isLoaded ? { clipPath: 'inset(0 0% 0 0)' } : {}}
+          transition={{ duration: 1.5, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: 'url(/images/hero/groom.jpg)',
+              willChange: 'auto',
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[var(--color-background)]/80" />
+          <div className="absolute inset-0 bg-[var(--color-groom)]/10" />
+        </motion.div>
 
-      {/* Main Content */}
+        {/* Right Panel - Bride */}
+        <motion.div
+          className="relative w-1/2 overflow-hidden"
+          initial={{ clipPath: 'inset(0 0 0 100%)' }}
+          animate={isLoaded ? { clipPath: 'inset(0 0 0 0%)' } : {}}
+          transition={{ duration: 1.5, delay: 0.5, ease: [0.76, 0, 0.24, 1] }}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: 'url(/images/hero/bride.jpg)',
+              willChange: 'auto',
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[var(--color-background)]/80" />
+          <div className="absolute inset-0 bg-[var(--color-bride)]/10" />
+        </motion.div>
+      </div>
+
+      {/* Center Gradient Blend */}
       <motion.div
+        className="absolute left-1/2 top-0 bottom-0 w-32 -translate-x-1/2 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={isLoaded ? { opacity: 1 } : {}}
-        transition={{ duration: 1 }}
-        className="relative z-10 text-center max-w-md mx-auto"
+        transition={{ duration: 2, delay: 1 }}
+        style={{
+          background: 'linear-gradient(to right, transparent, var(--color-background) 40%, var(--color-background) 60%, transparent)',
+        }}
+      />
+
+      {/* Main Content - Center */}
+      <motion.div
+        className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6"
+        style={{ y: textY, opacity }}
       >
         {/* English Quote */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.3, duration: 0.8 }}
+          transition={{ delay: 1, duration: 0.8 }}
           className="mb-8 text-xs tracking-[0.3em] uppercase"
           style={{
             fontFamily: 'var(--font-accent)',
@@ -56,7 +103,7 @@ export function Hero() {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={isLoaded ? { scaleX: 1 } : {}}
-          transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: 1.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mb-10 h-px w-16 origin-center"
           style={{ backgroundColor: 'var(--color-primary)' }}
         />
@@ -65,7 +112,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.7, duration: 0.8 }}
+          transition={{ delay: 1.4, duration: 0.8 }}
           className="mb-4"
         >
           <h1
@@ -88,7 +135,7 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.9, duration: 0.8 }}
+          transition={{ delay: 1.6, duration: 0.8 }}
           className="mb-12 text-sm tracking-[0.2em]"
           style={{
             fontFamily: 'var(--font-accent)',
@@ -103,8 +150,8 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.1, duration: 0.8 }}
-          className="mb-8"
+          transition={{ delay: 1.8, duration: 0.8 }}
+          className="mb-8 text-center"
         >
           <p
             className="text-lg min-[375px]:text-xl mb-2 tracking-wider"
@@ -130,7 +177,7 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.3, duration: 0.8 }}
+          transition={{ delay: 2, duration: 0.8 }}
           className="text-sm tracking-wider"
           style={{
             fontFamily: 'var(--font-heading)',
@@ -144,7 +191,7 @@ export function Hero() {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={isLoaded ? { scaleX: 1 } : {}}
-          transition={{ delay: 1.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: 2.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-12 h-px w-16 origin-center"
           style={{ backgroundColor: 'var(--color-primary)' }}
         />
@@ -154,8 +201,9 @@ export function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={isLoaded ? { opacity: 1 } : {}}
-        transition={{ delay: 2, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        transition={{ delay: 2.5, duration: 0.8 }}
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
+        style={{ opacity }}
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
@@ -177,6 +225,14 @@ export function Hero() {
           />
         </motion.div>
       </motion.div>
+
+      {/* Bottom Fade to Content */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to top, var(--color-background), transparent)',
+        }}
+      />
     </section>
   );
 }

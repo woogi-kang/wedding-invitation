@@ -1,11 +1,13 @@
 export { Hero } from './Hero';
 export { Greeting } from './Greeting';
+export { CoupleIntro } from './CoupleIntro';
+export { Interview } from './Interview';
+export { Video } from './Video';
 export { Gallery } from './Gallery';
+export { Timeline } from './Timeline';
 export { WeddingInfo } from './WeddingInfo';
 export { Location } from './Location';
-export { Information } from './Information';
 export { Account } from './Account';
-export { Video } from './Video';
 export { RSVP } from './RSVP';
 export { Guestbook } from './Guestbook';
 export { GuestSnap } from './GuestSnap';

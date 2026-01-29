@@ -125,6 +125,54 @@ export const WEDDING_INFO = {
 따뜻한 축복을 보내주시기 바랍니다.`,
   },
 
+  // 웨딩 인터뷰
+  interview: [
+    {
+      question: '결혼을 결심하게 된 계기가 있나요?',
+      answer: '함께 있을 때 가장 편안하고, 서로의 곁에서 성장하는 모습을 보며 평생을 함께하고 싶다는 확신이 들었습니다.',
+    },
+    {
+      question: '첫 만남은 어땠나요?',
+      answer: '처음 만났을 때부터 대화가 잘 통해서 시간 가는 줄 몰랐어요. 그때부터 운명이라고 느꼈던 것 같아요.',
+    },
+    {
+      question: '서로에게 하고 싶은 말이 있다면?',
+      answer: '앞으로의 모든 날들을 함께 걸어가자. 기쁜 날도, 힘든 날도 서로의 손을 놓지 않을게요.',
+    },
+    {
+      question: '신혼여행은 어디로 가시나요?',
+      answer: '따뜻한 곳에서 여유롭게 쉬다 오려고 해요. 둘만의 시간을 충분히 보내고 올 예정입니다.',
+    },
+  ],
+
+  // 우리의 시간 (타임라인)
+  timeline: [
+    {
+      date: '2022년 봄',
+      title: '첫 만남',
+      description: '운명처럼 만나게 된 우리',
+      icon: 'heart',
+    },
+    {
+      date: '2023년',
+      title: '1주년',
+      description: '함께한 첫 번째 해',
+      icon: 'sparkles',
+    },
+    {
+      date: '2024년',
+      title: '2주년',
+      description: '더 깊어진 사랑',
+      icon: 'calendar',
+    },
+    {
+      date: '2025년',
+      title: '결혼',
+      description: '영원을 약속하는 날',
+      icon: 'party',
+    },
+  ],
+
   // 갤러리 이미지
   gallery: {
     images: [
@@ -140,7 +188,7 @@ export const WEDDING_INFO = {
   // 영상 URL (YouTube)
   video: {
     enabled: true,
-    youtubeId: 'dQw4w9WgXcQ', // YouTube 영상 ID로 교체
+    youtubeId: 'M6JCSP7r7e8',
     title: '우리의 이야기',
   },
 
@@ -291,15 +339,15 @@ export const GUEST_SNAP_CONFIG = {
   },
 };
 
-// 디자인 테마 - Letter Style Elegant
+// 디자인 테마 - Salon de Letter Style 1 (Botanical Elegance)
 export const THEME = {
   colors: {
-    primary: '#6b5933', // Warm Brown
-    primaryLight: '#8a7854',
-    primaryDark: '#4d3f24',
+    primary: '#43573a', // Olive Green - 메인 포인트
+    primaryLight: '#5a6f50',
+    primaryDark: '#2f3d29',
     secondary: '#faf8f5', // Light Cream
-    accent: '#43573a', // Forest Green
-    accentLight: '#5a6f50',
+    accent: '#b7a989', // Soft Gold - 장식용
+    accentLight: '#d4c9b0',
     text: '#3d3d3d', // Dark Charcoal
     textLight: '#6b6b6b',
     textMuted: '#999999',
