@@ -3,6 +3,7 @@ export { Greeting } from './Greeting';
 export { Gallery } from './Gallery';
 export { WeddingInfo } from './WeddingInfo';
 export { Location } from './Location';
+export { Information } from './Information';
 export { Account } from './Account';
 export { Video } from './Video';
 export { RSVP } from './RSVP';
