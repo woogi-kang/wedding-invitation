@@ -15,6 +15,7 @@ import {
 } from '@/components/sections';
 import { MouseTrail } from '@/components/ui/MouseTrail';
 import { RSVPDialog } from '@/components/ui/RSVPDialog';
+import { GuestSnapDialog } from '@/components/ui/GuestSnapDialog';
 
 export default function InvitationPage() {
   return (
@@ -22,8 +23,11 @@ export default function InvitationPage() {
       {/* Mouse Trail - petal effect following cursor */}
       <MouseTrail />
 
-      {/* RSVP Dialog - 결혼식 전까지 2초 후 자동 표시 */}
+      {/* RSVP Dialog - 결혼식 시작 전까지 2초 후 자동 표시 */}
       <RSVPDialog />
+
+      {/* GuestSnap Dialog - 결혼식 시작 후 2초 후 자동 표시 */}
+      <GuestSnapDialog />
 
       <main className="min-h-screen main-content">
 
