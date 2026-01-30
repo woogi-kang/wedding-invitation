@@ -30,7 +30,7 @@ export function Footer() {
             className="text-lg tracking-wider"
             style={{
               fontFamily: 'var(--font-heading)',
-              color: 'var(--color-groom)',
+              color: 'var(--color-text)',
             }}
           >
             {groom.name}
@@ -45,7 +45,7 @@ export function Footer() {
             className="text-lg tracking-wider"
             style={{
               fontFamily: 'var(--font-heading)',
-              color: 'var(--color-bride)',
+              color: 'var(--color-text)',
             }}
           >
             {bride.name}
@@ -71,7 +71,7 @@ export function Footer() {
             color: 'var(--color-text-muted)',
           }}
         >
-          감사합니다
+          함께해 주셔서 감사합니다
         </p>
 
         {/* Copyright */}
