@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { LetterGlitch } from './LetterGlitch';
 
 // 8-bit style typing sound generator using Web Audio API
 function create8BitSound() {
@@ -291,7 +292,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black overflow-auto"
+      className="fixed inset-0 overflow-hidden"
       onClick={handleTap}
       onKeyDown={handleKeyDown}
       role="region"
@@ -305,25 +306,45 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
           ? '로딩 완료. 버튼을 눌러 청첩장을 확인하세요.'
           : '청첩장을 로딩 중입니다...'}
       </span>
-      {/* Scanline effect */}
+
+      {/* Letter Glitch Background */}
+      <LetterGlitch
+        glitchColors={['#2d5a27', '#4a7c45', '#1a3d16', '#3d6b37']}
+        glitchSpeed={50}
+        outerVignette={true}
+        centerVignette={true}
+        smooth={true}
+      />
+
+      {/* Scanline effect overlay */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-[0.03]"
+        className="fixed inset-0 pointer-events-none opacity-[0.02] z-10"
         style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 255, 0, 0.03) 1px, rgba(0, 255, 0, 0.03) 2px)',
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 255, 0, 0.05) 1px, rgba(0, 255, 0, 0.05) 2px)',
         }}
       />
 
-      {/* CRT glow effect */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          boxShadow: 'inset 0 0 100px rgba(0, 255, 0, 0.1)',
-        }}
-      />
+      {/* Glass Morphism Terminal Card */}
+      <div className="fixed inset-0 flex items-center justify-center p-4 z-20">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-md max-h-[85vh] overflow-auto rounded-2xl border border-green-500/30 bg-black/70 backdrop-blur-xl shadow-2xl shadow-green-900/20"
+        >
+          {/* Terminal Header */}
+          <div className="sticky top-0 flex items-center gap-2 px-4 py-3 border-b border-green-500/20 bg-black/50 backdrop-blur-sm">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+            </div>
+            <span className="ml-2 text-xs text-green-500/60 font-mono">wedding.exe</span>
+          </div>
 
-      {/* Terminal content */}
-      <div className="min-h-screen flex flex-col justify-center px-6 py-12 max-w-md mx-auto">
-        <div className="font-mono text-sm sm:text-base leading-relaxed">
+          {/* Terminal content */}
+          <div className="p-4 sm:p-6">
+            <div className="font-mono text-sm sm:text-base leading-relaxed">
           {/* Rendered lines */}
           {displayedLines.map((line, index) => (
             <motion.div
@@ -375,19 +396,21 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        {/* Skip hint */}
-        {!isTypingComplete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2 }}
-            className="fixed bottom-8 left-0 right-0 text-center text-green-600/40 text-xs font-mono"
-          >
-            화면을 탭하면 스킵
-          </motion.div>
-        )}
+            {/* Skip hint - inside card */}
+            {!isTypingComplete && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2 }}
+                className="mt-6 text-center text-green-600/50 text-xs font-mono"
+              >
+                화면을 탭하면 스킵
+              </motion.div>
+            )}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
