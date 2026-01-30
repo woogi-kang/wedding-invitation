@@ -135,28 +135,19 @@ interface TerminalLine {
 }
 
 const TERMINAL_LINES: TerminalLine[] = [
-  { text: '$ npm run wedding --with-love', type: 'command' },
+  { text: '$ npx create-wedding', type: 'command' },
   { text: '', type: 'empty' },
-  { text: '> @life/wedding@1.0.0 start', type: 'output' },
-  { text: '> Compiling shared memories...', type: 'output' },
   { text: 'PROGRESS', type: 'progress' },
   { text: '', type: 'empty' },
-  { text: '✓ Dependencies resolved', type: 'output' },
-  { text: '✓ Love module installed', type: 'output' },
-  { text: '✓ Promise<forever> pending...', type: 'output' },
+  { text: '[✓] 강태욱 ♥ 김선경', type: 'highlight' },
+  { text: '[✓] 2026. 04. 05 (일)', type: 'output' },
+  { text: '[✓] 오후 2시 10분', type: 'output' },
+  { text: '[✓] 라마다 서울 신도림', type: 'output' },
   { text: '', type: 'empty' },
-  { text: 'const wedding = {', type: 'highlight' },
-  { text: '  groom: "강태욱",', type: 'output' },
-  { text: '  bride: "김선경",', type: 'output' },
-  { text: '  date: new Date("2026-04-05"),', type: 'output' },
-  { text: '  time: "14:10",', type: 'output' },
-  { text: '  venue: "라마다 서울 신도림"', type: 'output' },
-  { text: '};', type: 'highlight' },
+  { text: '→ Ready to launch', type: 'highlight' },
   { text: '', type: 'empty' },
-  { text: 'await wedding.invite();', type: 'command' },
-  { text: '', type: 'empty' },
-  { text: '// 두 사람의 새로운 chapter에', type: 'highlight' },
-  { text: '// commit 해주시겠습니까?', type: 'highlight' },
+  { text: '> 두 사람의 새로운 시작을', type: 'output' },
+  { text: '> 함께 해주시겠습니까? _', type: 'command' },
 ];
 
 // Typing speed (ms per character)
@@ -456,10 +447,6 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
                 transition={{ duration: 0.5 }}
                 className="mt-8 space-y-4"
               >
-                <div className="text-green-400 text-center">
-                  {'> 선택하세요:'}
-                </div>
-
                 <button
                   type="button"
                   onClick={(e) => {
@@ -469,12 +456,8 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
                   className="w-full py-4 border-2 border-green-500 text-green-400 font-mono text-lg hover:bg-green-500/20 active:bg-green-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-black"
                   aria-label="청첩장 보기"
                 >
-                  {'[ Y ] 함께하기'}
+                  {'함께하기 (버튼을 눌러주세요)'}
                 </button>
-
-                <div className="text-green-600/60 text-center text-xs">
-                  <span className="animate-pulse">▊</span> 버튼을 탭하세요
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
