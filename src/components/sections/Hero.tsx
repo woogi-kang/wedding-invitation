@@ -92,8 +92,9 @@ export function Hero() {
           className="mb-8 text-xs tracking-[0.3em] uppercase"
           style={{
             fontFamily: 'var(--font-accent)',
-            color: 'var(--color-text-muted)',
+            color: 'var(--color-text)',
             fontStyle: 'italic',
+            textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
           }}
         >
           We are getting married
@@ -121,13 +122,14 @@ export function Hero() {
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
               fontWeight: 400,
+              textShadow: '0 2px 8px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5)',
             }}
           >
-            <span style={{ color: 'var(--color-groom)' }}>{groom.name}</span>
+            <span>{groom.name}</span>
             <span className="mx-3 text-2xl" style={{ color: 'var(--color-gold)' }}>
               &
             </span>
-            <span style={{ color: 'var(--color-bride)' }}>{bride.name}</span>
+            <span>{bride.name}</span>
           </h1>
         </motion.div>
 
@@ -139,8 +141,9 @@ export function Hero() {
           className="mb-12 text-sm tracking-[0.2em]"
           style={{
             fontFamily: 'var(--font-accent)',
-            color: 'var(--color-text-light)',
+            color: 'var(--color-text)',
             fontStyle: 'italic',
+            textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
           }}
         >
           {groom.englishName} & {bride.englishName}
@@ -158,6 +161,7 @@ export function Hero() {
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
+              textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
             }}
           >
             {dateDisplay.year}. {String(dateDisplay.month).padStart(2, '0')}. {String(dateDisplay.day).padStart(2, '0')}
@@ -166,7 +170,8 @@ export function Hero() {
             className="text-sm tracking-wider"
             style={{
               fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text-light)',
+              color: 'var(--color-text)',
+              textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
             }}
           >
             {dateDisplay.dayOfWeek} {dateDisplay.time}
@@ -181,7 +186,8 @@ export function Hero() {
           className="text-sm tracking-wider"
           style={{
             fontFamily: 'var(--font-heading)',
-            color: 'var(--color-text-muted)',
+            color: 'var(--color-text)',
+            textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
           }}
         >
           {venue.name}

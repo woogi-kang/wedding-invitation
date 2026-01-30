@@ -14,8 +14,6 @@ import {
   Share,
   Footer,
 } from '@/components/sections';
-import { MusicPlayer } from '@/components/ui/MusicPlayer';
-import { AudioPreloader } from '@/components/ui/AudioPreloader';
 import { MouseTrail } from '@/components/ui/MouseTrail';
 
 export default function InvitationPage() {
@@ -25,8 +23,6 @@ export default function InvitationPage() {
       <MouseTrail />
 
       <main className="min-h-screen main-content">
-        {/* Preload audio */}
-        <AudioPreloader />
 
         {/* 1. Hero */}
         <Hero />
@@ -69,9 +65,6 @@ export default function InvitationPage() {
 
         {/* 14. Footer */}
         <Footer />
-
-        {/* Music Player */}
-        <MusicPlayer />
       </main>
     </>
   );

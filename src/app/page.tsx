@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { IntroPage } from '@/components/ui/IntroPage';
+import { startGlobalAudio } from '@/hooks/useAudioPlayer';
 
 export default function Home() {
   const router = useRouter();
@@ -22,6 +23,8 @@ export default function Home() {
 
   const handleEnter = () => {
     sessionStorage.setItem('wedding-intro-seen', 'true');
+    // Start music on button click (user interaction)
+    startGlobalAudio();
     router.push('/invitation');
   };
 

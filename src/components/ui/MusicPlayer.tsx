@@ -53,8 +53,16 @@ export function MusicPlayer() {
   return (
     <motion.button
       initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+      animate={
+        isPlaying
+          ? { opacity: 1, y: 0, scale: [1, 1.05, 1] }
+          : { opacity: 1, y: 0, scale: 1 }
+      }
+      transition={
+        isPlaying
+          ? { scale: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' }, opacity: { delay: 0.5 }, y: { delay: 0.5, type: 'spring', stiffness: 200 } }
+          : { delay: 0.5, type: 'spring', stiffness: 200 }
+      }
       onClick={toggle}
       className="fixed top-4 right-4 min-[375px]:top-5 min-[375px]:right-5 sm:top-6 sm:right-6 z-50 flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 hover:scale-105"
       style={{
@@ -108,16 +116,6 @@ export function MusicPlayer() {
         )}
       </AnimatePresence>
 
-      {/* Pulsing ring when playing */}
-      {isPlaying && (
-        <motion.div
-          className="absolute inset-0 rounded-full"
-          style={{ border: '1px solid var(--color-primary)' }}
-          initial={{ opacity: 0.5, scale: 1 }}
-          animate={{ opacity: 0, scale: 1.3 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
-        />
-      )}
     </motion.button>
   );
 }
