@@ -39,7 +39,28 @@ export function preloadAudio() {
   fullAudio.load();
 }
 
-export function useAudioPlayer(src: string, autoPlay: boolean = false): AudioPlayerResult {
+// Global play function - can be called from anywhere (e.g., Intro page)
+export function startGlobalAudio(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  if (!quickAudio || !fullAudio) {
+    preloadAudio();
+  }
+
+  // Try to play full audio first
+  if (fullAudio && fullAudio.readyState >= 3) {
+    return fullAudio.play().then(() => true).catch(() => false) as unknown as boolean;
+  }
+
+  // Fallback to quick audio
+  if (quickAudio && quickAudio.readyState >= 2) {
+    return quickAudio.play().then(() => true).catch(() => false) as unknown as boolean;
+  }
+
+  return false;
+}
+
+export function useAudioPlayer(src: string, enabled: boolean = true): AudioPlayerResult {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -77,8 +98,22 @@ export function useAudioPlayer(src: string, autoPlay: boolean = false): AudioPla
       fullAudio.addEventListener('pause', handlePause);
     }
 
-    // Auto play on first user interaction
-    if (autoPlay) {
+    // Check if should auto-play from intro page
+    const shouldAutoPlay = sessionStorage.getItem('wedding-autoplay-music');
+    if (shouldAutoPlay && enabled) {
+      sessionStorage.removeItem('wedding-autoplay-music');
+      // Small delay to ensure audio is ready
+      const autoPlayTimer = setTimeout(() => {
+        if (!hasStartedRef.current) {
+          hasStartedRef.current = true;
+          playAudio();
+        }
+      }, 500);
+      return () => clearTimeout(autoPlayTimer);
+    }
+
+    // Fallback: Auto play on first user interaction (click, touch, or scroll)
+    if (enabled) {
       const handleUserInteraction = () => {
         if (hasStartedRef.current) return;
         hasStartedRef.current = true;
@@ -87,14 +122,20 @@ export function useAudioPlayer(src: string, autoPlay: boolean = false): AudioPla
 
         document.removeEventListener('click', handleUserInteraction);
         document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('scroll', handleUserInteraction, true);
+        window.removeEventListener('wheel', handleUserInteraction);
       };
 
       document.addEventListener('click', handleUserInteraction);
       document.addEventListener('touchstart', handleUserInteraction);
+      document.addEventListener('scroll', handleUserInteraction, true);
+      window.addEventListener('wheel', handleUserInteraction);
 
       return () => {
         document.removeEventListener('click', handleUserInteraction);
         document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('scroll', handleUserInteraction, true);
+        window.removeEventListener('wheel', handleUserInteraction);
       };
     }
 
@@ -109,7 +150,7 @@ export function useAudioPlayer(src: string, autoPlay: boolean = false): AudioPla
         fullAudio.removeEventListener('pause', handlePause);
       }
     };
-  }, [autoPlay]);
+  }, [enabled]);
 
   const playAudio = useCallback(() => {
     // If full audio is already ready, use it directly
