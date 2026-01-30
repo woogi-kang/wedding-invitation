@@ -13,8 +13,17 @@ export default function Home() {
     router.prefetch('/invitation');
   }, [router]);
 
-  // Check if user has already seen intro
+  // Check if user has already seen intro (skip if navigated back)
   useEffect(() => {
+    const navEntries = performance.getEntriesByType('navigation');
+    const navEntry = navEntries[0] as PerformanceNavigationTiming;
+
+    // If user navigated back, clear the flag and show intro
+    if (navEntry?.type === 'back_forward') {
+      sessionStorage.removeItem('wedding-intro-seen');
+      return;
+    }
+
     const hasSeenIntro = sessionStorage.getItem('wedding-intro-seen');
     if (hasSeenIntro) {
       router.replace('/invitation');
