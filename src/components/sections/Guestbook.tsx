@@ -149,13 +149,14 @@ export function Guestbook() {
         {/* Message Form */}
         <form onSubmit={handleSubmit} className="border-b border-[var(--color-border-light)] p-4 min-[375px]:p-6">
           <div className="space-y-3">
-            <div className="flex gap-2">
+            {/* Stack vertically on very small screens, side by side on larger */}
+            <div className="flex flex-col min-[360px]:flex-row gap-2">
               <input
                 type="text"
                 placeholder="이름"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="flex-1 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="flex-1 min-w-0 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                 maxLength={20}
               />
               <input
@@ -163,7 +164,7 @@ export function Guestbook() {
                 placeholder="비밀번호 (삭제용)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="flex-1 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="flex-1 min-w-0 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                 maxLength={10}
               />
             </div>

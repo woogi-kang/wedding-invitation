@@ -1,7 +1,83 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+
+// 8-bit style typing sound generator using Web Audio API
+function create8BitSound() {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+
+    return {
+      playTypingSound: () => {
+        // Create oscillator for 8-bit beep
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Random frequency for variety (typical 8-bit range)
+        const frequencies = [440, 523, 587, 659, 698, 784, 880];
+        oscillator.frequency.value = frequencies[Math.floor(Math.random() * frequencies.length)];
+        oscillator.type = 'square'; // Classic 8-bit square wave
+
+        // Very short beep
+        gainNode.gain.setValueAtTime(0.03, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.05);
+      },
+      playProgressSound: () => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = 220;
+        oscillator.type = 'square';
+
+        gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.03);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.03);
+      },
+      playCompleteSound: () => {
+        // Rising tone for completion
+        const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+        notes.forEach((freq, i) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = freq;
+          oscillator.type = 'square';
+
+          const startTime = audioContext.currentTime + i * 0.1;
+          gainNode.gain.setValueAtTime(0.05, startTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+
+          oscillator.start(startTime);
+          oscillator.stop(startTime + 0.15);
+        });
+      },
+      resume: () => {
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+      }
+    };
+  } catch {
+    return null;
+  }
+}
 
 interface TerminalIntroProps {
   onEnter: () => void;
@@ -51,6 +127,10 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
   // Refs for timeout cleanup to prevent memory leaks
   const buttonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  // Initialize 8-bit sound generator
+  const sound = useMemo(() => create8BitSound(), []);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -74,10 +154,19 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     }
   }, [shouldReduceMotion, isTypingComplete]);
 
+  // Enable sound on first interaction (required by browser autoplay policy)
+  const enableSound = useCallback(() => {
+    if (!soundEnabled && sound) {
+      sound.resume();
+      setSoundEnabled(true);
+    }
+  }, [soundEnabled, sound]);
+
   // Skip animation on tap
   const handleSkip = useCallback(() => {
     if (isTypingComplete) return;
 
+    enableSound();
     setIsSkipped(true);
     const allLines = TERMINAL_LINES.map(line =>
       line.type === 'progress' ? '> [████████████████] 100%' : line.text
@@ -85,8 +174,9 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     setDisplayedLines(allLines);
     setCurrentLineIndex(TERMINAL_LINES.length);
     setIsTypingComplete(true);
+    if (sound && soundEnabled) sound.playCompleteSound();
     buttonTimeoutRef.current = setTimeout(() => setShowButton(true), 300);
-  }, [isTypingComplete]);
+  }, [isTypingComplete, enableSound, sound, soundEnabled]);
 
   // Keyboard support for accessibility
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -101,6 +191,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     if (isSkipped || currentLineIndex >= TERMINAL_LINES.length) {
       if (!isSkipped) {
         setIsTypingComplete(true);
+        if (sound && soundEnabled) sound.playCompleteSound();
         buttonTimeoutRef.current = setTimeout(() => setShowButton(true), 500);
       }
       return;
@@ -113,6 +204,10 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
       if (progressValue < 100) {
         const timer = setTimeout(() => {
           setProgressValue(prev => Math.min(prev + 5, 100));
+          // Play progress sound every 20%
+          if (sound && soundEnabled && progressValue % 20 === 0) {
+            sound.playProgressSound();
+          }
         }, 30);
         return () => clearTimeout(timer);
       } else {
@@ -138,6 +233,10 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     if (currentCharIndex < currentLine.text.length) {
       const timer = setTimeout(() => {
         setCurrentCharIndex(prev => prev + 1);
+        // Play typing sound (throttled - every 2 characters)
+        if (sound && soundEnabled && currentCharIndex % 2 === 0) {
+          sound.playTypingSound();
+        }
       }, TYPING_SPEED);
       return () => clearTimeout(timer);
     } else {
@@ -149,7 +248,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
       }, LINE_DELAY);
       return () => clearTimeout(timer);
     }
-  }, [currentLineIndex, currentCharIndex, progressValue, isSkipped]);
+  }, [currentLineIndex, currentCharIndex, progressValue, isSkipped, sound, soundEnabled]);
 
   // Generate progress bar string with integer math for precision
   const getProgressBar = (value: number) => {
@@ -184,10 +283,16 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     }
   };
 
+  // Handle tap to enable sound and skip
+  const handleTap = useCallback(() => {
+    enableSound();
+    handleSkip();
+  }, [enableSound, handleSkip]);
+
   return (
     <div
       className="fixed inset-0 bg-black overflow-auto"
-      onClick={handleSkip}
+      onClick={handleTap}
       onKeyDown={handleKeyDown}
       role="region"
       aria-label="청첩장 로딩 화면"

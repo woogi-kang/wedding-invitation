@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { IntroPage } from '@/components/ui/IntroPage';
+import { TerminalIntro } from '@/components/ui/TerminalIntro';
 import { startGlobalAudio } from '@/hooks/useAudioPlayer';
 
 export default function Home() {
@@ -28,5 +28,5 @@ export default function Home() {
     router.push('/invitation');
   };
 
-  return <IntroPage onEnter={handleEnter} />;
+  return <TerminalIntro onEnter={handleEnter} />;
 }
