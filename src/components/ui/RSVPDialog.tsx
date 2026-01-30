@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { WEDDING_INFO } from '@/lib/constants';
-import { isBeforeWedding } from '@/lib/utils';
+import { isBeforeWedding, isBeforeWeddingStart } from '@/lib/utils';
 
 interface RSVPFormData {
   name: string;
@@ -17,6 +17,7 @@ interface RSVPFormData {
 }
 
 const STORAGE_KEY = 'wedding_rsvp_submitted';
+const STORAGE_KEY_SKIP_TODAY = 'wedding_rsvp_skip_today';
 
 export function RSVPDialog() {
   const { rsvp } = WEDDING_INFO;
@@ -32,11 +33,19 @@ export function RSVPDialog() {
   });
 
   useEffect(() => {
-    // 결혼식 전이고, RSVP가 활성화되어 있고, 이미 제출하지 않았으면 2초 후 dialog 표시
-    if (!rsvp.enabled || !isBeforeWedding()) return;
+    // 결혼식 시작 전이고, RSVP가 활성화되어 있고, 이미 제출하지 않았으면 2초 후 dialog 표시
+    // 결혼식 시작 이후에는 RSVP dialog를 표시하지 않음
+    if (!rsvp.enabled || !isBeforeWeddingStart()) return;
 
     const hasSubmitted = localStorage.getItem(STORAGE_KEY);
     if (hasSubmitted) return;
+
+    // 오늘 하루 보지 않기 체크
+    const skipToday = localStorage.getItem(STORAGE_KEY_SKIP_TODAY);
+    if (skipToday) {
+      const today = new Date().toDateString();
+      if (skipToday === today) return;
+    }
 
     const timer = setTimeout(() => {
       setIsOpen(true);
@@ -46,6 +55,12 @@ export function RSVPDialog() {
   }, [rsvp.enabled]);
 
   const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleSkipToday = () => {
+    const today = new Date().toDateString();
+    localStorage.setItem(STORAGE_KEY_SKIP_TODAY, today);
     setIsOpen(false);
   };
 
@@ -285,11 +300,11 @@ export function RSVPDialog() {
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={handleClose}
+                  onClick={handleSkipToday}
                   className="flex-1 py-3 text-sm rounded-md border border-[var(--color-border-light)] hover:bg-[var(--color-secondary)] transition-colors"
                   style={{ color: 'var(--color-text-light)' }}
                 >
-                  나중에
+                  오늘 하루 보지 않기
                 </button>
                 <button
                   type="submit"
