@@ -1087,20 +1087,7 @@ a:focus-visible {
   border: 1px solid rgba(200, 164, 165, 0.2);
 }
 
-/* ===== Intro Overlay Content Visibility ===== */
-/* Hide main content while intro is pending or active */
-body.intro-pending .main-content,
-body.intro-active .main-content {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* Ensure intro overlay is always visible */
-body.intro-pending .intro-overlay,
-body.intro-active .intro-overlay {
-  visibility: visible;
-  pointer-events: auto;
-}
+/* Legacy intro overlay styles removed - now using separate pages */
 
 /* ===== Performance Optimizations ===== */
 
@@ -1158,4 +1145,34 @@ body.intro-active .intro-overlay {
 .hero-image-panel {
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* ===== Mobile Performance Optimizations ===== */
+@media (max-width: 768px) {
+  /* Disable expensive blur filters on mobile */
+  .organic-bg {
+    filter: none !important;
+    animation: none !important;
+    opacity: 0.15;
+  }
+
+  .glass,
+  .glass-dark,
+  .glass-soft,
+  .glass-rose {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .glass-dark {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+  }
+
+  /* Reduce animation complexity */
+  @keyframes morphing {
+    0%, 100% {
+      border-radius: 50%;
+    }
+  }
 }

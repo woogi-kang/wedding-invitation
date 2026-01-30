@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
   // For static export without Guest Snap:
   // output: 'export',
   images: {
-    unoptimized: true,
+    // Enable Next.js image optimization for better mobile performance
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    formats: ['image/webp', 'image/avif'],
   },
   // GitHub Pages 배포 시 주석 해제
   // basePath: '/wedding-invitation',
