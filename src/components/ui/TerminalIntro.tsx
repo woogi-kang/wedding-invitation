@@ -129,9 +129,32 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
   const buttonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldReduceMotion = useReducedMotion();
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const hasInteractedRef = useRef(false);
 
   // Initialize 8-bit sound generator
   const sound = useMemo(() => create8BitSound(), []);
+
+  // Auto-enable sound on first user interaction anywhere
+  useEffect(() => {
+    const enableOnInteraction = () => {
+      if (!hasInteractedRef.current && sound) {
+        sound.resume();
+        setSoundEnabled(true);
+        hasInteractedRef.current = true;
+      }
+    };
+
+    // Listen for any user interaction
+    window.addEventListener('click', enableOnInteraction, { once: true });
+    window.addEventListener('touchstart', enableOnInteraction, { once: true });
+    window.addEventListener('keydown', enableOnInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener('click', enableOnInteraction);
+      window.removeEventListener('touchstart', enableOnInteraction);
+      window.removeEventListener('keydown', enableOnInteraction);
+    };
+  }, [sound]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -160,14 +183,21 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     if (!soundEnabled && sound) {
       sound.resume();
       setSoundEnabled(true);
+      hasInteractedRef.current = true;
     }
   }, [soundEnabled, sound]);
 
-  // Skip animation on tap
+  // Skip animation on tap (only skip on second tap, first tap enables sound)
   const handleSkip = useCallback(() => {
     if (isTypingComplete) return;
 
-    enableSound();
+    // First interaction: enable sound only, don't skip
+    if (!hasInteractedRef.current) {
+      enableSound();
+      return;
+    }
+
+    // Second interaction: skip animation
     setIsSkipped(true);
     const allLines = TERMINAL_LINES.map(line =>
       line.type === 'progress' ? '> [████████████████] 100%' : line.text
