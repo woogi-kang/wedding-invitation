@@ -4,71 +4,115 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { LetterGlitch } from './LetterGlitch';
 
-// 8-bit style typing sound generator using Web Audio API
-function create8BitSound() {
+// Sci-fi / "Her" movie style soft terminal sounds using Web Audio API
+function createTerminalSound() {
   if (typeof window === 'undefined') return null;
 
   try {
     const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
 
+    // Create a soft, futuristic typing click
+    const playTypingSound = () => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+
+      oscillator.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // Soft sine wave with slight pitch variation
+      const baseFreq = 1800 + Math.random() * 400;
+      oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, audioContext.currentTime + 0.03);
+      oscillator.type = 'sine';
+
+      // Low-pass filter for softer sound
+      filter.type = 'lowpass';
+      filter.frequency.value = 3000;
+      filter.Q.value = 1;
+
+      // Very soft, quick fade
+      gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.025);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.03);
+    };
+
+    // Soft progress tick
+    const playProgressSound = () => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.setValueAtTime(2400, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.02);
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.02);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.025);
+    };
+
+    // Elegant completion chime (like "Her" movie UI sounds)
+    const playCompleteSound = () => {
+      const notes = [880, 1108.73, 1318.51, 1760]; // A5, C#6, E6, A6 (A major arpeggio)
+
+      notes.forEach((freq, i) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filter = audioContext.createBiquadFilter();
+
+        oscillator.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = freq;
+        oscillator.type = 'sine';
+
+        filter.type = 'lowpass';
+        filter.frequency.value = 4000;
+
+        const startTime = audioContext.currentTime + i * 0.12;
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(0.1, startTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
+
+        oscillator.start(startTime);
+        oscillator.stop(startTime + 0.45);
+      });
+    };
+
+    // Soft boot/startup sound
+    const playStartSound = () => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.15);
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.25);
+    };
+
     return {
-      playTypingSound: () => {
-        // Create oscillator for 8-bit beep
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        // Random frequency for variety (typical 8-bit range)
-        const frequencies = [440, 523, 587, 659, 698, 784, 880];
-        oscillator.frequency.value = frequencies[Math.floor(Math.random() * frequencies.length)];
-        oscillator.type = 'square'; // Classic 8-bit square wave
-
-        // Very short beep
-        gainNode.gain.setValueAtTime(0.03, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
-
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.05);
-      },
-      playProgressSound: () => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator.frequency.value = 220;
-        oscillator.type = 'square';
-
-        gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.03);
-
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.03);
-      },
-      playCompleteSound: () => {
-        // Rising tone for completion
-        const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
-        notes.forEach((freq, i) => {
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-
-          oscillator.frequency.value = freq;
-          oscillator.type = 'square';
-
-          const startTime = audioContext.currentTime + i * 0.1;
-          gainNode.gain.setValueAtTime(0.05, startTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
-
-          oscillator.start(startTime);
-          oscillator.stop(startTime + 0.15);
-        });
-      },
+      playTypingSound,
+      playProgressSound,
+      playCompleteSound,
+      playStartSound,
       resume: () => {
         if (audioContext.state === 'suspended') {
           audioContext.resume();
@@ -91,25 +135,28 @@ interface TerminalLine {
 }
 
 const TERMINAL_LINES: TerminalLine[] = [
-  { text: '> Initializing wedding.exe...', type: 'command' },
-  { text: '> Loading memories...', type: 'command' },
+  { text: '$ npm run wedding --with-love', type: 'command' },
+  { text: '', type: 'empty' },
+  { text: '> @life/wedding@1.0.0 start', type: 'output' },
+  { text: '> Compiling shared memories...', type: 'output' },
   { text: 'PROGRESS', type: 'progress' },
   { text: '', type: 'empty' },
-  { text: '╔══════════════════════════════╗', type: 'output' },
-  { text: '║    WEDDING INVITATION v1.0   ║', type: 'highlight' },
-  { text: '╚══════════════════════════════╝', type: 'output' },
+  { text: '✓ Dependencies resolved', type: 'output' },
+  { text: '✓ Love module installed', type: 'output' },
+  { text: '✓ Future.promise() initialized', type: 'output' },
   { text: '', type: 'empty' },
-  { text: '> 신랑: 강태욱 (Taewook)', type: 'output' },
-  { text: '> 신부: 김선경 (Seongyeong)', type: 'output' },
+  { text: 'const wedding = {', type: 'highlight' },
+  { text: '  groom: "강태욱",', type: 'output' },
+  { text: '  bride: "김선경",', type: 'output' },
+  { text: '  date: new Date("2026-04-05"),', type: 'output' },
+  { text: '  time: "14:10",', type: 'output' },
+  { text: '  venue: "라마다 서울 신도림"', type: 'output' },
+  { text: '};', type: 'highlight' },
   { text: '', type: 'empty' },
-  { text: '> 날짜: 2026.04.05 (일요일)', type: 'output' },
-  { text: '> 시간: 14:10:00', type: 'output' },
-  { text: '> 장소: 라마다 서울 신도림 호텔', type: 'output' },
+  { text: 'wedding.invite(you);', type: 'command' },
   { text: '', type: 'empty' },
-  { text: '════════════════════════════════', type: 'output' },
-  { text: '', type: 'empty' },
-  { text: '두 사람의 새로운 시작에', type: 'highlight' },
-  { text: '함께 해주시겠습니까?', type: 'highlight' },
+  { text: '// 두 사람의 새로운 chapter에', type: 'highlight' },
+  { text: '// commit 해주시겠습니까?', type: 'highlight' },
 ];
 
 // Typing speed (ms per character)
@@ -130,8 +177,8 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
   const buttonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Initialize 8-bit sound generator
-  const sound = useMemo(() => create8BitSound(), []);
+  // Initialize terminal sound generator
+  const sound = useMemo(() => createTerminalSound(), []);
 
   // Start typing animation with sound
   const handleStart = useCallback(() => {
@@ -140,6 +187,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     // Enable audio context on user interaction
     if (sound) {
       sound.resume();
+      sound.playStartSound();
     }
     setHasStarted(true);
   }, [hasStarted, sound]);
