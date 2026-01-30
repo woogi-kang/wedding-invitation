@@ -274,38 +274,40 @@ export function Location() {
           </div>
 
           {/* Parking */}
-          <div className="flex gap-4 p-4 bg-white rounded-sm border border-[var(--color-border-light)]">
-            <div
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: 'var(--color-botanical-light)' }}
-            >
-              <Car className="h-5 w-5" style={{ color: 'var(--color-botanical)' }} />
-            </div>
-            <div className="flex-1">
-              <p
-                className="text-sm font-medium mb-1"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  color: 'var(--color-text)',
-                }}
+          <div className="p-4 bg-white rounded-sm border border-[var(--color-border-light)]">
+            <div className="flex gap-4">
+              <div
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+                style={{ backgroundColor: 'var(--color-botanical-light)' }}
               >
-                주차
-              </p>
-              <p
-                className="text-sm leading-relaxed whitespace-pre-line"
-                style={{ color: 'var(--color-text-light)' }}
-              >
-                {venue.parking}
-              </p>
-              {venue.parkingNotice && (
+                <Car className="h-5 w-5" style={{ color: 'var(--color-botanical)' }} />
+              </div>
+              <div className="flex-1">
                 <p
-                  className="text-xs leading-relaxed whitespace-pre-line text-center mt-3 pt-3 border-t border-[var(--color-border-light)]"
-                  style={{ color: 'var(--color-text-muted)' }}
+                  className="text-sm font-medium mb-1"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: 'var(--color-text)',
+                  }}
                 >
-                  {venue.parkingNotice}
+                  주차
                 </p>
-              )}
+                <p
+                  className="text-sm leading-relaxed whitespace-pre-line"
+                  style={{ color: 'var(--color-text-light)' }}
+                >
+                  {venue.parking}
+                </p>
+              </div>
             </div>
+            {venue.parkingNotice && (
+              <p
+                className="text-xs leading-relaxed whitespace-pre-line text-center mt-3 pt-3 border-t border-[var(--color-border-light)]"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                {venue.parkingNotice}
+              </p>
+            )}
           </div>
         </motion.div>
 
