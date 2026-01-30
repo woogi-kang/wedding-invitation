@@ -67,6 +67,8 @@ export function CoupleIntro() {
                 style={{
                   fontFamily: 'var(--font-accent)',
                   color: 'var(--color-groom)',
+                  position: 'relative',
+                  top: '-3px',
                 }}
               >
                 Groom
@@ -137,6 +139,8 @@ export function CoupleIntro() {
                 style={{
                   fontFamily: 'var(--font-accent)',
                   color: 'var(--color-bride)',
+                  position: 'relative',
+                  top: '-3px',
                 }}
               >
                 Bride

@@ -103,7 +103,7 @@ export function Interview() {
                 />
               </button>
 
-              {/* Answer */}
+              {/* Answers */}
               <AnimatePresence>
                 {openIndex === index && (
                   <motion.div
@@ -113,14 +113,10 @@ export function Interview() {
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 py-4 border-t" style={{ borderColor: 'var(--color-border-light)' }}>
-                      <div className="flex gap-3">
-                        <span
-                          className="text-xs font-medium"
-                          style={{ color: 'var(--color-gold)' }}
-                        >
-                          A.
-                        </span>
+                    <div className="px-5 py-4 border-t space-y-4" style={{ borderColor: 'var(--color-border-light)' }}>
+                      {/* Groom Answer */}
+                      <div className="flex gap-3 items-center">
+                        <span className="text-base flex-shrink-0 leading-none">🤵</span>
                         <p
                           className="text-sm leading-relaxed whitespace-pre-line"
                           style={{
@@ -128,7 +124,20 @@ export function Interview() {
                             color: 'var(--color-text-light)',
                           }}
                         >
-                          {item.answer}
+                          {item.groomAnswer}
+                        </p>
+                      </div>
+                      {/* Bride Answer */}
+                      <div className="flex gap-3 items-center">
+                        <span className="text-base flex-shrink-0 leading-none">👰</span>
+                        <p
+                          className="text-sm leading-relaxed whitespace-pre-line"
+                          style={{
+                            fontFamily: 'var(--font-body)',
+                            color: 'var(--color-text-light)',
+                          }}
+                        >
+                          {item.brideAnswer}
                         </p>
                       </div>
                     </div>

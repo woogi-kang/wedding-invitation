@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Send, User, Trash2 } from 'lucide-react';
 import { Section, SectionTitle } from '@/components/common/Section';
 import { WEDDING_INFO } from '@/lib/constants';
+import { isBeforeWedding } from '@/lib/utils';
 import { db } from '@/lib/firebase';
 import {
   collection,
@@ -119,7 +120,8 @@ export function Guestbook() {
     }).format(date);
   };
 
-  if (!guestbook.enabled) return null;
+  // 방명록 비활성화 또는 결혼식 당일 이후면 표시하지 않음
+  if (!guestbook.enabled || !isBeforeWedding()) return null;
 
   return (
     <Section id="guestbook" background="secondary">

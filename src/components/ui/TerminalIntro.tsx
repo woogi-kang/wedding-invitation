@@ -135,19 +135,21 @@ interface TerminalLine {
 }
 
 const TERMINAL_LINES: TerminalLine[] = [
-  { text: '$ npx create-wedding', type: 'command' },
+  { text: '$ npm run create-wedding', type: 'command' },
+  { text: '', type: 'empty' },
+  { text: '> Fetching soulmate dependencies...', type: 'output' },
+  { text: '> Building our-story v1.0.0...', type: 'output' },
   { text: '', type: 'empty' },
   { text: 'PROGRESS', type: 'progress' },
   { text: '', type: 'empty' },
   { text: '[✓] 강태욱 ♥ 김선경', type: 'highlight' },
   { text: '[✓] 2026. 04. 05 (일)', type: 'output' },
   { text: '[✓] 오후 2시 10분', type: 'output' },
-  { text: '[✓] 라마다 서울 신도림', type: 'output' },
+  { text: '[✓] 서울 신도림 라마다 호텔 하늘정원', type: 'output' },
   { text: '', type: 'empty' },
-  { text: '→ Ready to launch', type: 'highlight' },
+  { text: '→ Ready to launch 🚀', type: 'highlight' },
   { text: '', type: 'empty' },
-  { text: '> 두 사람의 새로운 시작을', type: 'output' },
-  { text: '> 함께 해주시겠습니까? _', type: 'command' },
+  { text: '> 두 사람의 새로운 시작을 함께 해주세요 🎉 _', type: 'command' },
 ];
 
 // Typing speed (ms per character)
@@ -196,7 +198,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
   useEffect(() => {
     if (shouldReduceMotion && hasStarted && !isTypingComplete) {
       const allLines = TERMINAL_LINES.map(line =>
-        line.type === 'progress' ? '> [████████████████] 100%' : line.text
+        line.type === 'progress' ? '> Installing [████████████████] 100%' : line.text
       );
       setDisplayedLines(allLines);
       setCurrentLineIndex(TERMINAL_LINES.length);
@@ -254,7 +256,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
         return () => clearTimeout(timer);
       } else {
         // Progress complete, move to next line
-        setDisplayedLines(prev => [...prev, `> [████████████████] 100%`]);
+        setDisplayedLines(prev => [...prev, `> Installing [████████████████] 100%`]);
         setCurrentLineIndex(prev => prev + 1);
         setCurrentCharIndex(0);
         return;
@@ -297,7 +299,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     const total = 16;
     const filled = Math.floor((value * total) / 100);
     const empty = total - filled;
-    return `> [${'█'.repeat(filled)}${'░'.repeat(empty)}] ${value}%`;
+    return `> Installing [${'█'.repeat(filled)}${'░'.repeat(empty)}] ${value}%`;
   };
 
   // Get current typing text
@@ -400,9 +402,11 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
               <motion.div
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="mb-6 text-4xl"
+                className="mb-6 flex items-center gap-4"
               >
-                💒
+                <span className="text-2xl">🤵</span>
+                <span className="text-4xl">💒</span>
+                <span className="text-2xl">👰</span>
               </motion.div>
               <p className="text-green-400 text-lg mb-2">Wedding Invitation</p>
               <p className="text-green-500/60 text-sm mb-8">v1.0.0</p>
@@ -438,29 +442,27 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
             </div>
           )}
 
-          {/* Button */}
-          <AnimatePresence>
-            {hasStarted && showButton && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-8 space-y-4"
+          {/* Button - 공간 미리 확보, opacity로만 제어 */}
+          {hasStarted && (
+            <div
+              className="mt-8 transition-opacity duration-700 ease-out"
+              style={{ opacity: showButton ? 1 : 0, pointerEvents: showButton ? 'auto' : 'none' }}
+            >
+              <motion.button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEnter();
+                }}
+                animate={{ scale: [1, 1.03, 1, 1.02, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="w-full py-4 border-2 border-green-500 text-green-400 font-mono text-lg hover:bg-green-500/20 active:bg-green-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-black"
+                aria-label="청첩장 보기"
               >
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEnter();
-                  }}
-                  className="w-full py-4 border-2 border-green-500 text-green-400 font-mono text-lg hover:bg-green-500/20 active:bg-green-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-black"
-                  aria-label="청첩장 보기"
-                >
-                  {'함께하기 (버튼을 눌러주세요)'}
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {'함께하기 (버튼을 눌러주세요)'}
+              </motion.button>
+            </div>
+          )}
 
             {/* Skip hint - inside card */}
             {hasStarted && !isTypingComplete && (

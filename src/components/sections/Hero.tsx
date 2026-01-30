@@ -125,7 +125,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY, duration: 0.8 }}
-            className="mb-6 sm:mb-8 text-xs tracking-[0.3em] uppercase text-center"
+            className="mb-6 sm:mb-8 text-xs sm:text-[28px] tracking-[0.3em] uppercase text-center"
             style={heroTextAccent}
           >
             We are getting married
@@ -164,7 +164,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY + STAGGER * 3, duration: 0.8 }}
-            className="hidden sm:block mb-8 sm:mb-12 text-xs sm:text-sm tracking-[0.2em] text-center"
+            className="hidden sm:block mb-8 sm:mb-12 text-xs sm:text-lg tracking-[0.2em] text-center"
             style={heroTextAccent}
           >
             {groom.englishName} & {bride.englishName}
@@ -200,6 +200,8 @@ export function Hero() {
             style={heroTextHeading}
           >
             {venue.name}
+            <br />
+            14F 하늘정원
           </motion.p>
 
           {/* Decorative Line Bottom */}

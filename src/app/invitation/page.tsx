@@ -8,19 +8,22 @@ import {
   WeddingInfo,
   Location,
   Account,
-  RSVP,
   Guestbook,
   GuestSnap,
   Share,
   Footer,
 } from '@/components/sections';
 import { MouseTrail } from '@/components/ui/MouseTrail';
+import { RSVPDialog } from '@/components/ui/RSVPDialog';
 
 export default function InvitationPage() {
   return (
     <>
       {/* Mouse Trail - petal effect following cursor */}
       <MouseTrail />
+
+      {/* RSVP Dialog - 결혼식 전까지 2초 후 자동 표시 */}
+      <RSVPDialog />
 
       <main className="min-h-screen main-content">
 
@@ -39,8 +42,8 @@ export default function InvitationPage() {
         {/* 5. Gallery */}
         <Gallery />
 
-        {/* 6. Video */}
-        <Video />
+        {/* 6. Video - 준비 후 주석 해제 */}
+        {/* <Video /> */}
 
         {/* 7. WeddingInfo */}
         <WeddingInfo />
@@ -51,19 +54,16 @@ export default function InvitationPage() {
         {/* 9. Account */}
         <Account />
 
-        {/* 10. RSVP */}
-        <RSVP />
-
-        {/* 11. Guestbook */}
+        {/* 10. Guestbook */}
         <Guestbook />
 
-        {/* 12. GuestSnap */}
+        {/* 11. GuestSnap */}
         <GuestSnap />
 
-        {/* 13. Share */}
+        {/* 12. Share */}
         <Share />
 
-        {/* 14. Footer */}
+        {/* 13. Footer */}
         <Footer />
       </main>
     </>

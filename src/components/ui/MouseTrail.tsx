@@ -119,7 +119,7 @@ export function MouseTrail() {
       createdAt: Date.now(),
     };
 
-    setPetals(prev => [...prev.slice(-30), newPetal]); // Keep max 30 petals
+    setPetals(prev => [...prev.slice(-15), newPetal]); // Keep max 15 petals
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -131,14 +131,14 @@ export function MouseTrail() {
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     // Only create petal if moved enough distance
-    if (distance > 30) {
+    if (distance > 60) {
       createPetal(e.clientX, e.clientY);
       lastPositionRef.current = { x: e.clientX, y: e.clientY };
 
       throttleRef.current = true;
       throttleTimeoutRef.current = setTimeout(() => {
         throttleRef.current = false;
-      }, 50);
+      }, 100);
     }
   }, [createPetal, isMobile]);
 

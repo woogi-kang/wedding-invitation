@@ -24,6 +24,20 @@ export function calculateDday(targetDate: Date | string): number {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+// 결혼식 전인지 확인 (KST 기준)
+export function isBeforeWedding(weddingDate: string = '2026-04-05'): boolean {
+  // KST 기준으로 현재 시간 계산
+  const now = new Date();
+  const kstOffset = 9 * 60; // KST = UTC+9
+  const utcOffset = now.getTimezoneOffset();
+  const kstNow = new Date(now.getTime() + (kstOffset + utcOffset) * 60 * 1000);
+
+  // 결혼식 날짜 (KST 자정)
+  const wedding = new Date(weddingDate + 'T00:00:00');
+
+  return kstNow < wedding;
+}
+
 // 클립보드 복사
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {

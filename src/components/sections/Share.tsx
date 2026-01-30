@@ -2,11 +2,11 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Calendar, User, Link2, Share2 } from 'lucide-react';
+import { Calendar, Link2, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Section } from '@/components/common/Section';
 import { WEDDING_INFO } from '@/lib/constants';
-import { saveToCalendar, saveContact, copyToClipboard, shareUrl } from '@/lib/utils';
+import { saveToCalendar, copyToClipboard, shareUrl } from '@/lib/utils';
 
 // Kakao Icon
 function KakaoIcon({ className }: { className?: string }) {
@@ -37,24 +37,6 @@ export function Share() {
     toast.success('캘린더에 저장되었습니다');
   };
 
-  const handleSaveGroomContact = () => {
-    saveContact(
-      `${groom.name} (신랑)`,
-      groom.phone,
-      `결혼식: ${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day}`
-    );
-    toast.success('연락처가 저장되었습니다');
-  };
-
-  const handleSaveBrideContact = () => {
-    saveContact(
-      `${bride.name} (신부)`,
-      bride.phone,
-      `결혼식: ${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day}`
-    );
-    toast.success('연락처가 저장되었습니다');
-  };
-
   const handleCopyLink = async () => {
     const success = await copyToClipboard(window.location.href);
     if (success) {
@@ -69,9 +51,10 @@ export function Share() {
   };
 
   const handleKakaoShare = () => {
-    if (typeof window !== 'undefined' && window.Kakao) {
+    if (typeof window !== 'undefined' && window.Kakao && window.Kakao.Share) {
       if (!window.Kakao.isInitialized()) {
-        // Initialize with Kakao App Key if available
+        toast.info('카카오 SDK가 초기화되지 않았습니다');
+        return;
       }
 
       window.Kakao.Share.sendDefault({
@@ -96,7 +79,9 @@ export function Share() {
         ],
       });
     } else {
-      toast.info('카카오 공유 기능을 사용하려면 설정이 필요합니다');
+      // Kakao SDK not loaded - fallback to link copy
+      handleCopyLink();
+      toast.info('카카오톡 공유 대신 링크가 복사되었습니다');
     }
   };
 
@@ -140,7 +125,7 @@ export function Share() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-4"
+          className="mb-6"
         >
           <button
             onClick={handleSaveCalendar}
@@ -169,66 +154,11 @@ export function Share() {
           </button>
         </motion.div>
 
-        {/* Contact Save */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-6"
-        >
-          <div className="p-4 bg-white rounded-sm border border-[var(--color-border-light)]">
-            <div className="flex items-center gap-4 mb-4">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full"
-                style={{ backgroundColor: 'var(--color-botanical-light)' }}
-              >
-                <User className="h-5 w-5" style={{ color: 'var(--color-botanical)' }} />
-              </div>
-              <div>
-                <p
-                  className="text-sm font-medium"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: 'var(--color-text)',
-                  }}
-                >
-                  연락처 저장
-                </p>
-                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                  휴대폰 연락처에 저장합니다
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleSaveGroomContact}
-                className="flex-1 py-2.5 text-sm rounded-sm border transition-all hover:opacity-70"
-                style={{
-                  borderColor: 'var(--color-groom)',
-                  color: 'var(--color-groom)',
-                }}
-              >
-                신랑 {groom.name}
-              </button>
-              <button
-                onClick={handleSaveBrideContact}
-                className="flex-1 py-2.5 text-sm rounded-sm border transition-all hover:opacity-70"
-                style={{
-                  borderColor: 'var(--color-bride)',
-                  color: 'var(--color-bride)',
-                }}
-              >
-                신부 {bride.name}
-              </button>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Share Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
           className="flex justify-center gap-6"
         >
           <button

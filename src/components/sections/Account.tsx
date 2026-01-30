@@ -203,14 +203,14 @@ export function Account() {
             accounts={groomAccounts}
             isOpen={openSection === 'groom'}
             onToggle={() => setOpenSection(openSection === 'groom' ? null : 'groom')}
-            accentColor="var(--color-groom)"
+            accentColor="var(--color-primary)"
           />
           <AccountGroup
             title="신부측 계좌번호"
             accounts={brideAccounts}
             isOpen={openSection === 'bride'}
             onToggle={() => setOpenSection(openSection === 'bride' ? null : 'bride')}
-            accentColor="var(--color-bride)"
+            accentColor="var(--color-primary)"
           />
         </motion.div>
       </div>

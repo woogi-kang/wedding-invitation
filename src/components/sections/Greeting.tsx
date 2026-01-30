@@ -77,39 +77,6 @@ export function Greeting() {
           </p>
         </motion.div>
 
-        {/* Decorative Element */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex justify-center"
-        >
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{ color: 'var(--color-primary)' }}
-          >
-            <path
-              d="M12 3C12 3 5 8 5 13C5 17 8.5 20 12 20C15.5 20 19 17 19 13C19 8 12 3 12 3Z"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              fill="none"
-            />
-            <path
-              d="M12 7V16"
-              stroke="currentColor"
-              strokeWidth="1"
-            />
-            <path
-              d="M9 10L12 7L15 10"
-              stroke="currentColor"
-              strokeWidth="1"
-              fill="none"
-            />
-          </svg>
-        </motion.div>
       </div>
     </Section>
   );

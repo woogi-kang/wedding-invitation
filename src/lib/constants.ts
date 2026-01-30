@@ -67,7 +67,7 @@ export const WEDDING_INFO = {
 
   // 예식장 정보
   venue: {
-    name: '라마다 서울 신도림 호텔',
+    name: '서울 신도림 라마다 호텔',
     hall: '14층 하늘정원(SKY GARDEN)',
     address: '서울 구로구 경인로 624',
     roadAddress: '서울 구로구 경인로 624',
@@ -117,33 +117,36 @@ export const WEDDING_INFO = {
   // 인사말
   greeting: {
     title: '소중한 분들을 초대합니다',
-    message: `있는 그대로를 사랑하고
-서로의 존재를 감사하며
-변함없이 서로를 아끼며 살겠습니다.
+    message: `한 사람이 오는 것은
+그 사람의 삶 전체가 오는 것이기에,
+누군가를 곁에 두기로 하는 것은
+무척 거대한 결심이라고 합니다.
 
-저희의 새로운 시작을
-소중한 분들과 함께 나누고자 하오니
-귀한 걸음으로
-따뜻한 축복을 보내주시기 바랍니다.`,
+그 귀한 마음을 서로에게 서약하는 날,
+가장 소중한 분들을 모십니다.`,
   },
 
   // 웨딩 인터뷰
   interview: [
     {
-      question: '결혼을 결심하게 된 계기가 있나요?',
-      answer: '함께 있을 때 가장 편안하고, 서로의 곁에서 성장하는 모습을 보며 평생을 함께하고 싶다는 확신이 들었습니다.',
+      question: '첫만남은 어땠나요?',
+      groomAnswer: '신랑 답변 placeholder',
+      brideAnswer: '신부 답변 placeholder',
     },
     {
-      question: '첫 만남은 어땠나요?',
-      answer: '처음 만났을 때부터 대화가 잘 통해서 시간 가는 줄 몰랐어요. 그때부터 운명이라고 느꼈던 것 같아요.',
+      question: '연애하면서 서로 닮아졌다고 느끼는 부분이 있나요?',
+      groomAnswer: '신랑 답변 placeholder',
+      brideAnswer: '신부 답변 placeholder',
     },
     {
-      question: '서로에게 하고 싶은 말이 있다면?',
-      answer: '앞으로의 모든 날들을 함께 걸어가자. 기쁜 날도, 힘든 날도 서로의 손을 놓지 않을게요.',
+      question: '이 사람과 결혼하면 "이건 참 좋겠다" 싶었던 점은요?',
+      groomAnswer: '신랑 답변 placeholder',
+      brideAnswer: '신부 답변 placeholder',
     },
     {
-      question: '신혼여행은 어디로 가시나요?',
-      answer: '따뜻한 곳에서 여유롭게 쉬다 오려고 해요. 둘만의 시간을 충분히 보내고 올 예정입니다.',
+      question: '이 사람의 이런 모습, 하객분들은 알고 계셨나요?',
+      groomAnswer: '신랑 답변 placeholder',
+      brideAnswer: '신부 답변 placeholder',
     },
   ],
 
