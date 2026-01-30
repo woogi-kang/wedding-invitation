@@ -5,6 +5,30 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { WEDDING_INFO } from '@/lib/constants';
 
+// Shared style objects to reduce duplication
+const heroTextAccent = {
+  fontFamily: 'var(--font-accent)',
+  color: 'var(--color-text)',
+  fontStyle: 'italic' as const,
+  textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
+};
+
+const heroTextHeading = {
+  fontFamily: 'var(--font-heading)',
+  color: 'var(--color-text)',
+  textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
+};
+
+const heroTextHeadingLarge = {
+  ...heroTextHeading,
+  fontWeight: 400,
+  textShadow: '0 2px 8px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5)',
+};
+
+// Animation timing constants
+const BASE_DELAY = 1;
+const STAGGER = 0.2;
+
 export function Hero() {
   const { groom, bride, dateDisplay, venue } = WEDDING_INFO;
   const [isLoaded, setIsLoaded] = useState(false);
@@ -15,8 +39,9 @@ export function Hero() {
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
+    // Use requestAnimationFrame for proper paint timing instead of arbitrary timeout
+    const frame = requestAnimationFrame(() => setIsLoaded(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   return (
@@ -40,6 +65,8 @@ export function Hero() {
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
+            role="img"
+            aria-label="신랑 사진"
             style={{
               backgroundImage: 'url(/images/hero/groom.jpg)',
               willChange: 'auto',
@@ -58,6 +85,8 @@ export function Hero() {
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
+            role="img"
+            aria-label="신부 사진"
             style={{
               backgroundImage: 'url(/images/hero/bride.jpg)',
               willChange: 'auto',
@@ -75,27 +104,22 @@ export function Hero() {
         animate={isLoaded ? { opacity: 1 } : {}}
         transition={{ duration: 2, delay: 1 }}
         style={{
-          background: 'linear-gradient(to right, transparent, rgba(245, 243, 237, 0.5) 35%, rgba(245, 243, 237, 0.6) 50%, rgba(245, 243, 237, 0.5) 65%, transparent)',
+          background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--color-background) 50%, transparent) 35%, color-mix(in srgb, var(--color-background) 60%, transparent) 50%, color-mix(in srgb, var(--color-background) 50%, transparent) 65%, transparent)',
         }}
       />
 
-      {/* Main Content - Center */}
+      {/* Main Content - Center on desktop, Bottom on mobile */}
       <motion.div
-        className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6"
+        className="relative z-10 flex min-h-screen flex-col items-center justify-end sm:justify-center px-6 pb-24 sm:pb-0"
         style={{ y: textY, opacity }}
       >
         {/* English Quote */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1, duration: 0.8 }}
+          transition={{ delay: BASE_DELAY, duration: 0.8 }}
           className="mb-8 text-xs tracking-[0.3em] uppercase"
-          style={{
-            fontFamily: 'var(--font-accent)',
-            color: 'var(--color-text)',
-            fontStyle: 'italic',
-            textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
-          }}
+          style={heroTextAccent}
         >
           We are getting married
         </motion.p>
@@ -104,7 +128,7 @@ export function Hero() {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={isLoaded ? { scaleX: 1 } : {}}
-          transition={{ delay: 1.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: BASE_DELAY + STAGGER, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mb-10 h-px w-16 origin-center"
           style={{ backgroundColor: 'var(--color-primary)' }}
         />
@@ -113,17 +137,12 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.4, duration: 0.8 }}
+          transition={{ delay: BASE_DELAY + STAGGER * 2, duration: 0.8 }}
           className="mb-4"
         >
           <h1
             className="text-3xl min-[375px]:text-4xl sm:text-5xl tracking-wider"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text)',
-              fontWeight: 400,
-              textShadow: '0 2px 8px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5)',
-            }}
+            style={heroTextHeadingLarge}
           >
             <span>{groom.name}</span>
             <span className="mx-3 text-2xl" style={{ color: 'var(--color-gold)' }}>
@@ -137,14 +156,9 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.6, duration: 0.8 }}
+          transition={{ delay: BASE_DELAY + STAGGER * 3, duration: 0.8 }}
           className="mb-12 text-sm tracking-[0.2em]"
-          style={{
-            fontFamily: 'var(--font-accent)',
-            color: 'var(--color-text)',
-            fontStyle: 'italic',
-            textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
-          }}
+          style={heroTextAccent}
         >
           {groom.englishName} & {bride.englishName}
         </motion.p>
@@ -153,26 +167,18 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.8, duration: 0.8 }}
+          transition={{ delay: BASE_DELAY + STAGGER * 4, duration: 0.8 }}
           className="mb-8 text-center"
         >
           <p
             className="text-lg min-[375px]:text-xl mb-2 tracking-wider"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text)',
-              textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
-            }}
+            style={heroTextHeading}
           >
             {dateDisplay.year}. {String(dateDisplay.month).padStart(2, '0')}. {String(dateDisplay.day).padStart(2, '0')}
           </p>
           <p
             className="text-sm tracking-wider"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text)',
-              textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
-            }}
+            style={heroTextHeading}
           >
             {dateDisplay.dayOfWeek} {dateDisplay.time}
           </p>
@@ -182,13 +188,9 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 2, duration: 0.8 }}
+          transition={{ delay: BASE_DELAY + STAGGER * 5, duration: 0.8 }}
           className="text-sm tracking-wider"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            color: 'var(--color-text)',
-            textShadow: '0 1px 4px rgba(255, 255, 255, 0.8)',
-          }}
+          style={heroTextHeading}
         >
           {venue.name}
         </motion.p>
@@ -197,18 +199,18 @@ export function Hero() {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={isLoaded ? { scaleX: 1 } : {}}
-          transition={{ delay: 2.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: BASE_DELAY + STAGGER * 6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-12 h-px w-16 origin-center"
           style={{ backgroundColor: 'var(--color-primary)' }}
         />
       </motion.div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator - hidden on very small screens */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={isLoaded ? { opacity: 1 } : {}}
-        transition={{ delay: 2.5, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
+        transition={{ delay: BASE_DELAY + STAGGER * 7.5, duration: 0.8 }}
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 hidden min-[375px]:block"
         style={{ opacity }}
       >
         <motion.div
