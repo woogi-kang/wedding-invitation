@@ -159,12 +159,12 @@ export function Hero() {
             </h1>
           </motion.div>
 
-          {/* Names - English */}
+          {/* Names - English - hidden on mobile */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY + STAGGER * 3, duration: 0.8 }}
-            className="mb-8 sm:mb-12 text-xs sm:text-sm tracking-[0.2em] text-center"
+            className="hidden sm:block mb-8 sm:mb-12 text-xs sm:text-sm tracking-[0.2em] text-center"
             style={heroTextAccent}
           >
             {groom.englishName} & {bride.englishName}
@@ -191,12 +191,12 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* Venue */}
+          {/* Venue - hidden on mobile */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY + STAGGER * 5, duration: 0.8 }}
-            className="text-xs sm:text-sm tracking-wider text-center"
+            className="hidden sm:block text-xs sm:text-sm tracking-wider text-center"
             style={heroTextHeading}
           >
             {venue.name}
