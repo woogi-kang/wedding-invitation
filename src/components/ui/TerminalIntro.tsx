@@ -117,6 +117,7 @@ const TYPING_SPEED = 30;
 const LINE_DELAY = 150;
 
 export function TerminalIntro({ onEnter }: TerminalIntroProps) {
+  const [hasStarted, setHasStarted] = useState(false); // Wait for user to start
   const [displayedLines, setDisplayedLines] = useState<string[]>([]);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
@@ -128,33 +129,20 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
   // Refs for timeout cleanup to prevent memory leaks
   const buttonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldReduceMotion = useReducedMotion();
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const hasInteractedRef = useRef(false);
 
   // Initialize 8-bit sound generator
   const sound = useMemo(() => create8BitSound(), []);
 
-  // Auto-enable sound on first user interaction anywhere
-  useEffect(() => {
-    const enableOnInteraction = () => {
-      if (!hasInteractedRef.current && sound) {
-        sound.resume();
-        setSoundEnabled(true);
-        hasInteractedRef.current = true;
-      }
-    };
+  // Start typing animation with sound
+  const handleStart = useCallback(() => {
+    if (hasStarted) return;
 
-    // Listen for any user interaction
-    window.addEventListener('click', enableOnInteraction, { once: true });
-    window.addEventListener('touchstart', enableOnInteraction, { once: true });
-    window.addEventListener('keydown', enableOnInteraction, { once: true });
-
-    return () => {
-      window.removeEventListener('click', enableOnInteraction);
-      window.removeEventListener('touchstart', enableOnInteraction);
-      window.removeEventListener('keydown', enableOnInteraction);
-    };
-  }, [sound]);
+    // Enable audio context on user interaction
+    if (sound) {
+      sound.resume();
+    }
+    setHasStarted(true);
+  }, [hasStarted, sound]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -167,7 +155,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
 
   // Skip animation for users who prefer reduced motion
   useEffect(() => {
-    if (shouldReduceMotion && !isTypingComplete) {
+    if (shouldReduceMotion && hasStarted && !isTypingComplete) {
       const allLines = TERMINAL_LINES.map(line =>
         line.type === 'progress' ? '> [████████████████] 100%' : line.text
       );
@@ -176,28 +164,12 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
       setIsTypingComplete(true);
       setShowButton(true);
     }
-  }, [shouldReduceMotion, isTypingComplete]);
+  }, [shouldReduceMotion, hasStarted, isTypingComplete]);
 
-  // Enable sound on first interaction (required by browser autoplay policy)
-  const enableSound = useCallback(() => {
-    if (!soundEnabled && sound) {
-      sound.resume();
-      setSoundEnabled(true);
-      hasInteractedRef.current = true;
-    }
-  }, [soundEnabled, sound]);
-
-  // Skip animation on tap (only skip on second tap, first tap enables sound)
+  // Skip animation on tap (after started)
   const handleSkip = useCallback(() => {
-    if (isTypingComplete) return;
+    if (!hasStarted || isTypingComplete) return;
 
-    // First interaction: enable sound only, don't skip
-    if (!hasInteractedRef.current) {
-      enableSound();
-      return;
-    }
-
-    // Second interaction: skip animation
     setIsSkipped(true);
     const allLines = TERMINAL_LINES.map(line =>
       line.type === 'progress' ? '> [████████████████] 100%' : line.text
@@ -205,9 +177,9 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     setDisplayedLines(allLines);
     setCurrentLineIndex(TERMINAL_LINES.length);
     setIsTypingComplete(true);
-    if (sound && soundEnabled) sound.playCompleteSound();
+    if (sound) sound.playCompleteSound();
     buttonTimeoutRef.current = setTimeout(() => setShowButton(true), 300);
-  }, [isTypingComplete, enableSound, sound, soundEnabled]);
+  }, [hasStarted, isTypingComplete, sound]);
 
   // Keyboard support for accessibility
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -217,12 +189,12 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     }
   }, [handleSkip]);
 
-  // Typing animation
+  // Typing animation - only runs after hasStarted
   useEffect(() => {
-    if (isSkipped || currentLineIndex >= TERMINAL_LINES.length) {
-      if (!isSkipped) {
+    if (!hasStarted || isSkipped || currentLineIndex >= TERMINAL_LINES.length) {
+      if (hasStarted && !isSkipped && currentLineIndex >= TERMINAL_LINES.length) {
         setIsTypingComplete(true);
-        if (sound && soundEnabled) sound.playCompleteSound();
+        if (sound) sound.playCompleteSound();
         buttonTimeoutRef.current = setTimeout(() => setShowButton(true), 500);
       }
       return;
@@ -236,7 +208,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
         const timer = setTimeout(() => {
           setProgressValue(prev => Math.min(prev + 5, 100));
           // Play progress sound every 20%
-          if (sound && soundEnabled && progressValue % 20 === 0) {
+          if (sound && progressValue % 20 === 0) {
             sound.playProgressSound();
           }
         }, 30);
@@ -264,8 +236,8 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     if (currentCharIndex < currentLine.text.length) {
       const timer = setTimeout(() => {
         setCurrentCharIndex(prev => prev + 1);
-        // Play typing sound (throttled - every 2 characters)
-        if (sound && soundEnabled && currentCharIndex % 2 === 0) {
+        // Play typing sound for each character
+        if (sound) {
           sound.playTypingSound();
         }
       }, TYPING_SPEED);
@@ -279,7 +251,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
       }, LINE_DELAY);
       return () => clearTimeout(timer);
     }
-  }, [currentLineIndex, currentCharIndex, progressValue, isSkipped, sound, soundEnabled]);
+  }, [hasStarted, currentLineIndex, currentCharIndex, progressValue, isSkipped, sound]);
 
   // Generate progress bar string with integer math for precision
   const getProgressBar = (value: number) => {
@@ -314,11 +286,14 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
     }
   };
 
-  // Handle tap to enable sound and skip
+  // Handle tap - start if not started, skip if already started
   const handleTap = useCallback(() => {
-    enableSound();
-    handleSkip();
-  }, [enableSound, handleSkip]);
+    if (!hasStarted) {
+      handleStart();
+    } else {
+      handleSkip();
+    }
+  }, [hasStarted, handleStart, handleSkip]);
 
   return (
     <div
@@ -375,8 +350,37 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
           {/* Terminal content */}
           <div className="p-4 sm:p-6">
             <div className="font-mono text-sm sm:text-base leading-relaxed">
-          {/* Rendered lines */}
-          {displayedLines.map((line, index) => (
+
+          {/* Start Screen - shown before typing begins */}
+          {!hasStarted && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-8 text-center"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="mb-6 text-4xl"
+              >
+                💒
+              </motion.div>
+              <p className="text-green-400 text-lg mb-2">Wedding Invitation</p>
+              <p className="text-green-500/60 text-sm mb-8">v1.0.0</p>
+              <motion.div
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="text-green-400 text-sm"
+              >
+                [ 화면을 터치하여 시작 ]
+              </motion.div>
+              <p className="text-green-600/40 text-xs mt-4">
+                🔊 사운드와 함께 시작됩니다
+              </p>
+            </motion.div>
+          )}
+          {/* Rendered lines - only show after started */}
+          {hasStarted && displayedLines.map((line, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0 }}
@@ -388,7 +392,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
           ))}
 
           {/* Currently typing line */}
-          {!isTypingComplete && currentLineIndex < TERMINAL_LINES.length && (
+          {hasStarted && !isTypingComplete && currentLineIndex < TERMINAL_LINES.length && (
             <div className={`${getLineColor('', currentLineIndex)} whitespace-pre min-h-[1.5em]`}>
               {getCurrentTypingText()}
               <span className="animate-pulse">▊</span>
@@ -397,7 +401,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
 
           {/* Button */}
           <AnimatePresence>
-            {showButton && (
+            {hasStarted && showButton && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -428,7 +432,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
           </AnimatePresence>
 
             {/* Skip hint - inside card */}
-            {!isTypingComplete && (
+            {hasStarted && !isTypingComplete && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
