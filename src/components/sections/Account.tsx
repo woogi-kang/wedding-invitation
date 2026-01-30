@@ -162,7 +162,7 @@ export function Account() {
               color: 'var(--color-primary)',
             }}
           >
-            Gift
+            Blessings
           </p>
           <h2
             className="text-2xl mb-3"
@@ -185,9 +185,14 @@ export function Account() {
               color: 'var(--color-text-light)',
             }}
           >
-            참석이 어려우신 분들을 위해
+            함께하지 못하시더라도
+            <br />
+            축하의 마음을 전해주실 분들을 위해
             <br />
             계좌번호를 안내드립니다.
+            <br />
+            <br />
+            보내주시는 마음, 감사히 간직하겠습니다.
           </p>
         </motion.div>
 
