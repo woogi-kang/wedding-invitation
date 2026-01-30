@@ -47,25 +47,65 @@ function PetalSVG({ type, size, rotation }: { type: PetalType; size: number; rot
 
 export function MouseTrail() {
   const [petals, setPetals] = useState<TrailPetal[]>([]);
+  const [isMobile, setIsMobile] = useState(true); // Default to true to prevent flash
+  const [isMounted, setIsMounted] = useState(false);
   const petalIdRef = useRef(0);
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const throttleRef = useRef(false);
-  const isTouchDevice = useRef(false);
+  const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Check for touch device
+  // Track mount state for SSR
   useEffect(() => {
-    isTouchDevice.current = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    setIsMounted(true);
   }, []);
 
-  // Clean up old petals
+  // Cleanup throttle timeout on unmount
   useEffect(() => {
+    return () => {
+      if (throttleTimeoutRef.current) {
+        clearTimeout(throttleTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Check for mobile/touch device using CSS media queries for accuracy
+  useEffect(() => {
+    const checkMobile = () => {
+      // Use pointer media query for more accurate input detection
+      const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+      const hasNoFinePointer = !window.matchMedia('(pointer: fine)').matches;
+      const isSmallScreen = window.matchMedia('(max-width: 767px)').matches;
+      // Only disable for true mobile (coarse pointer without fine pointer) or small screens
+      setIsMobile((isCoarsePointer && hasNoFinePointer) || isSmallScreen);
+    };
+    checkMobile();
+
+    // Listen to both resize and pointer changes
+    const mediaQuery = window.matchMedia('(pointer: fine)');
+    mediaQuery.addEventListener('change', checkMobile);
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      mediaQuery.removeEventListener('change', checkMobile);
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // Clean up old petals - only run when petals exist to avoid unnecessary re-renders
+  useEffect(() => {
+    if (isMobile || petals.length === 0) return;
+
     const interval = setInterval(() => {
       const now = Date.now();
-      setPetals(prev => prev.filter(p => now - p.createdAt < 2000));
+      setPetals(prev => {
+        const filtered = prev.filter(p => now - p.createdAt < 2000);
+        // Return same reference if no change to prevent unnecessary re-renders
+        return filtered.length === prev.length ? prev : filtered;
+      });
     }, 100);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isMobile, petals.length > 0]);
 
   const createPetal = useCallback((x: number, y: number) => {
     const types: PetalType[] = ['sakura', 'rose', 'heart'];
@@ -83,7 +123,7 @@ export function MouseTrail() {
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isTouchDevice.current) return;
+    if (isMobile) return;
     if (throttleRef.current) return;
 
     const dx = e.clientX - lastPositionRef.current.x;
@@ -96,19 +136,20 @@ export function MouseTrail() {
       lastPositionRef.current = { x: e.clientX, y: e.clientY };
 
       throttleRef.current = true;
-      setTimeout(() => {
+      throttleTimeoutRef.current = setTimeout(() => {
         throttleRef.current = false;
       }, 50);
     }
-  }, [createPetal]);
+  }, [createPetal, isMobile]);
 
   useEffect(() => {
+    if (isMobile) return;
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+  }, [handleMouseMove, isMobile]);
 
-  // Don't render on touch devices
-  if (typeof window !== 'undefined' && isTouchDevice.current) {
+  // Don't render on mobile devices or before mount (SSR)
+  if (!isMounted || isMobile) {
     return null;
   }
 
