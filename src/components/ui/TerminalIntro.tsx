@@ -135,21 +135,22 @@ interface TerminalLine {
 }
 
 const TERMINAL_LINES: TerminalLine[] = [
-  { text: '$ npm run create-wedding', type: 'command' },
+  { text: '$ flutter create wedding-invitation', type: 'command' },
   { text: '', type: 'empty' },
-  { text: '> Fetching soulmate dependencies...', type: 'output' },
-  { text: '> Building our-story v1.0.0...', type: 'output' },
+  { text: '> flutter pub add happiness...', type: 'output' },
+  { text: '> flutter pub add new_beginning...', type: 'output' },
+  { text: '> flutter build new_chapter --release', type: 'output' },
   { text: '', type: 'empty' },
   { text: 'PROGRESS', type: 'progress' },
   { text: '', type: 'empty' },
   { text: '[✓] 강태욱 ♥ 김선경', type: 'highlight' },
   { text: '[✓] 2026. 04. 05 (일)', type: 'output' },
   { text: '[✓] 오후 2시 10분', type: 'output' },
-  { text: '[✓] 서울 신도림 라마다 호텔 하늘정원', type: 'output' },
+  { text: '[✓] 라마다 호텔 하늘정원', type: 'output' },
   { text: '', type: 'empty' },
-  { text: '→ Ready to launch 🚀', type: 'highlight' },
+  { text: '→ flutter run wedding 🚀', type: 'highlight' },
   { text: '', type: 'empty' },
-  { text: '> 두 사람의 새로운 시작을 함께 해주세요 🎉 _', type: 'command' },
+  { text: '> 새로운 시작을 함께 해주세요 💙', type: 'command' },
 ];
 
 // Typing speed (ms per character)
@@ -198,7 +199,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
   useEffect(() => {
     if (shouldReduceMotion && hasStarted && !isTypingComplete) {
       const allLines = TERMINAL_LINES.map(line =>
-        line.type === 'progress' ? '> Installing [████████████████] 100%' : line.text
+        line.type === 'progress' ? '> Building [██████████] 100%' : line.text
       );
       setDisplayedLines(allLines);
       setCurrentLineIndex(TERMINAL_LINES.length);
@@ -213,7 +214,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
 
     setIsSkipped(true);
     const allLines = TERMINAL_LINES.map(line =>
-      line.type === 'progress' ? '> [████████████████] 100%' : line.text
+      line.type === 'progress' ? '> Building [██████████] 100%' : line.text
     );
     setDisplayedLines(allLines);
     setCurrentLineIndex(TERMINAL_LINES.length);
@@ -256,7 +257,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
         return () => clearTimeout(timer);
       } else {
         // Progress complete, move to next line
-        setDisplayedLines(prev => [...prev, `> Installing [████████████████] 100%`]);
+        setDisplayedLines(prev => [...prev, `> Building [██████████] 100%`]);
         setCurrentLineIndex(prev => prev + 1);
         setCurrentCharIndex(0);
         return;
@@ -296,10 +297,10 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
 
   // Generate progress bar string with integer math for precision
   const getProgressBar = (value: number) => {
-    const total = 16;
+    const total = 10;
     const filled = Math.floor((value * total) / 100);
     const empty = total - filled;
-    return `> Installing [${'█'.repeat(filled)}${'░'.repeat(empty)}] ${value}%`;
+    return `> Building [${'█'.repeat(filled)}${'░'.repeat(empty)}] ${value}%`;
   };
 
   // Get current typing text
