@@ -3,7 +3,7 @@
  * Tests file validation utilities for Guest Snap feature
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   sanitizeGuestName,
   sanitizeFileName,
