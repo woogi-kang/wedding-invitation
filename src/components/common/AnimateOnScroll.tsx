@@ -167,22 +167,19 @@ export function AnimateOnScroll({
     });
   };
 
-  // Create the element
-  const ElementComponent = Component as React.ElementType;
+  // Create the element with proper typing
+  const props = {
+    ref: animation.ref,
+    id,
+    className: cn(animation.className, className),
+    style: {
+      ...animationStyle,
+      ...style,
+    },
+    children: renderChildren(),
+  };
 
-  return (
-    <ElementComponent
-      ref={animation.ref}
-      id={id}
-      className={cn(animation.className, className)}
-      style={{
-        ...animationStyle,
-        ...style,
-      }}
-    >
-      {renderChildren()}
-    </ElementComponent>
-  );
+  return React.createElement(Component, props);
 }
 
 /**
