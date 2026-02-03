@@ -54,8 +54,29 @@ export function Hero() {
         }}
       />
 
-      {/* Split Screen Photo Reveal */}
-      <div className="absolute inset-0 flex">
+      {/* Mobile: Single Couple Photo */}
+      <motion.div
+        className="absolute inset-0 sm:hidden overflow-hidden"
+        initial={{ opacity: 0, scale: 1.1 }}
+        animate={isLoaded ? { opacity: 1, scale: 1 } : {}}
+        transition={{ duration: 1.5, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          role="img"
+          aria-label="커플 사진"
+          style={{
+            backgroundImage: 'url(/images/hero/couple.jpg)',
+            willChange: 'auto',
+          }}
+        />
+        {/* Subtle overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--color-background)]/90" />
+        <div className="absolute inset-0 bg-[var(--color-background)]/20" />
+      </motion.div>
+
+      {/* Desktop: Split Screen Photo Reveal */}
+      <div className="absolute inset-0 hidden sm:flex">
         {/* Left Panel - Groom */}
         <motion.div
           className="relative w-1/2 overflow-hidden"
@@ -97,9 +118,9 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Center Gradient Blend - Semi-transparent */}
+      {/* Center Gradient Blend - Desktop only */}
       <motion.div
-        className="absolute left-1/2 top-0 bottom-0 w-24 -translate-x-1/2 pointer-events-none"
+        className="absolute left-1/2 top-0 bottom-0 w-24 -translate-x-1/2 pointer-events-none hidden sm:block"
         initial={{ opacity: 0 }}
         animate={isLoaded ? { opacity: 1 } : {}}
         transition={{ duration: 2, delay: 1 }}

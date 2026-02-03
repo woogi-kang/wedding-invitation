@@ -16,8 +16,11 @@ import {
 import { MouseTrail } from '@/components/ui/MouseTrail';
 import { RSVPDialog } from '@/components/ui/RSVPDialog';
 import { GuestSnapDialog } from '@/components/ui/GuestSnapDialog';
+import { getGalleryImages } from '@/lib/cloudinary';
 
-export default function InvitationPage() {
+export default async function InvitationPage() {
+  // Fetch gallery images from Cloudinary (server-side)
+  const galleryImages = await getGalleryImages('wedding/gallery');
   return (
     <>
       {/* Mouse Trail - petal effect following cursor */}
@@ -44,7 +47,7 @@ export default function InvitationPage() {
         <Interview />
 
         {/* 5. Gallery */}
-        <Gallery />
+        <Gallery images={galleryImages} />
 
         {/* 6. Video - 준비 후 주석 해제 */}
         {/* <Video /> */}

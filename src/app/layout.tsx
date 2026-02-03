@@ -56,6 +56,27 @@ export default function RootLayout({
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
         />
+        {/* Preload Hero images for LCP optimization */}
+        {/* Desktop: groom & bride split view */}
+        <link
+          rel="preload"
+          href="/images/hero/groom.jpg"
+          as="image"
+          media="(min-width: 640px)"
+        />
+        <link
+          rel="preload"
+          href="/images/hero/bride.jpg"
+          as="image"
+          media="(min-width: 640px)"
+        />
+        {/* Mobile: couple together */}
+        <link
+          rel="preload"
+          href="/images/hero/couple.jpg"
+          as="image"
+          media="(max-width: 639px)"
+        />
         {/* Preload background music for faster playback */}
         <link
           rel="preload"

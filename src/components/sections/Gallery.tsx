@@ -1,33 +1,44 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import { motion, useInView } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Section } from '@/components/common/Section';
-import { WEDDING_INFO } from '@/lib/constants';
+import type { GalleryImage } from '@/lib/cloudinary';
 
 // Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 
-export function Gallery() {
-  const { gallery } = WEDDING_INFO;
+interface GalleryProps {
+  images: GalleryImage[];
+}
+
+// Skeleton component
+function ImageSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={`animate-pulse bg-[var(--color-primary)]/10 ${className || ''}`} />
+  );
+}
+
+export function Gallery({ images }: GalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const swiperRef = useRef<SwiperType | null>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
+  // Return null if no images
+  if (!images || images.length === 0) {
+    return null;
+  }
+
   const openDialog = useCallback((index: number) => {
     setSelectedIndex(index);
     dialogRef.current?.showModal();
     document.body.style.overflow = 'hidden';
-    // Swiper가 마운트된 후 해당 슬라이드로 이동
-    setTimeout(() => {
-      swiperRef.current?.slideToLoop(index, 0);
-    }, 0);
   }, []);
 
   const closeDialog = useCallback(() => {
@@ -35,6 +46,14 @@ export function Gallery() {
     setSelectedIndex(null);
     document.body.style.overflow = 'unset';
   }, []);
+
+  // Handle swiper initialization and slide sync
+  const handleSwiperInit = useCallback((swiper: SwiperType) => {
+    swiperRef.current = swiper;
+    if (selectedIndex !== null) {
+      swiper.slideToLoop(selectedIndex, 0);
+    }
+  }, [selectedIndex]);
 
   // 키보드 & 줌 비활성화
   useEffect(() => {
@@ -83,7 +102,7 @@ export function Gallery() {
         </motion.div>
 
         {/* Main + Thumbnail Gallery */}
-        <MainThumbnailGallery images={gallery.images} onImageClick={openDialog} isInView={isInView} />
+        <MainThumbnailGallery images={images} onImageClick={openDialog} isInView={isInView} />
 
         {/* Dialog */}
         <dialog
@@ -119,7 +138,8 @@ export function Gallery() {
 
               {/* Swiper for sliding */}
               <Swiper
-                onSwiper={(swiper) => { swiperRef.current = swiper; }}
+                key={selectedIndex}
+                onSwiper={handleSwiperInit}
                 onSlideChange={(swiper) => setSelectedIndex(swiper.realIndex)}
                 initialSlide={selectedIndex}
                 slidesPerView={1}
@@ -127,16 +147,21 @@ export function Gallery() {
                 loop={true}
                 className="w-full h-full"
               >
-                {gallery.images.map((image, i) => (
-                  <SwiperSlide key={i} className="flex items-center justify-center">
+                {images.map((image, i) => (
+                  <SwiperSlide key={image.publicId} className="flex items-center justify-center">
                     <div className="flex items-center justify-center w-full h-full px-2 py-16 md:p-16">
-                      <Image
-                        src={image.src}
+                      <CldImage
+                        src={image.publicId}
                         alt={image.alt}
-                        width={800}
-                        height={1000}
+                        width={1600}
+                        height={Math.round(1600 * (image.height / image.width))}
+                        format="auto"
+                        quality="auto:best"
+                        crop="limit"
                         className="max-h-[80vh] max-w-[96vw] md:max-h-[80vh] md:max-w-[90vw] w-auto h-auto object-contain select-none"
                         draggable={false}
+                        priority={i === selectedIndex}
+                        sizes="(max-width: 768px) 96vw, 90vw"
                       />
                     </div>
                   </SwiperSlide>
@@ -146,7 +171,7 @@ export function Gallery() {
               {/* Page indicator */}
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
                 <span className="text-sm text-white/60 bg-black/30 px-4 py-2 rounded-full">
-                  {selectedIndex + 1} / {gallery.images.length}
+                  {selectedIndex + 1} / {images.length}
                 </span>
               </div>
             </div>
@@ -158,10 +183,25 @@ export function Gallery() {
 }
 
 // ============================================
-// Main + Thumbnail Gallery
+// Main + Thumbnail Gallery with Skeleton
 // ============================================
-function MainThumbnailGallery({ images, onImageClick, isInView }: { images: { src: string; alt: string }[]; onImageClick: (index: number) => void; isInView: boolean }) {
+function MainThumbnailGallery({ images, onImageClick, isInView }: { images: GalleryImage[]; onImageClick: (index: number) => void; isInView: boolean }) {
   const [mainIndex, setMainIndex] = useState(0);
+  const [mainLoaded, setMainLoaded] = useState(false);
+  const [loadedThumbnails, setLoadedThumbnails] = useState<Set<number>>(new Set());
+
+  // Reset loaded state when main index changes
+  useEffect(() => {
+    setMainLoaded(false);
+  }, [mainIndex]);
+
+  if (!images || images.length === 0) {
+    return null;
+  }
+
+  const handleThumbnailLoad = (index: number) => {
+    setLoadedThumbnails(prev => new Set(prev).add(index));
+  };
 
   return (
     <motion.div
@@ -180,11 +220,22 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: { sr
           className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer"
           onClick={() => onImageClick(mainIndex)}
         >
-          <Image
-            src={images[mainIndex].src}
+          {/* Skeleton */}
+          {!mainLoaded && (
+            <ImageSkeleton className="absolute inset-0 rounded-xl" />
+          )}
+          <CldImage
+            src={images[mainIndex].publicId}
             alt={images[mainIndex].alt}
             fill
-            className="object-cover"
+            sizes="280px"
+            format="auto"
+            quality="auto:good"
+            crop="fill"
+            gravity="auto"
+            className={`object-cover transition-opacity duration-300 ${mainLoaded ? 'opacity-100' : 'opacity-0'}`}
+            loading="eager"
+            onLoad={() => setMainLoaded(true)}
           />
         </motion.div>
         <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">
@@ -197,7 +248,7 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: { sr
         <div className="flex gap-2 overflow-x-auto pb-2 thumbnail-scrollbar">
           {images.map((image, i) => (
             <button
-              key={i}
+              key={image.publicId}
               onClick={() => setMainIndex(i)}
               className={`relative flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden transition-all duration-300 ${
                 i === mainIndex
@@ -205,7 +256,23 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: { sr
                   : 'opacity-50 hover:opacity-80'
               }`}
             >
-              <Image src={image.src} alt={image.alt} fill className="object-cover" />
+              {/* Skeleton */}
+              {!loadedThumbnails.has(i) && (
+                <ImageSkeleton className="absolute inset-0" />
+              )}
+              <CldImage
+                src={image.publicId}
+                alt={image.alt}
+                width={64}
+                height={64}
+                format="auto"
+                quality="auto:low"
+                crop="fill"
+                gravity="auto"
+                className={`object-cover transition-opacity duration-300 ${loadedThumbnails.has(i) ? 'opacity-100' : 'opacity-0'}`}
+                loading="lazy"
+                onLoad={() => handleThumbnailLoad(i)}
+              />
             </button>
           ))}
         </div>
