@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 // Each character is a grid of color codes
@@ -142,18 +143,21 @@ export function PixelCharacter({
   const height = rows * pixelSize;
 
   // Generate box-shadow string for the entire sprite
-  const shadows: string[] = [];
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const colorIdx = sprite[y][x] as keyof typeof colors;
-      if (colorIdx === 0) continue;
-      const color = colors[colorIdx];
-      if (!color) continue;
-      const px = (x + 1) * pixelSize;
-      const py = (y + 1) * pixelSize;
-      shadows.push(`${px}px ${py}px 0 ${color}`);
+  const shadows = useMemo(() => {
+    const result: string[] = [];
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const colorIdx = sprite[y][x] as keyof typeof colors;
+        if (colorIdx === 0) continue;
+        const color = colors[colorIdx];
+        if (!color) continue;
+        const px = (x + 1) * pixelSize;
+        const py = (y + 1) * pixelSize;
+        result.push(`${px}px ${py}px 0 ${color}`);
+      }
     }
-  }
+    return result;
+  }, [sprite, colors, rows, cols, pixelSize]);
 
   const content = (
     <div
