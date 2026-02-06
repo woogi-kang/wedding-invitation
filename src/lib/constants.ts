@@ -239,12 +239,21 @@ export const WEDDING_INFO = {
   },
 };
 
+// 사이트 URL 자동 감지 (Vercel 시스템 환경변수 활용)
+function getSiteUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'https://wedding-invitation-delta-eight.vercel.app';
+}
+
 // OG 메타데이터
 export const OG_METADATA = {
   title: `${WEDDING_INFO.groom.name} ♥ ${WEDDING_INFO.bride.name} 결혼합니다`,
   description: `${WEDDING_INFO.dateDisplay.year}년 ${WEDDING_INFO.dateDisplay.month}월 ${WEDDING_INFO.dateDisplay.day}일 ${WEDDING_INFO.dateDisplay.dayOfWeek} ${WEDDING_INFO.dateDisplay.time}`,
   image: '/images/og-image.jpg',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-wedding-invitation.vercel.app',
+  url: getSiteUrl(),
 };
 
 // 카카오 설정 (환경변수에서 로드)
