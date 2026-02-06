@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-type TrickTheme = 'glitch' | '3d';
+type TrickTheme = 'glitch' | '3d' | 'arcade';
 
 interface UseTrickRouterOptions {
   preferredTheme?: TrickTheme;
@@ -57,43 +57,35 @@ function markActivated(): void {
   }
 }
 
+const ALL_THEMES: TrickTheme[] = ['glitch', '3d', 'arcade'];
+
 function selectTheme(preferred?: TrickTheme): TrickTheme {
-  // If preferred theme is specified, use it
   if (preferred) {
     return preferred;
   }
 
-  // Get last used theme to alternate
   const lastTheme = getLastTheme();
-
-  // Time-based probability with alternation
-  const isNight = isNightTime();
   const random = Math.random();
 
-  let selectedTheme: TrickTheme;
-
+  // Rotate through themes, weighted by time of day
   if (lastTheme) {
-    // Alternate from last theme with some randomness
-    if (isNight) {
-      // Night: prefer glitch (80%), but if last was glitch, 50% chance to switch
-      selectedTheme =
-        lastTheme === 'glitch' ? (random < 0.5 ? '3d' : 'glitch') : random < 0.8 ? 'glitch' : '3d';
-    } else {
-      // Day: prefer 3D (80%), but if last was 3D, 50% chance to switch
-      selectedTheme =
-        lastTheme === '3d' ? (random < 0.5 ? 'glitch' : '3d') : random < 0.8 ? '3d' : 'glitch';
-    }
-  } else {
-    // First time: pure time-based selection
-    if (isNight) {
-      selectedTheme = random < 0.8 ? 'glitch' : '3d';
-    } else {
-      selectedTheme = random < 0.8 ? '3d' : 'glitch';
-    }
+    const otherThemes = ALL_THEMES.filter((t) => t !== lastTheme);
+    // Pick randomly from the other two themes
+    return otherThemes[Math.floor(random * otherThemes.length)];
   }
 
-  setLastTheme(selectedTheme);
-  return selectedTheme;
+  // First time: time-based selection with arcade as equal option
+  const isNight = isNightTime();
+  if (isNight) {
+    // Night: glitch 50%, arcade 30%, 3d 20%
+    if (random < 0.5) return 'glitch';
+    if (random < 0.8) return 'arcade';
+    return '3d';
+  }
+  // Day: 3d 40%, arcade 35%, glitch 25%
+  if (random < 0.4) return '3d';
+  if (random < 0.75) return 'arcade';
+  return 'glitch';
 }
 
 export function useTrickRouter(options: UseTrickRouterOptions = {}) {
@@ -108,7 +100,12 @@ export function useTrickRouter(options: UseTrickRouterOptions = {}) {
     markActivated();
 
     const theme = selectTheme(options.preferredTheme);
-    const path = theme === 'glitch' ? '/invitation/glitch' : '/invitation/3d';
+    const pathMap: Record<TrickTheme, string> = {
+      glitch: '/invitation/glitch',
+      '3d': '/invitation/3d',
+      arcade: '/invitation/arcade',
+    };
+    const path = pathMap[theme];
 
     router.push(path);
   }, [router, options.preferredTheme]);
@@ -125,10 +122,17 @@ export function useTrickRouter(options: UseTrickRouterOptions = {}) {
     router.push('/invitation/3d');
   }, [router]);
 
+  const navigateToArcade = useCallback(() => {
+    markActivated();
+    setLastTheme('arcade');
+    router.push('/invitation/arcade');
+  }, [router]);
+
   return {
     navigateToTrick,
     navigateToGlitch,
     navigateTo3D,
+    navigateToArcade,
     hasActivated: hasActivatedThisSession,
   };
 }
