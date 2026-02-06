@@ -88,7 +88,7 @@ export function shareKakao(): void {
       content: {
         title: '결혼식에 초대합니다',
         description: '소중한 분들을 모시고 사랑의 약속을 하려 합니다.',
-        imageUrl: `${window.location.origin}/images/og-image.jpg`,
+        imageUrl: `${window.location.origin}/images/og-image.jpg?v2`,
         link: {
           mobileWebUrl: window.location.href,
           webUrl: window.location.href,

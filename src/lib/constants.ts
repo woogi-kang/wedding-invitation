@@ -249,10 +249,12 @@ function getSiteUrl(): string {
 }
 
 // OG 메타데이터
+// 카카오톡은 이미지 URL을 별도 캐시하므로 버전 파라미터로 캐시 버스팅
+const OG_IMAGE_VERSION = 'v2';
 export const OG_METADATA = {
   title: `${WEDDING_INFO.groom.name} ♥ ${WEDDING_INFO.bride.name} 결혼합니다`,
   description: `${WEDDING_INFO.dateDisplay.year}년 ${WEDDING_INFO.dateDisplay.month}월 ${WEDDING_INFO.dateDisplay.day}일 ${WEDDING_INFO.dateDisplay.dayOfWeek} ${WEDDING_INFO.dateDisplay.time}`,
-  image: '/images/og-image.jpg',
+  image: `/images/og-image.jpg?${OG_IMAGE_VERSION}`,
   url: getSiteUrl(),
 };
 
