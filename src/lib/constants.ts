@@ -130,23 +130,31 @@ export const WEDDING_INFO = {
   interview: [
     {
       question: '첫만남은 어땠나요?',
-      groomAnswer: '신랑 답변 placeholder',
-      brideAnswer: '신부 답변 placeholder',
-    },
-    {
-      question: '연애하면서 서로 닮아졌다고 느끼는 부분이 있나요?',
-      groomAnswer: '신랑 답변 placeholder',
-      brideAnswer: '신부 답변 placeholder',
-    },
-    {
-      question: '이 사람과 결혼하면 "이건 참 좋겠다" 싶었던 점은요?',
-      groomAnswer: '신랑 답변 placeholder',
-      brideAnswer: '신부 답변 placeholder',
+      groomAnswer:
+        '첫 만남은 회사 기획 미팅이었어요. 수많은 직원들 중 혼자만 노랑 탈색머리인 사람이 있어서 \'이상한 사람인가?\' 싶었는데, 미팅 중에 상사의 잘못된 의견을 조목조목 반박하는 모습을 보고 \'똑똑하고 당찬 사람이구나\' 싶었죠. 그때는 몰랐습니다, 그 조목조목의 대상이 제가 될 줄은. 그리고 이 사람이 제 인생을 송두리째 바꿀 사람이라는 것도요.',
+      brideAnswer:
+        '회사 회의에서 처음 만났는데 오류를 공격적으로 지적하던 모습이 아직도 기억납니다. 그런데 막상 업무요청하니까 친절하고 아주 번개처럼 처리해주는거에요, 프로페셔널함에 감동 받았는데 그냥 저를 꼬시기 위해 제 요청에 열심이었던 것으로 밝혀졌습니다.',
     },
     {
       question: '이 사람의 이런 모습, 하객분들은 알고 계셨나요?',
-      groomAnswer: '신랑 답변 placeholder',
-      brideAnswer: '신부 답변 placeholder',
+      groomAnswer:
+        '평소에 애니메이션 좋아하는 저를 오타쿠라고 부르며 놀리는 사람이, 노래방에서 귀멸의 칼날 OST 홍련화를 부르더라고요. 그것도 일본어 가사를 전부 외워서요. 자, 이제 누가 오타쿠지?',
+      brideAnswer:
+        '재워주는 걸 좋아하고 재워주면 정말 빠르게 잠들어요. 귀엽습니다.',
+    },
+    {
+      question: '서로에게 어떤 남편/아내가 되고 싶나요?',
+      groomAnswer:
+        '하객분들은 선경이의 당차고 강한 모습만 보셨을 텐데, 저한테는 별것 아닌 일에도 울고 투정을 부리는 사람이에요. 그런데 그게 저한테만 보여주는 모습이라는 걸 알기에, 제 앞에서만큼은 안심하고 약해져도 되는, 그런 남편이 되고 싶습니다.',
+      brideAnswer:
+        '어떠한 순간이 와도 본인을 지지해줄거라는 믿음을 주는 배우자가 되고 싶습니다. 불안함, 두려움을 마주했을 때에도 저와 함께임을 생각하면 마음이 놓였으면 좋겠어요.',
+    },
+    {
+      question: '상대방에게 하고 싶은 한마디?',
+      groomAnswer:
+        '처음에 선경이를 좀 이상한 사람이라고 생각했거든? 알고 보니 진짜 이상한 사람 맞더라. 근데 나한테 딱 맞는 이상한 사람.',
+      brideAnswer:
+        '나만 믿고 따라와',
     },
   ],
 
@@ -250,11 +258,11 @@ function getSiteUrl(): string {
 
 // OG 메타데이터
 // 카카오톡은 이미지 URL을 별도 캐시하므로 버전 파라미터로 캐시 버스팅
-const OG_IMAGE_VERSION = 'v2';
+const OG_IMAGE_VERSION = 'v3';
 export const OG_METADATA = {
   title: `${WEDDING_INFO.groom.name} ♥ ${WEDDING_INFO.bride.name} 결혼합니다`,
   description: `${WEDDING_INFO.dateDisplay.year}년 ${WEDDING_INFO.dateDisplay.month}월 ${WEDDING_INFO.dateDisplay.day}일 ${WEDDING_INFO.dateDisplay.dayOfWeek} ${WEDDING_INFO.dateDisplay.time}`,
-  image: `/images/og-image.jpg?${OG_IMAGE_VERSION}`,
+  image: `/images/og-wedding.jpg?${OG_IMAGE_VERSION}`,
   url: getSiteUrl(),
 };
 

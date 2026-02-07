@@ -62,7 +62,7 @@ export function Share() {
         content: {
           title: `${groom.name} & ${bride.name} 결혼식에 초대합니다`,
           description: `${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day} ${dateDisplay.dayOfWeek} ${dateDisplay.time}\n${venue.name}`,
-          imageUrl: `${window.location.origin}/images/og-image.jpg?v2`,
+          imageUrl: `${window.location.origin}/images/og-wedding.jpg?v3`,
           link: {
             mobileWebUrl: window.location.href,
             webUrl: window.location.href,
