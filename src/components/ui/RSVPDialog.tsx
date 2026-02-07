@@ -13,7 +13,6 @@ interface RSVPFormData {
   attendance: 'yes' | 'no';
   guestCount: number;
   mealType: 'yes' | 'no' | 'undecided';
-  message: string;
 }
 
 const STORAGE_KEY = 'wedding_rsvp_submitted';
@@ -29,7 +28,6 @@ export function RSVPDialog() {
     attendance: 'yes',
     guestCount: 1,
     mealType: 'undecided',
-    message: '',
   });
 
   useEffect(() => {
@@ -277,24 +275,6 @@ export function RSVPDialog() {
                   </div>
                 </>
               )}
-
-              {/* Message */}
-              <div>
-                <label
-                  className="block text-sm mb-1.5"
-                  style={{ color: 'var(--color-text)' }}
-                >
-                  축하 메시지 (선택)
-                </label>
-                <textarea
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="축하 메시지를 남겨주세요"
-                  rows={3}
-                  className="w-full px-3 py-2.5 text-sm border border-[var(--color-border-light)] rounded-md focus:outline-none focus:border-[var(--color-primary)] transition-colors resize-none"
-                  style={{ fontFamily: 'var(--font-body)' }}
-                />
-              </div>
 
               {/* Buttons */}
               <div className="flex gap-3 pt-2">
