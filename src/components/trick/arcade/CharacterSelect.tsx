@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelCharacter } from './shared/PixelCharacter';
+import { PixelButton } from './shared/PixelButton';
 
 const ARCADE_COLORS = {
   bg: '#0f0f23',
@@ -74,13 +75,13 @@ function StatBar({
   return (
     <div className="flex items-center gap-2">
       <span
-        className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px] w-8 text-right"
+        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] w-8 text-right"
         style={{ color: ARCADE_COLORS.gray }}
       >
         {label}
       </span>
       <div
-        className="flex-1 h-2 sm:h-2.5 relative"
+        className="flex-1 h-2.5 sm:h-3 relative"
         style={{ background: ARCADE_COLORS.darkGray, border: `1px solid ${ARCADE_COLORS.gray}40` }}
       >
         <motion.div
@@ -92,7 +93,7 @@ function StatBar({
         />
       </div>
       <span
-        className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px] w-7"
+        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] w-7"
         style={{ color }}
       >
         {value}
@@ -143,13 +144,13 @@ function CharacterCard({
       {/* Name */}
       <div className="text-center">
         <p
-          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[14px]"
+          className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[18px]"
           style={{ color: ARCADE_COLORS.text }}
         >
           {character.englishName}
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[9px] mt-0.5"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[12px] mt-0.5"
           style={{ color: ARCADE_COLORS.gray }}
         >
           {character.name}
@@ -165,7 +166,7 @@ function CharacterCard({
         }}
       >
         <span
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
           style={{ color: side === 'left' ? ARCADE_COLORS.blue : ARCADE_COLORS.pink }}
         >
           {character.className}
@@ -173,7 +174,7 @@ function CharacterCard({
       </div>
 
       {/* Stats */}
-      <div className="w-full max-w-[200px] flex flex-col gap-1">
+      <div className="w-full max-w-[240px] flex flex-col gap-1">
         {character.stats.map((stat, i) => (
           <StatBar
             key={stat.label}
@@ -188,13 +189,13 @@ function CharacterCard({
       {/* Special ability */}
       <div className="text-center mt-1">
         <p
-          className="font-['Press_Start_2P',monospace] text-[6px] sm:text-[7px]"
+          className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           SPECIAL
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
           style={{ color: ARCADE_COLORS.gold }}
         >
           {character.specialAbility}
@@ -204,13 +205,13 @@ function CharacterCard({
       {/* Equipment */}
       <div className="text-center">
         <p
-          className="font-['Press_Start_2P',monospace] text-[6px] sm:text-[7px]"
+          className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           EQUIP
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
           style={{ color: ARCADE_COLORS.green }}
         >
           {character.equipment}
@@ -228,10 +229,9 @@ export function CharacterSelect({ onComplete }: CharacterSelectProps) {
       setTimeout(() => setPhase('vs'), 1500),
       setTimeout(() => setPhase('heart'), 2800),
       setTimeout(() => setPhase('formed'), 3800),
-      setTimeout(() => onComplete(), 5500),
     ];
     return () => timers.forEach(clearTimeout);
-  }, [onComplete]);
+  }, []);
 
   return (
     <div
@@ -245,7 +245,7 @@ export function CharacterSelect({ onComplete }: CharacterSelectProps) {
         className="mb-4 sm:mb-6"
       >
         <p
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[12px] text-center"
+          className="font-['Press_Start_2P',monospace] text-[12px] sm:text-[16px] text-center"
           style={{ color: ARCADE_COLORS.gold }}
         >
           CHARACTER SELECT
@@ -341,7 +341,7 @@ export function CharacterSelect({ onComplete }: CharacterSelectProps) {
             className="mt-6 sm:mt-8 text-center"
           >
             <p
-              className="font-['Press_Start_2P',monospace] text-[12px] sm:text-[18px]"
+              className="font-['Press_Start_2P',monospace] text-[16px] sm:text-[24px]"
               style={{
                 color: ARCADE_COLORS.gold,
                 textShadow: `0 0 8px ${ARCADE_COLORS.gold}60, 0 0 16px ${ARCADE_COLORS.gold}30`,
@@ -356,6 +356,16 @@ export function CharacterSelect({ onComplete }: CharacterSelectProps) {
               className="mt-2 h-[2px] w-48 sm:w-64 mx-auto"
               style={{ background: `linear-gradient(90deg, transparent, ${ARCADE_COLORS.gold}, transparent)` }}
             />
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-5"
+            >
+              <PixelButton variant="primary" size="md" onClick={onComplete}>
+                TAP TO CONTINUE
+              </PixelButton>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

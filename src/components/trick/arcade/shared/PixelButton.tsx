@@ -34,17 +34,17 @@ const VARIANT_STYLES = {
 const SIZE_STYLES = {
   sm: {
     padding: '6px 12px',
-    fontSize: '8px',
+    fontSize: '10px',
     shadowOffset: 3,
   },
   md: {
     padding: '10px 20px',
-    fontSize: '10px',
+    fontSize: '13px',
     shadowOffset: 4,
   },
   lg: {
     padding: '14px 28px',
-    fontSize: '12px',
+    fontSize: '16px',
     shadowOffset: 5,
   },
 } as const;

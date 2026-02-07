@@ -28,7 +28,7 @@ export function StatusBar({
     <div className="flex items-center gap-2 w-full">
       {/* Label */}
       <span
-        className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[10px] w-8 sm:w-10 shrink-0 text-right"
+        className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[13px] w-8 sm:w-10 shrink-0 text-right"
         style={{ color: ARCADE_COLORS.text }}
       >
         {label}
@@ -76,7 +76,7 @@ export function StatusBar({
 
       {/* Values */}
       <span
-        className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px] w-16 sm:w-20 shrink-0"
+        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] w-16 sm:w-20 shrink-0"
         style={{ color: ARCADE_COLORS.text }}
       >
         {current}/{max}

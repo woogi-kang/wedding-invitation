@@ -2,20 +2,8 @@
 
 import { useReducer, useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PixelCharacter } from './shared/PixelCharacter';
-
-const ARCADE_COLORS = {
-  bg: '#0f0f23',
-  bgLight: '#1a1a3e',
-  text: '#ffffff',
-  gold: '#ffcc00',
-  pink: '#ff6b9d',
-  green: '#00ff41',
-  blue: '#4a9eff',
-  red: '#ff4444',
-  gray: '#8b8b8b',
-  darkGray: '#333333',
-} as const;
+import { PixelCharacter, ARCADE_COLORS } from './shared';
+import type { EmotionType } from './shared';
 
 // -- HP bar component --
 function HpBar({
@@ -36,14 +24,14 @@ function HpBar({
     <div className="w-full">
       <div className="flex justify-between mb-0.5">
         <span
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
           style={{ color: ARCADE_COLORS.text }}
         >
           {label}
         </span>
         {showNumbers && (
           <span
-            className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+            className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
             style={{ color: pct > 25 ? color : ARCADE_COLORS.red }}
           >
             {current}/{max}
@@ -51,7 +39,7 @@ function HpBar({
         )}
       </div>
       <div
-        className="w-full h-2.5 sm:h-3"
+        className="w-full h-3 sm:h-4"
         style={{ background: ARCADE_COLORS.darkGray, border: `1px solid ${ARCADE_COLORS.gray}40` }}
       >
         <motion.div
@@ -89,6 +77,7 @@ type BattleAction =
   | { type: 'MAGIC' }
   | { type: 'ITEM' }
   | { type: 'ESCAPE' }
+  | { type: 'COMBINE' }
   | { type: 'BOSS_TURN' }
   | { type: 'SET_IDLE' }
   | { type: 'VICTORY' };
@@ -218,6 +207,45 @@ function battleReducer(state: BattleState, action: BattleAction): BattleState {
       };
     }
 
+    case 'COMBINE': {
+      const damage = 8000 + Math.floor(Math.random() * 2000);
+      const heal = 1000;
+      const newHp = Math.max(0, state.bossHp - damage);
+      const newPhase = getPhase(newHp, state.bossMaxHp);
+      const combineLines = [
+        '두 사람의 마음이 하나로!',
+        `사랑의 합체공격!\n${damage.toLocaleString()} 데미지!`,
+        `전원 HP ${heal} 회복!`,
+      ];
+
+      if (newHp <= 0) {
+        return {
+          ...state,
+          bossHp: 0,
+          bossPhase: newPhase,
+          groomHp: Math.min(state.groomMaxHp, state.groomHp + heal),
+          brideHp: Math.min(state.brideMaxHp, state.brideHp + heal),
+          groomMp: state.groomMp - 50,
+          brideMp: state.brideMp - 50,
+          log: combineLines,
+          state: 'victory',
+          turn: state.turn + 1,
+        };
+      }
+      return {
+        ...state,
+        bossHp: newHp,
+        bossPhase: newPhase,
+        groomHp: Math.min(state.groomMaxHp, state.groomHp + heal),
+        brideHp: Math.min(state.brideMaxHp, state.brideHp + heal),
+        groomMp: state.groomMp - 50,
+        brideMp: state.brideMp - 50,
+        log: combineLines,
+        state: 'player_action',
+        turn: state.turn + 1,
+      };
+    }
+
     case 'BOSS_TURN': {
       const phaseDamage = { 1: 200, 2: 350, 3: 500 };
       const dmg = phaseDamage[state.bossPhase] + Math.floor(Math.random() * 100);
@@ -266,6 +294,134 @@ function battleReducer(state: BattleState, action: BattleAction): BattleState {
   }
 }
 
+// 보스 픽셀 스프라이트 (16x16) - "ADULTING" 몬스터
+// 0=transparent, 1=dark gray body, 2=red eyes/accent, 3=purple aura, 4=dark outline, 5=white teeth
+const BOSS_COLORS: Record<number, string> = {
+  0: 'transparent',
+  1: '#4a4a6a', // 몸체
+  2: '#ff4444', // 눈/강조
+  3: '#663399', // 보라색 오라
+  4: '#1a1a2e', // 외곽선
+  5: '#ffffff', // 이빨
+  6: '#8b8b8b', // 회색 디테일
+  7: '#ffcc00', // 황금 장식
+};
+
+const BOSS_SPRITE: number[][] = [
+  [0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+  [0,0,0,3,4,4,4,4,4,4,4,4,3,0,0,0],
+  [0,0,3,4,1,1,1,1,1,1,1,1,4,3,0,0],
+  [0,3,4,1,1,1,1,1,1,1,1,1,1,4,3,0],
+  [0,3,4,1,2,2,1,1,1,2,2,1,1,4,3,0],
+  [0,3,4,1,2,5,1,1,1,2,5,1,1,4,3,0],
+  [0,3,4,1,1,1,1,6,1,1,1,1,1,4,3,0],
+  [0,3,4,1,1,5,5,5,5,5,5,1,1,4,3,0],
+  [0,3,4,1,1,4,5,4,5,4,5,1,1,4,3,0],
+  [0,0,3,4,1,1,1,1,1,1,1,1,4,3,0,0],
+  [0,0,3,4,1,7,1,1,1,7,1,1,4,3,0,0],
+  [0,0,0,3,4,1,1,1,1,1,1,4,3,0,0,0],
+  [0,0,3,3,4,1,1,1,1,1,1,4,3,3,0,0],
+  [0,3,3,0,4,4,1,1,1,1,4,4,0,3,3,0],
+  [3,3,0,0,0,4,4,4,4,4,4,0,0,0,3,3],
+  [3,0,0,0,0,0,4,4,4,4,0,0,0,0,0,3],
+];
+
+// 보스 스프라이트 렌더러
+function BossSprite({ phase, shake }: { phase: 1 | 2 | 3; shake: boolean }) {
+  const scale = 5;
+  const rows = BOSS_SPRITE.length;
+  const cols = BOSS_SPRITE[0].length;
+
+  const phaseColors: Record<number, Record<number, string>> = {
+    1: BOSS_COLORS,
+    2: { ...BOSS_COLORS, 3: '#9933cc', 2: '#ff6666' },
+    3: { ...BOSS_COLORS, 3: '#cc0000', 2: '#ff0000', 1: '#3a3a5a' },
+  };
+  const colors = phaseColors[phase];
+
+  const shadows: string[] = [];
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const c = BOSS_SPRITE[y][x];
+      if (c === 0) continue;
+      const color = colors[c] || BOSS_COLORS[c];
+      if (!color || color === 'transparent') continue;
+      shadows.push(`${(x + 1) * scale}px ${(y + 1) * scale}px 0 ${color}`);
+    }
+  }
+
+  return (
+    <motion.div
+      animate={shake ? { x: [-8, 8, -6, 6, -3, 3, 0] } : {}}
+      transition={{ duration: 0.3 }}
+    >
+      <div
+        style={{
+          width: `${(cols + 1) * scale}px`,
+          height: `${(rows + 1) * scale}px`,
+          position: 'relative',
+          imageRendering: 'pixelated',
+        }}
+      >
+        <div
+          style={{
+            width: `${scale}px`,
+            height: `${scale}px`,
+            boxShadow: shadows.join(','),
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+        />
+      </div>
+      {/* 페이즈별 글로우 */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          inset: -8,
+          borderRadius: '50%',
+          background: phase === 3 ? 'radial-gradient(circle, rgba(255,0,0,0.15) 0%, transparent 70%)'
+            : phase === 2 ? 'radial-gradient(circle, rgba(153,51,204,0.1) 0%, transparent 70%)'
+            : 'none',
+          pointerEvents: 'none',
+        }}
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </motion.div>
+  );
+}
+
+/* ── 데미지 숫자 팝업 ── */
+interface DamageNumber {
+  id: string;
+  value: number;
+  x: number;
+  y: number;
+  color: string;
+  isHeal: boolean;
+}
+
+function DamagePopup({ damage }: { damage: DamageNumber }) {
+  return (
+    <motion.div
+      className="absolute font-['Press_Start_2P',monospace] pointer-events-none z-20"
+      style={{
+        left: `${damage.x}%`,
+        top: `${damage.y}%`,
+        color: damage.color,
+        fontSize: damage.isHeal ? '14px' : '18px',
+        textShadow: `0 0 8px ${damage.color}80, 2px 2px 0 rgba(0,0,0,0.5)`,
+      }}
+      initial={{ y: 0, opacity: 1, scale: 0.5 }}
+      animate={{ y: -50, opacity: [1, 1, 0], scale: [0.5, 1.2, 1] }}
+      transition={{ duration: 1, ease: 'easeOut' }}
+    >
+      {damage.isHeal ? '+' : '-'}{Math.abs(damage.value).toLocaleString()}
+    </motion.div>
+  );
+}
+
 const INITIAL_STATE: BattleState = {
   bossHp: 9999,
   bossMaxHp: 9999,
@@ -296,6 +452,17 @@ export function BossBattle({ onVictory }: BossBattleProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [bossShake, setBossShake] = useState(false);
   const [flashScreen, setFlashScreen] = useState(false);
+  const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
+  const [showCombineHearts, setShowCombineHearts] = useState(false);
+
+  const addDamageNumber = useCallback((value: number, x: number, y: number, isHeal: boolean) => {
+    const id = `dmg-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const color = isHeal ? ARCADE_COLORS.green : ARCADE_COLORS.red;
+    setDamageNumbers((prev) => [...prev, { id, value, x, y, color, isHeal }]);
+    setTimeout(() => {
+      setDamageNumbers((prev) => prev.filter((d) => d.id !== id));
+    }, 1200);
+  }, []);
 
   const currentLog = state.log[logIdx] || '';
 
@@ -311,6 +478,10 @@ export function BossBattle({ onVictory }: BossBattleProps) {
       // After player action, boss attacks
       setIsAnimating(true);
       setTimeout(() => {
+        const phaseDmg = { 1: 200, 2: 350, 3: 500 };
+        const bossDmg = phaseDmg[state.bossPhase] + Math.floor(Math.random() * 100);
+        const actualBossDmg = state.bossPhase === 3 ? Math.floor(bossDmg * 0.5) : bossDmg;
+        addDamageNumber(actualBossDmg, 20, 55, false);
         dispatch({ type: 'BOSS_TURN' });
         setLogIdx(0);
         setIsAnimating(false);
@@ -324,27 +495,46 @@ export function BossBattle({ onVictory }: BossBattleProps) {
 
   // Handle player command
   const handleCommand = useCallback(
-    (cmd: 'ATTACK' | 'MAGIC' | 'ITEM' | 'ESCAPE') => {
+    (cmd: 'ATTACK' | 'MAGIC' | 'ITEM' | 'ESCAPE' | 'COMBINE') => {
       if (state.state !== 'idle' || isAnimating) return;
 
+      // 데미지 계산용 (실제 reducer 결과와 동일한 로직)
       if (cmd === 'ATTACK') {
+        const dmg = 2500 + Math.floor(Math.random() * 1000);
         setBossShake(true);
         setFlashScreen(true);
-        setTimeout(() => {
-          setBossShake(false);
-          setFlashScreen(false);
-        }, 200);
+        addDamageNumber(dmg, 75, 25, false);
+        setTimeout(() => { setBossShake(false); setFlashScreen(false); }, 200);
       }
 
       if (cmd === 'MAGIC') {
+        const dmg = 4000 + Math.floor(Math.random() * 1500);
+        setBossShake(true);
         setFlashScreen(true);
-        setTimeout(() => setFlashScreen(false), 250);
+        addDamageNumber(dmg, 75, 25, false);
+        addDamageNumber(500, 20, 60, true);
+        setTimeout(() => { setBossShake(false); setFlashScreen(false); }, 250);
+      }
+
+      if (cmd === 'ITEM') {
+        addDamageNumber(800, 15, 60, true);
+        addDamageNumber(20, 30, 65, true);
+      }
+
+      if (cmd === 'COMBINE') {
+        const dmg = 8000 + Math.floor(Math.random() * 2000);
+        setBossShake(true);
+        setFlashScreen(true);
+        setShowCombineHearts(true);
+        addDamageNumber(dmg, 75, 25, false);
+        addDamageNumber(1000, 20, 60, true);
+        setTimeout(() => { setBossShake(false); setFlashScreen(false); setShowCombineHearts(false); }, 1500);
       }
 
       dispatch({ type: cmd });
       setLogIdx(0);
     },
-    [state.state, isAnimating],
+    [state.state, isAnimating, addDamageNumber],
   );
 
   // Victory sequence progression
@@ -366,11 +556,12 @@ export function BossBattle({ onVictory }: BossBattleProps) {
     'ACHIEVEMENT UNLOCKED:\n영원한 사랑',
   ];
 
+  const canCombine = state.groomMp >= 50 && state.brideMp >= 50;
   const commands = [
-    { label: '공격', key: 'ATTACK' as const, color: ARCADE_COLORS.red },
-    { label: '마법', key: 'MAGIC' as const, color: ARCADE_COLORS.blue },
-    { label: '아이템', key: 'ITEM' as const, color: ARCADE_COLORS.green },
-    { label: '도망', key: 'ESCAPE' as const, color: ARCADE_COLORS.gray },
+    { label: '공격', key: 'ATTACK' as const, color: ARCADE_COLORS.red, disabled: false },
+    { label: '마법', key: 'MAGIC' as const, color: ARCADE_COLORS.blue, disabled: state.groomMp < 30 },
+    { label: '합체기', key: 'COMBINE' as const, color: ARCADE_COLORS.pink, disabled: !canCombine },
+    { label: '아이템', key: 'ITEM' as const, color: ARCADE_COLORS.green, disabled: false },
   ];
 
   return (
@@ -392,138 +583,188 @@ export function BossBattle({ onVictory }: BossBattleProps) {
         )}
       </AnimatePresence>
 
-      {/* Boss area (top half) */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 pt-4 pb-2 min-h-0">
-        {/* Boss info */}
-        <div className="w-full max-w-xs mb-3">
-          <div className="flex justify-between items-center mb-1">
-            <span
-              className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[10px]"
-              style={{ color: ARCADE_COLORS.red }}
-            >
-              ADULTING Lv.99
-            </span>
-            <span
-              className="font-['Press_Start_2P',monospace] text-[6px] sm:text-[7px]"
-              style={{ color: ARCADE_COLORS.gray }}
-            >
-              {BOSS_PHASE_NAMES[state.bossPhase]}
-            </span>
+      {/* 포켓몬 스타일 배틀 필드 */}
+      <div
+        className="flex-1 relative min-h-0 overflow-hidden"
+        style={{
+          background: `linear-gradient(180deg, #1a1a3e 0%, #2a1a4e 40%, #3a5a3a 60%, #4a7a4a 100%)`,
+        }}
+      >
+        {/* 배틀 필드 바닥 라인 */}
+        <div
+          className="absolute left-0 right-0"
+          style={{ top: '55%', height: '2px', background: 'rgba(255,255,255,0.08)' }}
+        />
+
+        {/* 배경 요소: 풀밭 디테일 */}
+        {[15, 35, 55, 75, 90].map((left, i) => (
+          <div
+            key={`grass-${i}`}
+            className="absolute"
+            style={{
+              left: `${left}%`,
+              bottom: `${42 + (i % 3) * 2}%`,
+              width: 6 + (i % 2) * 4,
+              height: 8,
+              background: `linear-gradient(0deg, #3a5a3a, ${i % 2 === 0 ? '#5a8a5a' : '#4a7a4a'})`,
+              borderRadius: '40% 40% 0 0',
+              opacity: 0.6,
+            }}
+          />
+        ))}
+
+        {/* 배경 요소: 바위 */}
+        {[{ l: 80, b: 44, s: 14 }, { l: 25, b: 43, s: 10 }, { l: 60, b: 45, s: 8 }].map((r, i) => (
+          <div
+            key={`rock-${i}`}
+            className="absolute"
+            style={{
+              left: `${r.l}%`,
+              bottom: `${r.b}%`,
+              width: r.s,
+              height: r.s * 0.7,
+              background: 'linear-gradient(135deg, #5a5a6a, #3a3a4a)',
+              borderRadius: '30%',
+              opacity: 0.5,
+            }}
+          />
+        ))}
+
+        {/* 배경 요소: 떠다니는 파티클 */}
+        {[
+          { x: 20, y: 15, d: 0 }, { x: 50, y: 25, d: 1.2 }, { x: 75, y: 10, d: 0.6 },
+          { x: 40, y: 35, d: 1.8 }, { x: 85, y: 20, d: 2.4 }, { x: 10, y: 30, d: 0.9 },
+        ].map((p, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            className="absolute rounded-full"
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: 2 + (i % 2),
+              height: 2 + (i % 2),
+              background: i % 3 === 0 ? '#9966cc40' : i % 3 === 1 ? '#ffffff20' : '#ffcc0020',
+            }}
+            animate={{ y: [0, -8, 0], opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 3 + i * 0.5, delay: p.d, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        ))}
+
+        {/* 데미지 숫자 팝업 */}
+        <AnimatePresence>
+          {damageNumbers.map((dmg) => (
+            <DamagePopup key={dmg.id} damage={dmg} />
+          ))}
+        </AnimatePresence>
+
+        {/* 합체기 하트 폭발 */}
+        {showCombineHearts && (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
+            {Array.from({ length: 15 }).map((_, i) => (
+              <motion.span
+                key={`combine-heart-${i}`}
+                className="absolute"
+                style={{
+                  left: `${10 + Math.random() * 80}%`,
+                  top: '50%',
+                  fontSize: 16 + Math.random() * 12,
+                  color: i % 2 === 0 ? ARCADE_COLORS.pink : ARCADE_COLORS.gold,
+                }}
+                initial={{ y: 0, opacity: 1, scale: 0 }}
+                animate={{
+                  y: -80 - Math.random() * 60,
+                  x: (Math.random() - 0.5) * 80,
+                  opacity: [1, 1, 0],
+                  scale: [0, 1.3, 0.8],
+                }}
+                transition={{ duration: 1.2, delay: Math.random() * 0.3 }}
+              >
+                {i % 3 === 0 ? '\u2665' : '\u2736'}
+              </motion.span>
+            ))}
           </div>
-          <HpBar label="HP" current={state.bossHp} max={state.bossMaxHp} color={ARCADE_COLORS.red} />
+        )}
+
+        {/* 보스 영역 (우측 상단) */}
+        <div className="absolute top-3 right-2 sm:right-4 flex flex-col items-end">
+          {/* 보스 HP 바 */}
+          <div className="w-[200px] sm:w-[250px] mb-2 p-2"
+            style={{
+              background: 'rgba(0,0,0,0.7)',
+              border: `2px solid ${ARCADE_COLORS.gray}`,
+            }}
+          >
+            <div className="flex justify-between items-center mb-0.5">
+              <span
+                className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[11px]"
+                style={{ color: ARCADE_COLORS.red }}
+              >
+                ADULTING Lv.99
+              </span>
+              <span
+                className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+                style={{ color: ARCADE_COLORS.gray }}
+              >
+                {BOSS_PHASE_NAMES[state.bossPhase]}
+              </span>
+            </div>
+            <HpBar label="HP" current={state.bossHp} max={state.bossMaxHp} color={ARCADE_COLORS.red} />
+          </div>
+          {/* 보스 스프라이트 */}
+          <div className="relative mr-2 sm:mr-6">
+            <BossSprite phase={state.bossPhase} shake={bossShake} />
+          </div>
         </div>
 
-        {/* Boss sprite (CSS art) */}
-        <motion.div
-          animate={bossShake ? { x: [-8, 8, -6, 6, -3, 3, 0] } : {}}
-          transition={{ duration: 0.3 }}
-          className="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center"
-        >
-          {/* Boss body using layered divs */}
-          <div className="relative">
-            {/* Phase-based appearance */}
+        {/* 아군 영역 (좌측 하단) - 뒷모습 */}
+        <div className="absolute bottom-4 left-2 sm:left-4 flex flex-col items-start">
+          {/* 아군 스프라이트 (뒷모습) */}
+          <div className="flex items-end gap-1 mb-2">
             <motion.div
-              className="w-20 h-20 sm:w-28 sm:h-28 flex items-center justify-center"
-              style={{
-                background: `linear-gradient(180deg,
-                  ${state.bossPhase === 1 ? ARCADE_COLORS.gray : state.bossPhase === 2 ? '#663399' : ARCADE_COLORS.red}40,
-                  ${ARCADE_COLORS.darkGray})`,
-                border: `3px solid ${state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.gray}`,
-                boxShadow: `
-                  0 0 ${state.bossPhase * 6}px ${state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.gray}40,
-                  inset 0 0 10px rgba(0,0,0,0.5)
-                `,
-                imageRendering: 'pixelated',
-              }}
-              animate={{
-                boxShadow: [
-                  `0 0 ${state.bossPhase * 6}px ${state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.gray}40`,
-                  `0 0 ${state.bossPhase * 10}px ${state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.gray}60`,
-                  `0 0 ${state.bossPhase * 6}px ${state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.gray}40`,
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={state.state === 'player_action' ? { x: [0, 6, 0] } : {}}
+              transition={{ duration: 0.3 }}
             >
-              {/* Face */}
-              <div className="text-center">
-                <div className="flex justify-center gap-3 sm:gap-4 mb-1.5">
-                  <span
-                    className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[10px]"
-                    style={{ color: state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.text }}
-                  >
-                    {'*'}
-                  </span>
-                  <span
-                    className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[10px]"
-                    style={{ color: state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.text }}
-                  >
-                    {'*'}
-                  </span>
-                </div>
-                <span
-                  className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[12px]"
-                  style={{ color: state.bossPhase === 3 ? ARCADE_COLORS.red : ARCADE_COLORS.text }}
-                >
-                  {state.bossPhase === 1 ? '---' : state.bossPhase === 2 ? '~~~' : 'XXX'}
-                </span>
-              </div>
+              <PixelCharacter character="groom" size="full" scale={4} facing="back" />
+            </motion.div>
+            <motion.div
+              animate={state.state === 'player_action' ? { x: [0, 6, 0] } : {}}
+              transition={{ duration: 0.3, delay: 0.05 }}
+            >
+              <PixelCharacter character="bride" size="full" scale={4} facing="back" />
             </motion.div>
           </div>
-        </motion.div>
-      </div>
-
-      {/* Bottom section */}
-      <div className="flex-shrink-0 px-2 pb-3 sm:px-4 sm:pb-4">
-        {/* Party status bar */}
-        <div
-          className="w-full p-2 sm:p-3 mb-2"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: `2px solid ${ARCADE_COLORS.gray}`,
-            imageRendering: 'pixelated',
-          }}
-        >
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            {/* Groom */}
-            <div>
-              <div className="flex items-center gap-1.5 mb-1">
-                <PixelCharacter character="groom" size="mini" scale={1} />
-                <span
-                  className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
-                  style={{ color: ARCADE_COLORS.blue }}
-                >
-                  {'강태욱'}
-                </span>
+          {/* 아군 HP 바 */}
+          <div className="w-[200px] sm:w-[250px] p-2"
+            style={{
+              background: 'rgba(0,0,0,0.7)',
+              border: `2px solid ${ARCADE_COLORS.gray}`,
+            }}
+          >
+            <div className="grid grid-cols-2 gap-1">
+              <div>
+                <HpBar label="GROOM" current={state.groomHp} max={state.groomMaxHp} color={ARCADE_COLORS.green} showNumbers />
+                <div className="mt-0.5">
+                  <HpBar label="MP" current={state.groomMp} max={state.groomMaxMp} color={ARCADE_COLORS.blue} showNumbers />
+                </div>
               </div>
-              <HpBar label="HP" current={state.groomHp} max={state.groomMaxHp} color={ARCADE_COLORS.green} showNumbers />
-              <div className="mt-0.5">
-                <HpBar label="MP" current={state.groomMp} max={state.groomMaxMp} color={ARCADE_COLORS.blue} showNumbers />
-              </div>
-            </div>
-            {/* Bride */}
-            <div>
-              <div className="flex items-center gap-1.5 mb-1">
-                <PixelCharacter character="bride" size="mini" scale={1} />
-                <span
-                  className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
-                  style={{ color: ARCADE_COLORS.pink }}
-                >
-                  {'김선경'}
-                </span>
-              </div>
-              <HpBar label="HP" current={state.brideHp} max={state.brideMaxHp} color={ARCADE_COLORS.green} showNumbers />
-              <div className="mt-0.5">
-                <HpBar label="MP" current={state.brideMp} max={state.brideMaxMp} color={ARCADE_COLORS.blue} showNumbers />
+              <div>
+                <HpBar label="BRIDE" current={state.brideHp} max={state.brideMaxHp} color={ARCADE_COLORS.green} showNumbers />
+                <div className="mt-0.5">
+                  <HpBar label="MP" current={state.brideMp} max={state.brideMaxMp} color={ARCADE_COLORS.blue} showNumbers />
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
+      {/* 하단: 로그 + 커맨드 */}
+      <div className="flex-shrink-0 px-2 pb-3 sm:px-4 sm:pb-4">
         {/* Log + command area */}
         <div className="flex gap-2">
           {/* Log box */}
           <div
-            className="flex-1 min-h-[80px] sm:min-h-[90px] px-3 py-2 cursor-pointer"
+            className="flex-1 min-h-[100px] sm:min-h-[110px] px-4 py-3 cursor-pointer"
             style={{
               background: 'rgba(0, 0, 0, 0.9)',
               border: `3px solid ${ARCADE_COLORS.gray}`,
@@ -541,7 +782,7 @@ export function BossBattle({ onVictory }: BossBattleProps) {
             aria-label="Battle log - click to advance"
           >
             <p
-              className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[10px] leading-[14px] sm:leading-[18px] whitespace-pre-wrap"
+              className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[13px] leading-[18px] sm:leading-[24px] whitespace-pre-wrap"
               style={{ color: ARCADE_COLORS.text }}
             >
               {currentLog}
@@ -550,7 +791,7 @@ export function BossBattle({ onVictory }: BossBattleProps) {
               <motion.span
                 animate={{ opacity: [0, 1, 0] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="font-['Press_Start_2P',monospace] text-[8px] block mt-1"
+                className="font-['Press_Start_2P',monospace] text-[10px] block mt-1"
                 style={{ color: ARCADE_COLORS.gray }}
               >
                 {'\u25BC'}
@@ -560,7 +801,7 @@ export function BossBattle({ onVictory }: BossBattleProps) {
 
           {/* Command menu */}
           <div
-            className="flex-shrink-0 w-[110px] sm:w-[130px] flex flex-col gap-1 p-1.5 sm:p-2"
+            className="flex-shrink-0 w-[130px] sm:w-[155px] flex flex-col gap-1.5 p-2 sm:p-2.5"
             style={{
               background: 'rgba(0, 0, 0, 0.9)',
               border: `3px solid ${ARCADE_COLORS.gray}`,
@@ -570,13 +811,13 @@ export function BossBattle({ onVictory }: BossBattleProps) {
             {commands.map((cmd) => (
               <motion.button
                 key={cmd.key}
-                whileHover={state.state === 'idle' ? { x: 3 } : undefined}
-                whileTap={state.state === 'idle' ? { scale: 0.95 } : undefined}
+                whileHover={state.state === 'idle' && !cmd.disabled ? { x: 3 } : undefined}
+                whileTap={state.state === 'idle' && !cmd.disabled ? { scale: 0.95 } : undefined}
                 onClick={() => handleCommand(cmd.key)}
-                disabled={state.state !== 'idle' || isAnimating}
-                className="w-full text-left px-2 py-1.5 font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px] disabled:opacity-40 transition-opacity"
+                disabled={state.state !== 'idle' || isAnimating || cmd.disabled}
+                className="w-full text-left px-2 py-1.5 font-['Press_Start_2P',monospace] text-[9px] sm:text-[11px] disabled:opacity-30 transition-opacity"
                 style={{
-                  color: state.state === 'idle' ? cmd.color : ARCADE_COLORS.gray,
+                  color: state.state === 'idle' && !cmd.disabled ? cmd.color : ARCADE_COLORS.gray,
                   background: 'transparent',
                   borderBottom: `1px solid ${ARCADE_COLORS.darkGray}`,
                 }}
@@ -584,20 +825,92 @@ export function BossBattle({ onVictory }: BossBattleProps) {
                 {'>'} {cmd.label}
               </motion.button>
             ))}
+            <motion.button
+              whileHover={state.state === 'idle' ? { x: 2 } : undefined}
+              onClick={() => handleCommand('ESCAPE')}
+              disabled={state.state !== 'idle' || isAnimating}
+              className="w-full text-center pt-1 font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px] disabled:opacity-30 transition-opacity"
+              style={{ color: ARCADE_COLORS.gray, background: 'transparent' }}
+            >
+              도망
+            </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Victory overlay */}
+      {/* 승리 오버레이 - 커플 만남 연출 */}
       <AnimatePresence>
         {showVictory && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="absolute inset-0 z-40 flex flex-col items-center justify-center px-4"
-            style={{ background: 'rgba(0, 0, 0, 0.85)' }}
+            style={{ background: 'rgba(0, 0, 0, 0.9)' }}
           >
-            <div className="text-center flex flex-col items-center gap-3">
+            {/* 커플 만남 씬 (step 0~1에서 등장) */}
+            {victoryStep >= 0 && (
+              <div className="relative flex items-end justify-center gap-0 mb-6" style={{ height: 80 }}>
+                {/* 신랑: 왼쪽에서 걸어옴 */}
+                <motion.div
+                  initial={{ x: -80, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                >
+                  <PixelCharacter
+                    character="groom"
+                    size="full"
+                    scale={4}
+                    emotion={victoryStep >= 3 ? 'love' : 'happy'}
+                  />
+                </motion.div>
+                {/* 신부: 오른쪽에서 걸어옴 */}
+                <motion.div
+                  initial={{ x: 80, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
+                >
+                  <PixelCharacter
+                    character="bride"
+                    size="full"
+                    scale={4}
+                    emotion={victoryStep >= 3 ? 'love' : 'happy'}
+                  />
+                </motion.div>
+                {/* 하트 폭발 (step 2 이후) */}
+                {victoryStep >= 2 && (
+                  <motion.div
+                    className="absolute"
+                    style={{ top: -20, left: '50%', transform: 'translateX(-50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                  >
+                    {[...Array(6)].map((_, i) => (
+                      <motion.span
+                        key={i}
+                        className="absolute"
+                        style={{
+                          fontSize: 12 + Math.random() * 8,
+                          color: i % 2 === 0 ? ARCADE_COLORS.pink : ARCADE_COLORS.gold,
+                        }}
+                        initial={{ x: 0, y: 0, opacity: 1 }}
+                        animate={{
+                          x: (i - 2.5) * 18,
+                          y: -20 - Math.random() * 30,
+                          opacity: [1, 1, 0],
+                          scale: [0.5, 1.2, 0.8],
+                        }}
+                        transition={{ duration: 1.5, delay: i * 0.1, repeat: Infinity, repeatDelay: 1 }}
+                      >
+                        {i % 3 === 0 ? '\u2665' : '\u2736'}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+            )}
+
+            {/* 텍스트 라인 */}
+            <div className="text-center flex flex-col items-center gap-2.5">
               {VICTORY_LINES.slice(0, victoryStep + 1).map((line, i) => (
                 <motion.p
                   key={i}
@@ -612,7 +925,7 @@ export function BossBattle({ onVictory }: BossBattleProps) {
                       i === 3 ? ARCADE_COLORS.blue :
                       i === 4 ? ARCADE_COLORS.pink :
                       ARCADE_COLORS.gold,
-                    fontSize: i === 2 || i === 4 ? '14px' : '10px',
+                    fontSize: i === 2 || i === 4 ? '18px' : '13px',
                     textShadow: i === 5
                       ? `0 0 8px ${ARCADE_COLORS.gold}60`
                       : undefined,
@@ -628,12 +941,12 @@ export function BossBattle({ onVictory }: BossBattleProps) {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                   onClick={onVictory}
-                  className="mt-6 px-6 py-3 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+                  className="mt-6 px-8 py-3.5 font-['Press_Start_2P',monospace] text-[12px] sm:text-[13px]"
                   style={{
                     color: '#000',
                     background: ARCADE_COLORS.gold,
                     border: '2px solid #b38f00',
-                    boxShadow: `4px 4px 0px #b38f00`,
+                    boxShadow: '4px 4px 0px #b38f00',
                   }}
                 >
                   CONTINUE

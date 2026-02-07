@@ -342,7 +342,7 @@ function FogOverlay() {
         transition={{ duration: 2, repeat: Infinity }}
       >
         <span
-          className="font-['Press_Start_2P',monospace] text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[13px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           ? ? ?
@@ -369,7 +369,7 @@ const STAGE_INFO: StageInfo[] = [
     id: 0,
     name: 'First Encounter',
     subtitle: '2022 봄',
-    description: '야생의 김선경이 나타났다!\n심장 박동수: ???',
+    description: '야생의 김선경이 나타났다! 심장 박동수: ???',
     difficulty: 1,
     reward: '호감도 MAX',
     warning: '심장이 약하신 분 주의',
@@ -378,7 +378,7 @@ const STAGE_INFO: StageInfo[] = [
     id: 1,
     name: 'Butterfly Effect',
     subtitle: '2023',
-    description: '상태이상: LOVE_STRUCK\nDuration: PERMANENT',
+    description: '상태이상: LOVE_STRUCK Duration: PERMANENT',
     difficulty: 2,
     reward: '사랑 포인트 +9999',
     warning: '부작용: 5분마다 카톡 확인',
@@ -387,7 +387,7 @@ const STAGE_INFO: StageInfo[] = [
     id: 2,
     name: 'Side Quests',
     subtitle: '2024',
-    description: '커플 잠옷 획득! (해제 불가)\nIKEA 조립 퀘스트 발생!',
+    description: '커플 잠옷 획득! (해제 불가) IKEA 조립 퀘스트 발생!',
     difficulty: 3,
     reward: '맛집 리스트 x147',
     warning: '위장 용량 초과 가능',
@@ -396,7 +396,7 @@ const STAGE_INFO: StageInfo[] = [
     id: 3,
     name: 'The Proposal',
     subtitle: '2025',
-    description: 'ERROR: NO 버튼을\n찾을 수 없습니다',
+    description: 'ERROR: NO 버튼을 찾을 수 없습니다',
     difficulty: 5,
     reward: 'Ring of Eternal Promise',
     warning: 'NO.exe has been deleted',
@@ -460,26 +460,26 @@ function StageInfoCard({
         >
           <button
             onClick={onClose}
-            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center font-['Press_Start_2P',monospace] text-[8px]"
+            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center font-['Press_Start_2P',monospace] text-[10px]"
             style={{ color: ARCADE_COLORS.gray }}
             aria-label="Close"
           >
             X
           </button>
           <p
-            className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
+            className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px]"
             style={{ color: ARCADE_COLORS.gray }}
           >
             STAGE {stage.id + 1}
           </p>
           <p
-            className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[12px] mt-0.5"
+            className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px] mt-0.5"
             style={{ color: ARCADE_COLORS.gold }}
           >
             {stage.name}
           </p>
           <p
-            className="font-['Press_Start_2P',monospace] text-[8px] mt-0.5"
+            className="font-['Press_Start_2P',monospace] text-[10px] mt-0.5"
             style={{ color: ARCADE_COLORS.gray }}
           >
             {stage.subtitle}
@@ -490,7 +490,7 @@ function StageInfoCard({
         <div className="px-4 py-3 flex flex-col gap-2.5">
           {/* Description */}
           <p
-            className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px] leading-[14px] sm:leading-[16px] whitespace-pre-wrap"
+            className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px] leading-[18px] sm:leading-[21px] whitespace-pre-wrap"
             style={{ color: ARCADE_COLORS.text }}
           >
             {stage.description}
@@ -499,7 +499,7 @@ function StageInfoCard({
           {/* Difficulty */}
           <div className="flex items-center gap-2">
             <span
-              className="font-['Press_Start_2P',monospace] text-[8px]"
+              className="font-['Press_Start_2P',monospace] text-[10px]"
               style={{ color: ARCADE_COLORS.gray }}
             >
               LV
@@ -525,13 +525,13 @@ function StageInfoCard({
           {/* Reward */}
           <div>
             <span
-              className="font-['Press_Start_2P',monospace] text-[8px]"
+              className="font-['Press_Start_2P',monospace] text-[10px]"
               style={{ color: ARCADE_COLORS.gray }}
             >
               REWARD
             </span>
             <p
-              className="font-['Press_Start_2P',monospace] text-[8px] mt-0.5"
+              className="font-['Press_Start_2P',monospace] text-[10px] mt-0.5"
               style={{ color: ARCADE_COLORS.green }}
             >
               {stage.reward}
@@ -548,7 +548,7 @@ function StageInfoCard({
               }}
             >
               <p
-                className="font-['Press_Start_2P',monospace] text-[8px]"
+                className="font-['Press_Start_2P',monospace] text-[10px]"
                 style={{ color: ARCADE_COLORS.red }}
               >
                 {'! '}{stage.warning}
@@ -563,7 +563,7 @@ function StageInfoCard({
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onStart}
-            className="w-full px-4 py-2.5 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+            className="w-full px-4 py-2.5 font-['Press_Start_2P',monospace] text-[12px] sm:text-[13px]"
             style={{
               color: '#000',
               background: ARCADE_COLORS.gold,
@@ -650,6 +650,19 @@ function PixelPath({ completed }: { completed: boolean }) {
   );
 }
 
+// --- 미니 이벤트 (스테이지 클리어 후 랜덤 팝업) ---
+
+const MINI_EVENTS = [
+  { icon: '\u2618', text: '들판에서 네잎클로버를 발견했다!', color: ARCADE_COLORS.green },
+  { icon: '\u2764', text: '사랑의 파워가 1 올랐다!', color: ARCADE_COLORS.pink },
+  { icon: '\u2728', text: '신비한 별빛이 길을 비춘다!', color: ARCADE_COLORS.gold },
+  { icon: '\u2709', text: '하객으로부터 편지가 도착했다!', color: ARCADE_COLORS.blue },
+  { icon: '\u266A', text: '어디선가 웨딩마치가 들려온다...', color: ARCADE_COLORS.pink },
+  { icon: '\u2605', text: '행운의 별을 발견했다! LUK+1', color: ARCADE_COLORS.gold },
+  { icon: '\u2615', text: '커피 아이템을 획득! HP 회복!', color: ARCADE_COLORS.green },
+  { icon: '\u2661', text: '커플 시너지 효과 발동!', color: ARCADE_COLORS.pink },
+];
+
 // --- Main WorldMap component ---
 
 interface WorldMapProps {
@@ -668,12 +681,28 @@ export function WorldMap({
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
+  // 미니 이벤트 상태
+  const [miniEvent, setMiniEvent] = useState<typeof MINI_EVENTS[number] | null>(null);
+
   useEffect(() => {
     return () => {
       if (shakeTimerRef.current) {
         clearTimeout(shakeTimerRef.current);
       }
     };
+  }, []);
+
+  // 스테이지 클리어 후 60% 확률로 미니 이벤트 표시
+  useEffect(() => {
+    if (completedStages.length === 0) return;
+    if (Math.random() > 0.6) return;
+    const delay = setTimeout(() => {
+      const evt = MINI_EVENTS[Math.floor(Math.random() * MINI_EVENTS.length)];
+      setMiniEvent(evt);
+      setTimeout(() => setMiniEvent(null), 3000);
+    }, 800);
+    return () => clearTimeout(delay);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isStageAccessible = useCallback(
@@ -728,13 +757,13 @@ export function WorldMap({
         className="text-center py-4 sm:py-6 flex-shrink-0 z-20"
       >
         <p
-          className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[13px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           WORLD 1
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[14px] sm:text-[20px] mt-1"
+          className="font-['Press_Start_2P',monospace] text-[18px] sm:text-[26px] mt-1"
           style={{
             color: ARCADE_COLORS.gold,
             textShadow: `0 0 8px ${ARCADE_COLORS.gold}40`,
@@ -742,12 +771,33 @@ export function WorldMap({
         >
           DESTINY
         </p>
-        <p
-          className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px] mt-2"
-          style={{ color: ARCADE_COLORS.gray }}
-        >
-          STAGES: {completedStages.length}/{ZONES.length}
-        </p>
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <p
+            className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px]"
+            style={{ color: ARCADE_COLORS.gray }}
+          >
+            STAGE {completedStages.length}/{ZONES.length}
+          </p>
+          <div className="flex gap-1">
+            {ZONES.map((zone) => (
+              <div
+                key={zone.id}
+                style={{
+                  width: 8,
+                  height: 8,
+                  background: completedStages.includes(zone.id)
+                    ? ARCADE_COLORS.green
+                    : ARCADE_COLORS.darkGray,
+                  border: `1px solid ${
+                    completedStages.includes(zone.id)
+                      ? ARCADE_COLORS.green
+                      : ARCADE_COLORS.gray
+                  }`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </motion.div>
 
       {/* Map zones */}
@@ -815,10 +865,18 @@ export function WorldMap({
 
                   {/* Stage node + info */}
                   <div className="flex-1 flex flex-col items-center gap-1">
-                    {/* Walking character on current stage */}
+                    {/* 커플 워킹 - 스테이지 진행에 따라 간격 좁아짐 */}
                     {isCurrent && (
-                      <div className="mb-1">
+                      <div className="mb-1 flex items-end" style={{ gap: ['8px', '5px', '2px', '0px'][zone.id] ?? '8px' }}>
                         <PixelCharacterWalking character="groom" scale={2} />
+                        <PixelCharacterWalking character="bride" scale={2} />
+                      </div>
+                    )}
+
+                    {/* 클리어 스테이지에 하트 마크 */}
+                    {isCompleted && !isCurrent && (
+                      <div className="mb-1 flex items-center gap-0.5">
+                        <span style={{ color: '#ff6b9d', fontSize: 10 }}>{'♥'}</span>
                       </div>
                     )}
 
@@ -891,7 +949,7 @@ export function WorldMap({
                     {/* Stage label */}
                     <div className="text-center">
                       <p
-                        className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
+                        className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px]"
                         style={{
                           color: isCompleted
                             ? ARCADE_COLORS.green
@@ -903,7 +961,7 @@ export function WorldMap({
                         {zone.name}
                       </p>
                       <p
-                        className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px] mt-0.5"
+                        className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px] mt-0.5"
                         style={{ color: ARCADE_COLORS.gray }}
                       >
                         {zone.subtitle}
@@ -927,7 +985,7 @@ export function WorldMap({
                     }}
                   >
                     <span
-                      className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+                      className="font-['Press_Start_2P',monospace] text-[12px] sm:text-[13px]"
                       style={{ color: ARCADE_COLORS.green }}
                     >
                       CLEAR
@@ -942,13 +1000,45 @@ export function WorldMap({
 
       {/* Hint text */}
       <motion.p
-        className="text-center pb-3 font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
+        className="text-center pb-3 font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px]"
         style={{ color: ARCADE_COLORS.gray }}
         animate={prefersReducedMotion ? undefined : { opacity: [0.3, 0.6, 0.3] }}
         transition={prefersReducedMotion ? undefined : { duration: 2.5, repeat: Infinity }}
       >
         TAP A STAGE TO BEGIN
       </motion.p>
+
+      {/* 미니 이벤트 팝업 */}
+      <AnimatePresence>
+        {miniEvent && (
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed bottom-20 left-4 right-4 z-30 flex justify-center pointer-events-none"
+          >
+            <div
+              className="px-4 py-3 flex items-center gap-2 max-w-sm"
+              style={{
+                background: 'rgba(0,0,0,0.92)',
+                border: `2px solid ${miniEvent.color}`,
+                boxShadow: `0 0 12px ${miniEvent.color}40`,
+              }}
+              onClick={() => setMiniEvent(null)}
+              role="status"
+            >
+              <span className="text-[16px] sm:text-[18px] shrink-0">{miniEvent.icon}</span>
+              <p
+                className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] leading-[16px]"
+                style={{ color: miniEvent.color }}
+              >
+                {miniEvent.text}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Stage info card popup */}
       <AnimatePresence>

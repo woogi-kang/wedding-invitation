@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { TitleScreen } from '@/components/trick/arcade/TitleScreen';
 import { CharacterSelect } from '@/components/trick/arcade/CharacterSelect';
@@ -9,6 +9,7 @@ import { StageEvent } from '@/components/trick/arcade/StageEvent';
 import { BossBattle } from '@/components/trick/arcade/BossBattle';
 import { EndingSequence } from '@/components/trick/arcade/EndingSequence';
 import { PostGameVillage } from '@/components/trick/arcade/PostGameVillage';
+import { BattleTransition } from '@/components/trick/arcade/shared';
 
 type GamePhase =
   | 'title'
@@ -21,19 +22,106 @@ type GamePhase =
 
 const TOTAL_STAGES = 4;
 
+/* ── localStorage 진행 상태 저장 ── */
+const SAVE_KEY = 'wedding_arcade_progress';
+
+interface SaveData {
+  completedStages: number[];
+  currentStage: number;
+  phase: GamePhase;
+}
+
+function saveProgress(data: SaveData): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  } catch { /* 저장 실패 무시 */ }
+}
+
+function loadProgress(): SaveData | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function clearProgress(): void {
+  if (typeof window === 'undefined') return;
+  try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
+}
+
 export default function ArcadeInvitationPage() {
   const [phase, setPhase] = useState<GamePhase>('title');
   const [completedStages, setCompletedStages] = useState<number[]>([]);
   const [currentStage, setCurrentStage] = useState(0);
   const [activeStage, setActiveStage] = useState<number | null>(null);
+  const [hasSaveData, setHasSaveData] = useState(false);
+
+  // 마운트 시 저장된 진행 상태 확인
+  useEffect(() => {
+    const saved = loadProgress();
+    if (saved && saved.completedStages.length > 0) {
+      setHasSaveData(true);
+    }
+  }, []);
+
+  // 진행 상태 자동 저장 (title, character-select 제외)
+  useEffect(() => {
+    if (phase === 'title' || phase === 'character-select') return;
+    saveProgress({ completedStages, currentStage, phase });
+  }, [completedStages, currentStage, phase]);
+
+  // CONTINUE: 저장된 진행 상태 복원
+  const handleContinue = useCallback(() => {
+    const saved = loadProgress();
+    if (saved) {
+      setCompletedStages(saved.completedStages);
+      setCurrentStage(saved.currentStage);
+      // stage-event, boss-battle 등 중간 phase는 world-map으로 복원
+      const restorePhase = saved.phase === 'post-game' ? 'post-game' : 'world-map';
+      setPhase(restorePhase);
+    }
+  }, []);
+
+  // NEW GAME: 저장 데이터 삭제 후 새 게임
+  const handleNewGame = useCallback(() => {
+    clearProgress();
+    setHasSaveData(false);
+    setPhase('character-select');
+  }, []);
+
+  // 배틀 전환 효과 상태
+  const [transitioning, setTransitioning] = useState(false);
+  const [pendingPhase, setPendingPhase] = useState<GamePhase | null>(null);
+  const [pendingStage, setPendingStage] = useState<number | null>(null);
+
+  // 전환 효과와 함께 페이즈 변경
+  const transitionToPhase = useCallback((nextPhase: GamePhase, stageIdx?: number) => {
+    setTransitioning(true);
+    setPendingPhase(nextPhase);
+    if (stageIdx !== undefined) setPendingStage(stageIdx);
+  }, []);
+
+  const handleTransitionComplete = useCallback(() => {
+    if (pendingPhase) {
+      if (pendingStage !== null) {
+        setActiveStage(pendingStage);
+      }
+      setPhase(pendingPhase);
+    }
+    setTransitioning(false);
+    setPendingPhase(null);
+    setPendingStage(null);
+  }, [pendingPhase, pendingStage]);
 
   const handleStageSelect = useCallback(
     (stageIndex: number) => {
       if (completedStages.includes(stageIndex)) return;
-      setActiveStage(stageIndex);
-      setPhase('stage-event');
+      // 전환 효과와 함께 스테이지 진입
+      transitionToPhase('stage-event', stageIndex);
     },
-    [completedStages],
+    [completedStages, transitionToPhase],
   );
 
   const handleStageComplete = useCallback(() => {
@@ -44,13 +132,14 @@ export default function ArcadeInvitationPage() {
     setActiveStage(null);
 
     if (newCompleted.length >= TOTAL_STAGES) {
-      setPhase('boss-battle');
+      // 보스전 진입도 전환 효과 사용
+      transitionToPhase('boss-battle');
     } else {
       const nextStage = Math.min(activeStage + 1, TOTAL_STAGES - 1);
       setCurrentStage(nextStage);
       setPhase('world-map');
     }
-  }, [activeStage, completedStages]);
+  }, [activeStage, completedStages, transitionToPhase]);
 
   const handleStageClose = useCallback(() => {
     setActiveStage(null);
@@ -66,10 +155,21 @@ export default function ArcadeInvitationPage() {
         imageRendering: 'auto',
       }}
     >
+      {/* 포켓몬 스타일 배틀 전환 효과 */}
+      <BattleTransition
+        isActive={transitioning}
+        onComplete={handleTransitionComplete}
+      />
+
       <AnimatePresence mode="wait">
         {phase === 'title' && (
           <PhaseWrapper key="title">
-            <TitleScreen onStart={() => setPhase('character-select')} />
+            <TitleScreen
+              onStart={() => setPhase('character-select')}
+              hasSaveData={hasSaveData}
+              onContinue={handleContinue}
+              onNewGame={handleNewGame}
+            />
           </PhaseWrapper>
         )}
 

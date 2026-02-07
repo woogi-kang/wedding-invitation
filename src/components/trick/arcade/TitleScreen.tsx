@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PixelCharacter } from './shared/PixelCharacter';
 
 const ARCADE_COLORS = {
@@ -39,9 +39,13 @@ function createStars(count: number): Star[] {
 
 interface TitleScreenProps {
   onStart: () => void;
+  hasSaveData?: boolean;
+  onContinue?: () => void;
+  onNewGame?: () => void;
 }
 
-export function TitleScreen({ onStart }: TitleScreenProps) {
+export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: TitleScreenProps) {
+  const [showMenu, setShowMenu] = useState(false);
   const [stars] = useState(() => createStars(60));
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -87,18 +91,23 @@ export function TitleScreen({ onStart }: TitleScreenProps) {
   }, []);
 
   const handleStart = useCallback(() => {
+    if (hasSaveData && !showMenu) {
+      setShowMenu(true);
+      return;
+    }
     onStart();
-  }, [onStart]);
+  }, [onStart, hasSaveData, showMenu]);
 
-  // Key press handler
+  // Key press handler (메뉴 표시 중에는 무시)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (showMenu) return;
       e.preventDefault();
       handleStart();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleStart]);
+  }, [handleStart, showMenu]);
 
   return (
     <div
@@ -185,27 +194,66 @@ export function TitleScreen({ onStart }: TitleScreenProps) {
         />
 
         {/* Press Start blinking */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ delay: 1.2, duration: 1.5, repeat: Infinity, times: [0, 0.1, 0.7, 1] }}
-          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[14px] mt-8"
-          style={{ color: ARCADE_COLORS.text }}
-        >
-          PRESS START
-        </motion.p>
+        {/* PRESS START 또는 CONTINUE/NEW GAME 메뉴 */}
+        <AnimatePresence mode="wait">
+          {!showMenu ? (
+            <motion.p
+              key="press-start"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 1, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 1.2, duration: 1.5, repeat: Infinity, times: [0, 0.1, 0.7, 1] }}
+              className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[18px] mt-8"
+              style={{ color: ARCADE_COLORS.text }}
+            >
+              PRESS START
+            </motion.p>
+          ) : (
+            <motion.div
+              key="menu"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 flex flex-col items-center gap-3"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={(e) => { e.stopPropagation(); onContinue?.(); }}
+                className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px] px-6 py-3 cursor-pointer"
+                style={{
+                  color: ARCADE_COLORS.gold,
+                  background: 'transparent',
+                  border: `2px solid ${ARCADE_COLORS.gold}`,
+                  textShadow: `0 0 8px ${ARCADE_COLORS.gold}60`,
+                }}
+              >
+                CONTINUE
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onNewGame?.(); }}
+                className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[13px] px-4 py-2 cursor-pointer"
+                style={{
+                  color: ARCADE_COLORS.gray,
+                  background: 'transparent',
+                  border: `1px solid ${ARCADE_COLORS.gray}`,
+                }}
+              >
+                NEW GAME
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Bottom bar */}
       <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between items-end z-10">
         <span
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           {'CREDIT: \u221E'}
         </span>
         <span
-          className="font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           &copy; 2026 LOVE STUDIO

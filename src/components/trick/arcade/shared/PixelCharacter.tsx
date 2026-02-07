@@ -3,6 +3,9 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
+// 감정 타입 - 캐릭터 리액션 시스템
+export type EmotionType = 'idle' | 'happy' | 'surprised' | 'nervous' | 'love';
+
 // Each character is a grid of color codes
 // 0=transparent, 1=skin, 2=hair, 3=outfit, 4=accent, 5=white, 6=shoes, 7=blush
 const COLOR_MAPS = {
@@ -30,8 +33,8 @@ const COLOR_MAPS = {
   },
 } as const;
 
-// 16x20 pixel grids
-// Groom: formal suit, short hair, standing pose
+// --- Front-facing sprites (16x20) ---
+
 const GROOM_SPRITE: number[][] = [
   [0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0],
   [0,0,0,0,2,2,8,2,2,2,2,0,0,0,0,0],
@@ -55,7 +58,6 @@ const GROOM_SPRITE: number[][] = [
   [0,0,0,0,6,6,6,0,6,6,6,0,0,0,0,0],
 ];
 
-// Bride: dress, longer hair, flowers
 const BRIDE_SPRITE: number[][] = [
   [0,0,0,0,0,5,5,5,5,5,0,0,0,0,0,0],
   [0,0,0,0,5,5,5,4,5,5,5,0,0,0,0,0],
@@ -79,7 +81,56 @@ const BRIDE_SPRITE: number[][] = [
   [0,0,0,0,0,6,6,0,6,6,0,0,0,0,0,0],
 ];
 
-// Mini versions (8x10) for dialog portraits and map
+// --- Back-facing sprites (16x20) - 포켓몬 배틀용 ---
+
+const GROOM_BACK_SPRITE: number[][] = [
+  [0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0],
+  [0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0],
+  [0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0],
+  [0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0],
+  [0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0],
+  [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+  [0,0,0,0,3,5,3,3,3,5,3,0,0,0,0,0],
+  [0,0,0,3,3,5,3,3,3,5,3,3,0,0,0,0],
+  [0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+  [0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+  [0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+  [0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+  [0,0,3,1,3,3,3,3,3,3,3,1,3,0,0,0],
+  [0,0,0,1,3,3,3,3,3,3,3,1,0,0,0,0],
+  [0,0,0,1,0,3,3,3,3,3,0,1,0,0,0,0],
+  [0,0,0,0,0,3,3,0,3,3,0,0,0,0,0,0],
+  [0,0,0,0,0,3,3,0,3,3,0,0,0,0,0,0],
+  [0,0,0,0,0,3,3,0,3,3,0,0,0,0,0,0],
+  [0,0,0,0,0,6,6,0,6,6,0,0,0,0,0,0],
+  [0,0,0,0,6,6,6,0,6,6,6,0,0,0,0,0],
+];
+
+const BRIDE_BACK_SPRITE: number[][] = [
+  [0,0,0,0,0,5,5,5,5,5,0,0,0,0,0,0],
+  [0,0,0,0,5,5,5,5,5,5,5,0,0,0,0,0],
+  [0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0],
+  [0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0],
+  [0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0],
+  [0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0],
+  [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+  [0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0],
+  [0,0,0,3,3,3,4,3,4,3,3,3,0,0,0,0],
+  [0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0],
+  [0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+  [0,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0],
+  [0,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0],
+  [0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+  [0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0],
+  [0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0],
+  [0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0],
+  [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0],
+  [0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0],
+  [0,0,0,0,0,6,6,0,6,6,0,0,0,0,0,0],
+];
+
+// --- Mini versions (8x10) ---
+
 const GROOM_MINI: number[][] = [
   [0,0,2,2,2,2,0,0],
   [0,2,2,2,2,2,2,0],
@@ -114,13 +165,101 @@ interface PixelCharacterProps {
   size?: SpriteSize;
   scale?: number;
   animate?: boolean;
+  emotion?: EmotionType;
+  facing?: 'front' | 'back';
   className?: string;
   flipX?: boolean;
 }
 
-function getSpriteData(character: CharacterType, size: SpriteSize) {
+// 감정별 애니메이션 설정
+const EMOTION_ANIMATIONS: Record<EmotionType, {
+  animate: Record<string, number[]>;
+  transition: Record<string, unknown>;
+} | null> = {
+  idle: null,
+  happy: {
+    animate: { y: [0, -8, 0] },
+    transition: { duration: 0.5, repeat: 2, ease: 'easeOut' },
+  },
+  surprised: {
+    animate: { y: [0, -12, 0], scale: [1, 1.1, 1] },
+    transition: { duration: 0.4, repeat: 1, ease: 'easeOut' },
+  },
+  nervous: {
+    animate: { x: [-1, 1, -1, 1, 0] },
+    transition: { duration: 0.3, repeat: Infinity, ease: 'linear' },
+  },
+  love: {
+    animate: { y: [0, -3, 0] },
+    transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
+  },
+};
+
+// 하트 파티클 (love 감정용)
+function HeartParticles({ scale }: { scale: number }) {
+  const hearts = useMemo(() =>
+    Array.from({ length: 4 }, (_, i) => ({
+      id: i,
+      x: (i - 1.5) * scale * 3,
+      delay: i * 0.3,
+      size: Math.max(8, scale * 3),
+    })),
+    [scale],
+  );
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: -scale * 4,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        pointerEvents: 'none',
+        width: scale * 16,
+        height: scale * 10,
+      }}
+    >
+      {hearts.map((h) => (
+        <motion.span
+          key={h.id}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: 0,
+            marginLeft: h.x,
+            fontSize: h.size,
+            color: '#ff6b9d',
+          }}
+          animate={{
+            y: [0, -scale * 8, -scale * 14],
+            opacity: [1, 0.8, 0],
+            scale: [0.5, 1, 0.6],
+          }}
+          transition={{
+            duration: 1.2,
+            delay: h.delay,
+            repeat: Infinity,
+            ease: 'easeOut',
+          }}
+        >
+          {'♥'}
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
+function getSpriteData(
+  character: CharacterType,
+  size: SpriteSize,
+  facing: 'front' | 'back' = 'front',
+) {
   if (size === 'mini') {
+    // mini는 앞모습만 지원
     return character === 'groom' ? GROOM_MINI : BRIDE_MINI;
+  }
+  if (facing === 'back') {
+    return character === 'groom' ? GROOM_BACK_SPRITE : BRIDE_BACK_SPRITE;
   }
   return character === 'groom' ? GROOM_SPRITE : BRIDE_SPRITE;
 }
@@ -130,10 +269,12 @@ export function PixelCharacter({
   size = 'full',
   scale = 3,
   animate = false,
+  emotion,
+  facing = 'front',
   className = '',
   flipX = false,
 }: PixelCharacterProps) {
-  const sprite = getSpriteData(character, size);
+  const sprite = getSpriteData(character, size, facing);
   const colors = COLOR_MAPS[character];
   const rows = sprite.length;
   const cols = sprite[0].length;
@@ -142,7 +283,6 @@ export function PixelCharacter({
   const width = cols * pixelSize;
   const height = rows * pixelSize;
 
-  // Generate box-shadow string for the entire sprite
   const shadows = useMemo(() => {
     const result: string[] = [];
     for (let y = 0; y < rows; y++) {
@@ -159,9 +299,8 @@ export function PixelCharacter({
     return result;
   }, [sprite, colors, rows, cols, pixelSize]);
 
-  const content = (
+  const spriteElement = (
     <div
-      className={className}
       style={{
         width: `${width + pixelSize}px`,
         height: `${height + pixelSize}px`,
@@ -183,20 +322,62 @@ export function PixelCharacter({
     </div>
   );
 
-  if (!animate) return content;
+  // emotion이 설정된 경우 감정 애니메이션 적용
+  const emotionConfig = emotion ? EMOTION_ANIMATIONS[emotion] : null;
+  const shouldAnimate = emotion ? !!emotionConfig : animate;
 
+  if (!shouldAnimate && emotion !== 'love') {
+    return (
+      <div className={className} style={{ position: 'relative', display: 'inline-block' }}>
+        {spriteElement}
+      </div>
+    );
+  }
+
+  // love 감정: 하트 파티클 + 부드러운 바운스
+  if (emotion === 'love') {
+    const loveConfig = EMOTION_ANIMATIONS.love!;
+    return (
+      <div className={className} style={{ position: 'relative', display: 'inline-block' }}>
+        <HeartParticles scale={scale} />
+        <motion.div
+          animate={loveConfig.animate}
+          transition={loveConfig.transition}
+        >
+          {spriteElement}
+        </motion.div>
+      </div>
+    );
+  }
+
+  // emotion 애니메이션
+  if (emotionConfig) {
+    return (
+      <div className={className} style={{ position: 'relative', display: 'inline-block' }}>
+        <motion.div
+          animate={emotionConfig.animate}
+          transition={emotionConfig.transition}
+        >
+          {spriteElement}
+        </motion.div>
+      </div>
+    );
+  }
+
+  // 기존 animate prop (하위 호환)
   return (
     <motion.div
       animate={{ y: [0, -4, 0] }}
       transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+      className={className}
       style={{ display: 'inline-block' }}
     >
-      {content}
+      {spriteElement}
     </motion.div>
   );
 }
 
-// Walking animation variant - alternates between two frames
+// Walking animation variant
 export function PixelCharacterWalking({
   character,
   scale = 2,

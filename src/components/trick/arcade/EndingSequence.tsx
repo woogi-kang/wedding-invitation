@@ -77,12 +77,14 @@ function SparkleField({ count = 40 }: { count?: number }) {
 
 interface CreditBlock {
   heading: string;
+  icon: string;
   lines: { name: string; role: string }[];
 }
 
 const CREDITS: CreditBlock[] = [
   {
     heading: 'CAST',
+    icon: '\u2694',
     lines: [
       { name: '\uAC15\uD0DC\uC6B1', role: 'as The Groom' },
       { name: '\uAE40\uC120\uACBD', role: 'as The Bride' },
@@ -90,6 +92,7 @@ const CREDITS: CreditBlock[] = [
   },
   {
     heading: 'PRODUCED BY',
+    icon: '\u2605',
     lines: [
       { name: '\uAC15\uC2B9\uD638 & \uC774\uC9C0\uC21C', role: "Groom's Family" },
       { name: '\uAE40\uC885\uD0DC & \uC2E0\uD604\uC784', role: "Bride's Family" },
@@ -97,18 +100,21 @@ const CREDITS: CreditBlock[] = [
   },
   {
     heading: 'SPECIAL THANKS',
+    icon: '\u2665',
     lines: [
       { name: '\uC18C\uC911\uD55C \uD558\uAC1D \uC5EC\uB7EC\uBD84', role: 'Our Beloved Guests' },
     ],
   },
   {
     heading: 'DEVELOPED BY',
+    icon: '\u2726',
     lines: [
       { name: 'LOVE STUDIO', role: 'Since 2022' },
     ],
   },
   {
     heading: 'POWERED BY',
+    icon: '\u25C6',
     lines: [
       { name: '\uC0AC\uB791 & \uBFFF\uC74C & \uCEE4\uD53C', role: 'Love & Trust & Coffee' },
     ],
@@ -150,7 +156,7 @@ function VictoryScreen({ onSkip }: { onSkip: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.8 }}
       >
-        <PixelCharacter character="groom" size="full" scale={3} animate />
+        <PixelCharacter character="groom" size="full" scale={4} animate />
         <motion.span
           className="text-[20px] sm:text-[28px] mb-6"
           style={{ color: ARCADE_COLORS.pink }}
@@ -159,7 +165,7 @@ function VictoryScreen({ onSkip }: { onSkip: () => void }) {
         >
           {'♥'}
         </motion.span>
-        <PixelCharacter character="bride" size="full" scale={3} animate />
+        <PixelCharacter character="bride" size="full" scale={4} animate />
       </motion.div>
 
       {/* QUEST COMPLETE */}
@@ -194,7 +200,7 @@ function VictoryScreen({ onSkip }: { onSkip: () => void }) {
         className="relative z-10 mt-6 text-center font-['Press_Start_2P',monospace]"
         style={{
           color: ARCADE_COLORS.text,
-          fontSize: 'clamp(8px, 2.5vw, 12px)',
+          fontSize: 'clamp(10px, 3.2vw, 16px)',
           lineHeight: 1.8,
         }}
         initial={{ opacity: 0, y: 20 }}
@@ -213,7 +219,7 @@ function VictoryScreen({ onSkip }: { onSkip: () => void }) {
         className="absolute bottom-8 font-['Press_Start_2P',monospace] text-center"
         style={{
           color: ARCADE_COLORS.gray,
-          fontSize: '8px',
+          fontSize: '10px',
         }}
         animate={{ opacity: [0.3, 0.7, 0.3] }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -229,7 +235,7 @@ function VictoryScreen({ onSkip }: { onSkip: () => void }) {
 function CreditsRoll({ onSkip }: { onSkip: () => void }) {
   // Calculate total height for scroll: heading + lines + spacing
   // Each credit block: heading + lines + gap
-  const CREDITS_DURATION = 15;
+  const CREDITS_DURATION = 22;
 
   return (
     <motion.div
@@ -271,14 +277,12 @@ function CreditsRoll({ onSkip }: { onSkip: () => void }) {
                 className="font-['Press_Start_2P',monospace] mb-6 sm:mb-8"
                 style={{
                   color: ARCADE_COLORS.gold,
-                  fontSize: 'clamp(8px, 2.5vw, 11px)',
+                  fontSize: 'clamp(10px, 3.2vw, 14px)',
                   letterSpacing: '0.15em',
                   textShadow: `0 0 8px ${ARCADE_COLORS.gold}40`,
                 }}
               >
-                {'\u2014 '}
-                {block.heading}
-                {' \u2014'}
+                {block.icon} {block.heading} {block.icon}
               </p>
 
               {/* Names and roles */}
@@ -288,7 +292,7 @@ function CreditsRoll({ onSkip }: { onSkip: () => void }) {
                     className="font-['Press_Start_2P',monospace]"
                     style={{
                       color: ARCADE_COLORS.text,
-                      fontSize: 'clamp(10px, 3vw, 14px)',
+                      fontSize: 'clamp(13px, 4vw, 18px)',
                       lineHeight: 1.6,
                     }}
                   >
@@ -298,7 +302,7 @@ function CreditsRoll({ onSkip }: { onSkip: () => void }) {
                     className="mt-1 font-['Press_Start_2P',monospace]"
                     style={{
                       color: ARCADE_COLORS.gray,
-                      fontSize: 'clamp(7px, 2vw, 9px)',
+                      fontSize: 'clamp(9px, 2.6vw, 12px)',
                       lineHeight: 1.6,
                     }}
                   >
@@ -333,7 +337,7 @@ function CreditsRoll({ onSkip }: { onSkip: () => void }) {
         className="absolute bottom-6 left-0 right-0 text-center font-['Press_Start_2P',monospace] z-20"
         style={{
           color: ARCADE_COLORS.gray,
-          fontSize: '7px',
+          fontSize: '9px',
         }}
         animate={{ opacity: [0.2, 0.5, 0.2] }}
         transition={{ duration: 2.5, repeat: Infinity }}
@@ -376,7 +380,7 @@ function FinalMessage({ onComplete }: { onComplete: () => void }) {
               className="font-['Press_Start_2P',monospace]"
               style={{
                 color: ARCADE_COLORS.gray,
-                fontSize: 'clamp(14px, 4vw, 22px)',
+                fontSize: 'clamp(18px, 5vw, 28px)',
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -398,7 +402,7 @@ function FinalMessage({ onComplete }: { onComplete: () => void }) {
                 className="font-['Press_Start_2P',monospace]"
                 style={{
                   color: ARCADE_COLORS.gold,
-                  fontSize: 'clamp(14px, 4vw, 22px)',
+                  fontSize: 'clamp(18px, 5vw, 28px)',
                 }}
                 animate={{
                   textShadow: [
@@ -421,15 +425,15 @@ function FinalMessage({ onComplete }: { onComplete: () => void }) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                <PixelCharacter character="groom" size="mini" scale={2} animate />
-                <PixelCharacter character="bride" size="mini" scale={2} animate />
+                <PixelCharacter character="groom" size="mini" scale={3} animate />
+                <PixelCharacter character="bride" size="mini" scale={3} animate />
               </motion.div>
 
               <motion.p
                 className="mt-4"
                 style={{
                   color: ARCADE_COLORS.pink,
-                  fontSize: 'clamp(9px, 2.5vw, 12px)',
+                  fontSize: 'clamp(12px, 3.2vw, 16px)',
                   fontFamily: "'Press Start 2P', monospace",
                   lineHeight: 1.8,
                 }}
@@ -490,7 +494,7 @@ export function EndingSequence({ onComplete }: EndingSequenceProps) {
     if (phase === 'credits') {
       autoAdvanceRef.current = setTimeout(() => {
         setPhase('final');
-      }, 15000);
+      }, 22000);
       return () => {
         if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
       };
