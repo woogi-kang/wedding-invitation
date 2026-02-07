@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { LetterGlitch } from './LetterGlitch';
 
 // Sci-fi / "Her" movie style soft terminal sounds using Web Audio API
@@ -371,22 +371,33 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
         }}
       />
 
-      {/* Glass Morphism Terminal Card */}
+      {/* Glass Morphism Terminal Card - Cyberpunk Enhanced */}
       <div className="fixed inset-0 flex items-center justify-center p-4 z-20">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md max-h-[85vh] overflow-auto rounded-2xl border border-green-500/30 bg-black/70 backdrop-blur-xl shadow-2xl shadow-green-900/20"
+          className="w-full max-w-md max-h-[85vh] overflow-auto rounded-2xl border bg-black/70 backdrop-blur-xl cyberpunk-card"
+          style={{
+            borderColor: 'rgba(0, 240, 255, 0.35)',
+          }}
         >
           {/* Terminal Header */}
-          <div className="sticky top-0 flex items-center gap-2 px-4 py-3 border-b border-green-500/20 bg-black/50 backdrop-blur-sm">
+          <div
+            className="sticky top-0 flex items-center gap-2 px-4 py-3 border-b bg-black/50 backdrop-blur-sm"
+            style={{ borderColor: 'rgba(0, 240, 255, 0.15)' }}
+          >
             <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+              <div className="w-3 h-3 rounded-full bg-red-500/80" style={{ boxShadow: '0 0 6px #ef4444' }} />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" style={{ boxShadow: '0 0 6px #eab308' }} />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" style={{ boxShadow: '0 0 6px #22c55e' }} />
             </div>
-            <span className="ml-2 text-xs text-green-500/60 font-mono">wedding.exe</span>
+            <span
+              className="ml-2 text-xs font-mono"
+              style={{ color: 'rgba(0, 240, 255, 0.6)', textShadow: '0 0 4px rgba(0, 240, 255, 0.4)' }}
+            >
+              wedding.exe
+            </span>
           </div>
 
           {/* Terminal content */}
@@ -443,7 +454,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
             </div>
           )}
 
-          {/* Button - 공간 미리 확보, opacity로만 제어 */}
+          {/* Button */}
           {hasStarted && (
             <div
               className="mt-8 transition-opacity duration-700 ease-out"
@@ -460,7 +471,7 @@ export function TerminalIntro({ onEnter }: TerminalIntroProps) {
                 className="w-full py-4 border-2 border-green-500 text-green-400 font-mono text-lg hover:bg-green-500/20 active:bg-green-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-black"
                 aria-label="청첩장 보기"
               >
-                {'함께하기 (버튼을 눌러주세요)'}
+                함께하기 (버튼을 눌러주세요)
               </motion.button>
             </div>
           )}
