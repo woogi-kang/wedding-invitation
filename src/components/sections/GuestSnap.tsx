@@ -2,19 +2,17 @@
 
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Camera, Upload, Share2, TestTube2 } from 'lucide-react';
+import { Camera, Upload, Share2 } from 'lucide-react';
 import { Section } from '@/components/common/Section';
 import { GUEST_SNAP_CONFIG, WEDDING_INFO } from '@/lib/constants';
 import { GuestNameModal } from '@/components/guestsnap/GuestNameModal';
 import { UploadModal } from '@/components/guestsnap/UploadModal';
-import { GuestSnapDialog } from '@/components/ui/GuestSnapDialog';
+
 import type { GuestSnapModalState, GuestSnapFile } from '@/types/guestsnap';
 
 // 디자인 선택: 'sample7' | 'sample8'
 const DESIGN_VARIANT: 'sample7' | 'sample8' = 'sample8';
 
-// 개발 환경에서만 테스트 버튼 표시
-const SHOW_TEST_BUTTON = process.env.NODE_ENV === 'development';
 
 export function GuestSnap() {
   const { messages } = GUEST_SNAP_CONFIG;
@@ -26,7 +24,6 @@ export function GuestSnap() {
   const [guestName, setGuestName] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<GuestSnapFile[]>([]);
   const [showNotYetMessage, setShowNotYetMessage] = useState(false);
-  const [showTestDialog, setShowTestDialog] = useState(false);
 
   // Check if feature is available (wedding day or after)
   const isFeatureAvailable = useMemo(() => {
@@ -298,23 +295,7 @@ export function GuestSnap() {
                     SHARE PHOTOS
                   </motion.button>
 
-                  {/* Test Button - 개발 환경에서만 표시 */}
-                  {SHOW_TEST_BUTTON && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setShowTestDialog(true)}
-                      className="inline-flex items-center gap-2 px-6 py-2 text-xs rounded-full"
-                      style={{
-                        backgroundColor: 'var(--color-text-muted)',
-                        color: 'white',
-                        fontFamily: 'var(--font-body)',
-                      }}
-                    >
-                      <TestTube2 className="w-3 h-3" />
-                      Dialog 테스트
-                    </motion.button>
-                  )}
+
                 </div>
 
                 {/* Not yet available message */}
@@ -367,13 +348,6 @@ export function GuestSnap() {
         onFilesSelected={handleFilesSelected}
       />
 
-      {/* GuestSnap Dialog - 테스트용 */}
-      {showTestDialog && (
-        <GuestSnapDialog
-          forceOpen={true}
-          onClose={() => setShowTestDialog(false)}
-        />
-      )}
     </Section>
   );
 }
