@@ -105,7 +105,7 @@ export function CodeBlock({
 
       {/* Code Content */}
       <div className="p-4 overflow-x-auto">
-        <pre className="font-mono text-sm leading-relaxed">
+        <pre className="font-mono text-[10px] sm:text-sm leading-relaxed">
           {highlightedLines.map((line, i) => (
             <div key={i} className="flex">
               {showLineNumbers && (

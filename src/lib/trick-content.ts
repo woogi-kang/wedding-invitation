@@ -95,12 +95,12 @@ export function toPackageJson(): string {
     name: "wedding-invitation",
     version: `${dateDisplay.year}.${dateDisplay.month}.${dateDisplay.day}`,
     description: `${groom.name} ♥ ${bride.name} 결혼합니다`,
-    main: "matrimony.exe",
+    main: "love.js",
     scripts: {
-      start: "flutter run wedding --release",
-      build: "flutter build happiness",
-      test: "flutter test love --coverage=100%",
-      deploy: "vercel --prod"
+      dev: "npm run wedding --mode=forever",
+      build: "npm run build:happiness",
+      test: "npm test -- --coverage love",
+      deploy: "npm run deploy --prod"
     },
     authors: [
       { name: groom.name, role: "groom" },
@@ -219,10 +219,10 @@ export function getBootSequence(): string[] {
   return [
     `BIOS v${dateDisplay.year}.${String(dateDisplay.month).padStart(2, '0')}.${String(dateDisplay.day).padStart(2, '0')}`,
     '',
-    '> Initializing MATRIMONY.EXE...',
-    '> Loading happiness modules...',
-    '> Compiling love.ts...',
-    '> flutter pub add new_beginning...',
+    '> npm init wedding-app...',
+    '> npm install happiness...',
+    '> npm run compile love.js...',
+    '> npm install new_beginning...',
     '',
     'PROGRESS',
     '',
@@ -247,14 +247,4 @@ export const GLITCH_COLORS = {
   text: '#00ff41',
   textDim: 'rgba(0, 255, 65, 0.6)',
   scanline: 'rgba(0, 255, 65, 0.03)',
-} as const;
-
-// 3D theme colors
-export const THEME_3D_COLORS = {
-  background: '#1a1a2e',
-  primary: '#16213e',
-  secondary: '#0f3460',
-  accent: '#e94560',
-  glow: '#00d4ff',
-  text: '#ffffff',
 } as const;

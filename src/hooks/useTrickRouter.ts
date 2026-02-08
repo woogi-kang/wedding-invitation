@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-type TrickTheme = 'glitch' | '3d' | 'arcade';
+type TrickTheme = 'glitch' | 'arcade';
 
 interface UseTrickRouterOptions {
   preferredTheme?: TrickTheme;
@@ -57,7 +57,7 @@ function markActivated(): void {
   }
 }
 
-const ALL_THEMES: TrickTheme[] = ['glitch', '3d', 'arcade'];
+const ALL_THEMES: TrickTheme[] = ['glitch', 'arcade'];
 
 function selectTheme(preferred?: TrickTheme): TrickTheme {
   if (preferred) {
@@ -74,17 +74,15 @@ function selectTheme(preferred?: TrickTheme): TrickTheme {
     return otherThemes[Math.floor(random * otherThemes.length)];
   }
 
-  // First time: time-based selection with arcade as equal option
+  // First time: time-based selection
   const isNight = isNightTime();
   if (isNight) {
-    // Night: glitch 50%, arcade 30%, 3d 20%
-    if (random < 0.5) return 'glitch';
-    if (random < 0.8) return 'arcade';
-    return '3d';
+    // Night: glitch 60%, arcade 40%
+    if (random < 0.6) return 'glitch';
+    return 'arcade';
   }
-  // Day: 3d 40%, arcade 35%, glitch 25%
-  if (random < 0.4) return '3d';
-  if (random < 0.75) return 'arcade';
+  // Day: arcade 55%, glitch 45%
+  if (random < 0.55) return 'arcade';
   return 'glitch';
 }
 
@@ -102,7 +100,6 @@ export function useTrickRouter(options: UseTrickRouterOptions = {}) {
     const theme = selectTheme(options.preferredTheme);
     const pathMap: Record<TrickTheme, string> = {
       glitch: '/invitation/glitch',
-      '3d': '/invitation/3d',
       arcade: '/invitation/arcade',
     };
     const path = pathMap[theme];
@@ -116,12 +113,6 @@ export function useTrickRouter(options: UseTrickRouterOptions = {}) {
     router.push('/invitation/glitch');
   }, [router]);
 
-  const navigateTo3D = useCallback(() => {
-    markActivated();
-    setLastTheme('3d');
-    router.push('/invitation/3d');
-  }, [router]);
-
   const navigateToArcade = useCallback(() => {
     markActivated();
     setLastTheme('arcade');
@@ -131,22 +122,7 @@ export function useTrickRouter(options: UseTrickRouterOptions = {}) {
   return {
     navigateToTrick,
     navigateToGlitch,
-    navigateTo3D,
     navigateToArcade,
     hasActivated: hasActivatedThisSession,
   };
-}
-
-// Utility to check WebGL support for 3D page fallback
-export function checkWebGLSupport(): boolean {
-  if (typeof window === 'undefined') return false;
-
-  try {
-    const canvas = document.createElement('canvas');
-    const gl =
-      canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    return gl !== null;
-  } catch {
-    return false;
-  }
 }

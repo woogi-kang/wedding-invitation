@@ -42,7 +42,7 @@ export function GlitchHero({ onBootComplete }: GlitchHeroProps) {
           </div>
 
           {/* Boot Sequence */}
-          <div className="p-6 min-h-[400px]">
+          <div className="p-3 sm:p-6 min-h-[250px] sm:min-h-[400px]">
             <TypingGlitch
               lines={bootLines}
               typingSpeed={25}
@@ -62,7 +62,7 @@ export function GlitchHero({ onBootComplete }: GlitchHeroProps) {
           >
             <GlitchText
               text={`${WEDDING_INFO.groom.name} ♥ ${WEDDING_INFO.bride.name}`}
-              className="text-3xl sm:text-4xl font-bold text-[#00ff41]"
+              className="text-xl sm:text-3xl md:text-4xl font-bold text-[#00ff41]"
               as="h1"
             />
             <motion.p

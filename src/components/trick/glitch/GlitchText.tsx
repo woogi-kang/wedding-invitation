@@ -61,7 +61,7 @@ export function GlitchText({
       className={`relative inline-block ${className}`}
       style={{
         textShadow: isGlitching
-          ? '-2px 0 #ff0080, 2px 0 #00d4ff'
+          ? '-1px 0 #ff0080, 1px 0 #00d4ff'
           : 'none',
       }}
     >

@@ -7,26 +7,28 @@ import { WEDDING_INFO } from '@/lib/constants';
 import Link from 'next/link';
 
 export function GlitchFooter() {
-  const { navigateTo3D } = useTrickRouter();
-  const { handleTap } = useTripleTap(navigateTo3D);
+  const { navigateToArcade } = useTrickRouter();
+  const { handleTap } = useTripleTap(navigateToArcade);
 
   return (
-    <footer className="py-12 px-4 border-t border-[#00ff41]/20">
+    <footer className="py-8 sm:py-12 px-4 border-t border-[#00ff41]/20">
       <div className="max-w-2xl mx-auto text-center">
         {/* ASCII Art Heart */}
-        <motion.pre
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="font-mono text-[#ff0080] text-xs mb-6 leading-tight"
+          className="mb-6 overflow-x-auto"
         >
-{`   ██╗      ██████╗ ██╗   ██╗███████╗
-   ██║     ██╔═══██╗██║   ██║██╔════╝
-   ██║     ██║   ██║██║   ██║█████╗
-   ██║     ██║   ██║╚██╗ ██╔╝██╔══╝
-   ███████╗╚██████╔╝ ╚████╔╝ ███████╗
-   ╚══════╝ ╚═════╝   ╚═══╝  ╚══════╝`}
-        </motion.pre>
+          <pre className="font-mono text-[#ff0080] text-[8px] sm:text-xs leading-tight inline-block">
+{`██╗      ██████╗ ██╗   ██╗███████╗
+██║     ██╔═══██╗██║   ██║██╔════╝
+██║     ██║   ██║██║   ██║█████╗
+██║     ██║   ██║╚██╗ ██╔╝██╔══╝
+███████╗╚██████╔╝ ╚████╔╝ ███████╗
+╚══════╝ ╚═════╝   ╚═══╝  ╚══════╝`}
+          </pre>
+        </motion.div>
 
         {/* Names */}
         <motion.div
@@ -55,7 +57,7 @@ export function GlitchFooter() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="flex justify-center gap-4 mb-8"
+          className="flex justify-center gap-2 sm:gap-4 mb-8"
         >
           <Link
             href="/invitation"
@@ -64,10 +66,10 @@ export function GlitchFooter() {
             [일반 초대장]
           </Link>
           <Link
-            href="/invitation/3d"
+            href="/invitation/arcade"
             className="font-mono text-xs text-[#ffff00] hover:underline"
           >
-            [3D 버전]
+            [ARCADE 버전]
           </Link>
         </motion.div>
 
@@ -82,7 +84,7 @@ export function GlitchFooter() {
         >
           // Made with ♥ and lots of ☕
           <br />
-          // Tap here 3x for 3D mode
+          // Tap here 3x for arcade mode
         </motion.div>
 
         {/* Version */}

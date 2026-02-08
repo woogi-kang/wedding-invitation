@@ -4,14 +4,17 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { WEDDING_INFO } from '@/lib/constants';
+import type { GalleryImage } from '@/lib/cloudinary';
 import { TerminalWindow } from '../shared/TerminalWindow';
 
-export function GlitchGallery() {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const { gallery } = WEDDING_INFO;
+interface GlitchGalleryProps {
+  images?: GalleryImage[];
+}
 
-  const images = gallery.images;
+export function GlitchGallery({ images: propImages }: GlitchGalleryProps) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const images = propImages ?? [];
 
   const openImage = (index: number) => setSelectedIndex(index);
   const closeImage = () => setSelectedIndex(null);
@@ -29,7 +32,7 @@ export function GlitchGallery() {
   };
 
   return (
-    <section className="py-20 px-4">
+    <section className="py-10 sm:py-20 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -117,9 +120,9 @@ export function GlitchGallery() {
               {/* Close button */}
               <button
                 onClick={closeImage}
-                className="absolute top-4 right-4 p-2 text-[#00ff41] hover:bg-[#00ff41]/20 rounded transition-colors z-10"
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 p-2 text-[#00ff41] hover:bg-[#00ff41]/20 rounded transition-colors z-10"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
               {/* Navigation */}
@@ -128,9 +131,9 @@ export function GlitchGallery() {
                   e.stopPropagation();
                   goPrev();
                 }}
-                className="absolute left-4 p-2 text-[#00ff41] hover:bg-[#00ff41]/20 rounded transition-colors"
+                className="absolute left-1 sm:left-4 p-1.5 sm:p-2 text-[#00ff41] hover:bg-[#00ff41]/20 rounded transition-colors"
               >
-                <ChevronLeft className="w-8 h-8" />
+                <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
               </button>
 
               <button
@@ -138,9 +141,9 @@ export function GlitchGallery() {
                   e.stopPropagation();
                   goNext();
                 }}
-                className="absolute right-4 p-2 text-[#00ff41] hover:bg-[#00ff41]/20 rounded transition-colors"
+                className="absolute right-1 sm:right-4 p-1.5 sm:p-2 text-[#00ff41] hover:bg-[#00ff41]/20 rounded transition-colors"
               >
-                <ChevronRight className="w-8 h-8" />
+                <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
               </button>
 
               {/* Image */}
@@ -149,7 +152,7 @@ export function GlitchGallery() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="relative max-w-4xl max-h-[80vh] w-full h-full"
+                className="relative max-w-[95vw] sm:max-w-4xl max-h-[85vh] sm:max-h-[80vh] w-full h-full"
                 onClick={(e) => e.stopPropagation()}
               >
                 <CldImage

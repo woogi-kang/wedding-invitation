@@ -956,7 +956,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
             <motion.div
               key={`groom-bubble-${groomBubble}`}
               className="absolute z-10"
-              style={{ bottom: '50%', left: '10%' }}
+              style={{ bottom: 'calc(5% + 96px)', left: '12%' }}
             >
               <SpeechBubble emoticon={groomBubble} />
             </motion.div>
@@ -967,7 +967,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
             <motion.div
               key={`bride-bubble-${brideBubble}`}
               className="absolute z-10"
-              style={{ bottom: '50%', right: '10%' }}
+              style={{ bottom: 'calc(5% + 96px)', right: '12%' }}
             >
               <SpeechBubble emoticon={brideBubble} />
             </motion.div>

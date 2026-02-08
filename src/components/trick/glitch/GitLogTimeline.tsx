@@ -8,7 +8,7 @@ export function GitLogTimeline() {
   const commits = toGitLog();
 
   return (
-    <section className="py-20 px-4">
+    <section className="py-10 sm:py-20 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -35,7 +35,7 @@ export function GitLogTimeline() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-start gap-2 font-mono text-sm"
+                className="flex items-start gap-1.5 sm:gap-2 font-mono text-xs sm:text-sm flex-wrap"
               >
                 {/* Graph line */}
                 <span className="text-[#ff0080]">*</span>

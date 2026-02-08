@@ -41,7 +41,7 @@ export function TransferAccount() {
   };
 
   return (
-    <section className="py-20 px-4">
+    <section className="py-10 sm:py-20 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -115,7 +115,7 @@ export function TransferAccount() {
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: i * 0.1 }}
-                              className="flex items-center justify-between p-3 bg-black/30 rounded border"
+                              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-black/30 rounded border"
                               style={{ borderColor: `${data.color}20` }}
                             >
                               <div className="font-mono text-xs space-y-1">

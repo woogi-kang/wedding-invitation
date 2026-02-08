@@ -6,6 +6,7 @@ import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import { WEDDING_INFO } from '@/lib/constants';
 import { ARCADE_COLORS } from './shared/RetroText';
+import type { GalleryImage } from '@/lib/cloudinary';
 
 // -- Types --
 
@@ -347,15 +348,22 @@ function InnContent() {
   );
 }
 
-function TrophyContent() {
-  const { gallery } = WEDDING_INFO;
+function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  if (galleryImages.length === 0) {
+    return (
+      <p className="text-center py-4 font-['Press_Start_2P',monospace] text-[9px]" style={{ color: ARCADE_COLORS.gray }}>
+        No photos collected yet...
+      </p>
+    );
+  }
 
   return (
     <div>
       {/* Image grid */}
       <div className="grid grid-cols-3 gap-2">
-        {gallery.images.map((img, i) => (
+        {galleryImages.map((img, i) => (
           <motion.button
             key={img.publicId}
             whileHover={{ scale: 1.05 }}
@@ -415,8 +423,8 @@ function TrophyContent() {
               onClick={(e) => e.stopPropagation()}
             >
               <CldImage
-                src={gallery.images[lightboxIdx].publicId}
-                alt={gallery.images[lightboxIdx].alt}
+                src={galleryImages[lightboxIdx].publicId}
+                alt={galleryImages[lightboxIdx].alt}
                 width={800}
                 height={1000}
                 crop="fit"
@@ -448,7 +456,7 @@ function TrophyContent() {
                   {'\u25C0'}
                 </button>
               )}
-              {lightboxIdx < gallery.images.length - 1 && (
+              {lightboxIdx < galleryImages.length - 1 && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightboxIdx(lightboxIdx + 1); }}
                   className="absolute right-2 top-1/2 -translate-y-1/2 font-['Press_Start_2P',monospace] text-[16px] sm:text-[20px] p-2"
@@ -463,7 +471,7 @@ function TrophyContent() {
                 className="text-center mt-2 font-['Press_Start_2P',monospace] text-[10px]"
                 style={{ color: ARCADE_COLORS.gray }}
               >
-                {lightboxIdx + 1} / {gallery.images.length}
+                {lightboxIdx + 1} / {galleryImages.length}
               </p>
             </motion.div>
           </motion.div>
@@ -618,9 +626,10 @@ function GuildBoardContent() {
 
 interface PostGameVillageProps {
   onNavigate?: (path: string) => void;
+  galleryImages?: GalleryImage[];
 }
 
-export function PostGameVillage({ onNavigate }: PostGameVillageProps) {
+export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVillageProps) {
   const [expandedBuilding, setExpandedBuilding] = useState<BuildingId | null>(null);
 
   const toggleBuilding = useCallback((id: BuildingId) => {
@@ -636,7 +645,7 @@ export function PostGameVillage({ onNavigate }: PostGameVillageProps) {
       case 'inn':
         return <InnContent />;
       case 'trophy':
-        return <TrophyContent />;
+        return <TrophyContent galleryImages={galleryImages} />;
       case 'guild':
         return <GuildBoardContent />;
     }

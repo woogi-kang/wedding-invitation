@@ -33,7 +33,7 @@ export function TerminalWindow({
       </div>
 
       {/* Terminal Content */}
-      <div className="p-4 font-mono text-sm text-[#00ff41]">
+      <div className="p-3 sm:p-4 font-mono text-xs sm:text-sm text-[#00ff41]">
         {children}
       </div>
     </motion.div>
