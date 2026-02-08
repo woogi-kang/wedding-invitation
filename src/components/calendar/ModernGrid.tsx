@@ -75,6 +75,17 @@ export function ModernGrid({ className = '' }: CalendarProps) {
           border: '1px solid var(--color-border-light)',
         }}
       >
+        {/* Month label */}
+        <p
+          className="text-center text-sm mb-3"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            color: 'var(--color-text)',
+          }}
+        >
+          {dateDisplay.month}월
+        </p>
+
         {/* Week day headers */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {weekDays.map((day, index) => (
@@ -112,7 +123,7 @@ export function ModernGrid({ className = '' }: CalendarProps) {
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
                     className="absolute inset-0.5 rounded-full"
-                    style={{ backgroundColor: 'var(--color-bride)' }}
+                    style={{ backgroundColor: 'var(--color-primary)' }}
                   />
                 )}
                 <span

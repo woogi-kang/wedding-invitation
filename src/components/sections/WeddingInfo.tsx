@@ -2,13 +2,11 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { MapPin } from 'lucide-react';
+import { UtensilsCrossed } from 'lucide-react';
 import { Section } from '@/components/common/Section';
-import { WEDDING_INFO } from '@/lib/constants';
 import { ModernGrid } from '@/components/calendar';
 
 export function WeddingInfo() {
-  const { venue } = WEDDING_INFO;
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
@@ -57,7 +55,7 @@ export function WeddingInfo() {
           <ModernGrid />
         </motion.div>
 
-        {/* Venue Info */}
+        {/* 식사 안내 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -65,28 +63,30 @@ export function WeddingInfo() {
           className="text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-3">
-            <MapPin
-              className="w-4 h-4"
+            <UtensilsCrossed
+              className="w-5 h-5"
               style={{ color: 'var(--color-primary)' }}
             />
             <span
-              className="text-lg"
+              className="text-xl"
               style={{
                 fontFamily: 'var(--font-heading)',
                 color: 'var(--color-text)',
               }}
             >
-              {venue.name}
+              식사 안내
             </span>
           </div>
           <p
-            className="text-sm mb-1"
+            className="text-sm mb-5 leading-relaxed"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text-light)',
             }}
           >
-            {venue.hall}
+            귀한 걸음 해주시는 하객분들을 위해
+            <br />
+            정성껏 식사를 준비하였습니다
           </p>
           <p
             className="text-sm"
@@ -95,13 +95,9 @@ export function WeddingInfo() {
               color: 'var(--color-text-muted)',
             }}
           >
-            {venue.roadAddress}
-          </p>
-          <p
-            className="text-xs mt-2"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            Tel. {venue.tel}
+            식사는 예식 30분 전부터 가능하며
+            <br />
+            총 2시간 이용 가능합니다
           </p>
         </motion.div>
       </div>

@@ -141,13 +141,13 @@ export function GuestSnap() {
                     className="text-lg text-center mb-3"
                     style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
                   >
-                    저희의 스냅 작가님이<br />되어주세요!
+                    몰래 찍어주셔도 좋아요,<br />아니 제발 찍어주세요
                   </p>
                   <p
                     className="text-sm text-center"
                     style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-light)' }}
                   >
-                    여러분이 찍어주신 사진으로<br />평생 간직할 앨범 만들 거예요!
+                    셀카든 몰카든<br />그 순간이 저희에겐 전부예요
                   </p>
                 </div>
 
@@ -161,7 +161,7 @@ export function GuestSnap() {
                   </p>
 
                   <div className="flex flex-wrap justify-center gap-2 mb-4">
-                    {['웃는 모습', '몰카', '함께 찍은 컷', '셀카'].map((tag, i) => (
+                    {['우는 신랑', '눈맞춤', '단체컷', '풍경', '아무거나'].map((tag, i) => (
                       <span
                         key={i}
                         className="px-3 py-1 rounded-full text-xs"
@@ -180,7 +180,7 @@ export function GuestSnap() {
                     className="text-xs mb-4"
                     style={{ fontFamily: 'var(--font-body)', color: 'var(--color-primary)' }}
                   >
-                    🎁 찐 베스트컷 보내주시면 밥 쏩니다!
+                    MVP 스냅작가에겐 특별한 감사선물을 전달드릴게요
                   </p>
 
                   <motion.button
@@ -233,14 +233,14 @@ export function GuestSnap() {
                   className="text-xl mb-6"
                   style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
                 >
-                  저희의 스냅 작가님이 되어주세요
+                  몰래 찍어주셔도 좋아요,<br />아니 제발 찍어주세요
                 </p>
 
                 <p
                   className="text-[15px] leading-loose mb-8"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-light)' }}
                 >
-                  여러분이 찍어주신 사진으로<br />평생 간직할 앨범 만들 거예요
+                  셀카든 몰카든<br />그 순간이 저희에겐 전부예요
                 </p>
 
                 {/* Tips - Minimal List */}
@@ -255,7 +255,7 @@ export function GuestSnap() {
                     Photo Guide
                   </p>
                   <div className="space-y-2">
-                    {['웃고 있는 저희 둘', '걸어가는 모습', '소중한 분들과 함께', '여러분의 예쁜 얼굴'].map((tip, i) => (
+                    {['신랑이 우는 장면 (제보 환영)', '둘이 눈 마주치는 순간', '예식장 분위기가 담긴 풍경', '하객분들끼리 찍는 단체컷', '아무거나 다 좋아요 진짜로'].map((tip, i) => (
                       <p
                         key={i}
                         className="text-sm"
@@ -272,7 +272,7 @@ export function GuestSnap() {
                   className="text-sm mb-2"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--color-primary)' }}
                 >
-                  베스트컷에는 특별한 선물이 있어요
+                  MVP 스냅작가에겐 특별한 감사선물을 전달드릴게요
                 </p>
                 <p
                   className="text-xs mb-8"

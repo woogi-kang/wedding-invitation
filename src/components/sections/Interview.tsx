@@ -115,31 +115,57 @@ export function Interview() {
                   >
                     <div className="px-5 py-4 border-t space-y-4" style={{ borderColor: 'var(--color-border-light)' }}>
                       {/* Groom Answer */}
-                      <div className="flex gap-3 items-center">
-                        <span className="text-base flex-shrink-0 leading-none">🤵</span>
-                        <p
-                          className="text-sm leading-relaxed whitespace-pre-line"
-                          style={{
-                            fontFamily: 'var(--font-body)',
-                            color: 'var(--color-text-light)',
-                          }}
-                        >
-                          {item.groomAnswer}
-                        </p>
-                      </div>
+                      {item.groomAnswer && (
+                        <div className="rounded-lg p-3" style={{ backgroundColor: 'white' }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm flex-shrink-0 leading-none">🤵</span>
+                            <span
+                              className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                              style={{
+                                backgroundColor: 'var(--color-groom)',
+                                color: 'white',
+                              }}
+                            >
+                              신랑
+                            </span>
+                          </div>
+                          <p
+                            className="text-sm leading-relaxed whitespace-pre-line pl-6"
+                            style={{
+                              fontFamily: 'var(--font-body)',
+                              color: 'var(--color-text-light)',
+                            }}
+                          >
+                            {item.groomAnswer}
+                          </p>
+                        </div>
+                      )}
                       {/* Bride Answer */}
-                      <div className="flex gap-3 items-center">
-                        <span className="text-base flex-shrink-0 leading-none">👰</span>
-                        <p
-                          className="text-sm leading-relaxed whitespace-pre-line"
-                          style={{
-                            fontFamily: 'var(--font-body)',
-                            color: 'var(--color-text-light)',
-                          }}
-                        >
-                          {item.brideAnswer}
-                        </p>
-                      </div>
+                      {item.brideAnswer && (
+                        <div className="rounded-lg p-3" style={{ backgroundColor: 'white' }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm flex-shrink-0 leading-none">👰</span>
+                            <span
+                              className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                              style={{
+                                backgroundColor: 'var(--color-bride)',
+                                color: 'white',
+                              }}
+                            >
+                              신부
+                            </span>
+                          </div>
+                          <p
+                            className="text-sm leading-relaxed whitespace-pre-line pl-6"
+                            style={{
+                              fontFamily: 'var(--font-body)',
+                              color: 'var(--color-text-light)',
+                            }}
+                          >
+                            {item.brideAnswer}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}

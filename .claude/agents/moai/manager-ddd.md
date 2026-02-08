@@ -8,16 +8,16 @@ description: |
   KO: DDD, 리팩토링, 레거시코드, 동작보존, 특성테스트, 도메인주도리팩토링
   JA: DDD, リファクタリング, レガシーコード, 動作保存, 特性テスト, ドメイン駆動リファクタリング
   ZH: DDD, 重构, 遗留代码, 行为保存, 特性测试, 领域驱动重构
-tools: Read, Write, Edit, MultiEdit, Bash, Grep, Glob, TodoWrite, Task, Skill, mcp__sequential-thinking__sequentialthinking, mcp__context7__resolve-library-id, mcp__context7__get-library-docs, mcp__memory__*
+tools: Read, Write, Edit, MultiEdit, Bash, Grep, Glob, TodoWrite, Task, Skill, mcp__sequential-thinking__sequentialthinking, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: inherit
 permissionMode: default
-skills: moai-foundation-claude, moai-foundation-memory, moai-workflow-ddd, moai-tool-ast-grep, moai-workflow-testing, moai-foundation-quality
+skills: moai-foundation-claude, moai-workflow-ddd, moai-tool-ast-grep, moai-workflow-testing, moai-foundation-quality
 hooks:
   PostToolUse:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "{{HOOK_SHELL_PREFIX}}uv run \"{{PROJECT_DIR}}\".claude/hooks/moai/post_tool__ast_grep_scan.py{{HOOK_SHELL_SUFFIX}}"
+          command: "/bin/zsh -l -c 'export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin:$HOME/.cargo/bin:/opt/homebrew/bin:$PATH; uv run \"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/post_tool__ast_grep_scan.py\"'"
           timeout: 60
 ---
 
@@ -168,7 +168,7 @@ DDD Implementation Report:
 
 ## Essential Reference
 
-IMPORTANT: This agent follows Alfred's core execution directives defined in @CLAUDE.md:
+IMPORTANT: This agent follows MoAI's core execution directives defined in @CLAUDE.md:
 
 - Rule 1: 8-Step User Request Analysis Process
 - Rule 3: Behavioral Constraints (Never execute directly, always delegate)
@@ -183,7 +183,7 @@ For complete execution guidelines and mandatory rules, refer to @CLAUDE.md.
 
 IMPORTANT: Receive prompts in the user's configured conversation_language.
 
-Alfred passes the user's language directly through natural language delegation for multilingual support.
+MoAI passes the user's language directly through natural language delegation for multilingual support.
 
 Language Guidelines:
 
@@ -225,7 +225,7 @@ Automatic Core Skills (from YAML frontmatter):
 - moai-tool-ast-grep: AST-based structural analysis and code transformation
 - moai-workflow-testing: Characterization tests and behavior verification
 
-Conditional Skills (auto-loaded by Alfred when needed):
+Conditional Skills (auto-loaded by MoAI when needed):
 
 - moai-workflow-project: Project management and configuration patterns
 - moai-foundation-quality: Quality validation and metrics analysis
