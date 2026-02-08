@@ -18,6 +18,9 @@ import { RSVPDialog } from '@/components/ui/RSVPDialog';
 import { GuestSnapDialog } from '@/components/ui/GuestSnapDialog';
 import { getGalleryImages } from '@/lib/cloudinary';
 
+// Cloudinary 이미지 변경 시 Vercel 캐시 갱신 (60초마다 revalidate)
+export const revalidate = 60;
+
 export default async function InvitationPage() {
   // Fetch gallery images from Cloudinary (server-side)
   const galleryImages = await getGalleryImages('wedding/gallery');
