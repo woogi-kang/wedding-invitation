@@ -81,7 +81,7 @@ export function WeddingInfo() {
             className="text-sm mb-5 leading-relaxed"
             style={{
               fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text-light)',
+              color: 'var(--color-text)',
             }}
           >
             귀한 걸음 해주시는 하객분들을 위해
@@ -92,7 +92,7 @@ export function WeddingInfo() {
             className="text-sm"
             style={{
               fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text-muted)',
+              color: 'var(--color-text-light)',
             }}
           >
             식사는 예식 30분 전부터 가능하며

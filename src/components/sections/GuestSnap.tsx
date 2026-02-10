@@ -230,14 +230,14 @@ export function GuestSnap() {
                   className="text-xl mb-6"
                   style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
                 >
-                  몰래 찍어주셔도 좋아요,<br />아니 제발 찍어주세요
+                  찍어주신 소중한 사진을 공유해주세요
                 </p>
 
                 <p
                   className="text-[15px] leading-loose mb-8"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-light)' }}
                 >
-                  셀카든 몰카든<br />그 순간이 저희에겐 전부예요
+                  그 순간을 감사히 간직하겠습니다
                 </p>
 
                 {/* Tips - Minimal List */}

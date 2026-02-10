@@ -212,17 +212,15 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* Venue - hidden on mobile */}
+          {/* Venue */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY + STAGGER * 5, duration: 0.8 }}
-            className="hidden sm:block text-xs sm:text-sm tracking-wider text-center"
+            className="text-xs sm:text-sm tracking-wider text-center"
             style={heroTextHeading}
           >
-            {venue.name}
-            <br />
-            14F 하늘정원
+            신도림 라마다 호텔 14층 하늘정원홀
           </motion.p>
 
           {/* Decorative Line Bottom */}

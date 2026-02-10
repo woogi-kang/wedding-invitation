@@ -104,7 +104,7 @@ export function Location() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mb-6 text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex items-center justify-center gap-2 mb-1">
             <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
             <span
               className="text-base"
@@ -116,7 +116,16 @@ export function Location() {
               {venue.name}
             </span>
           </div>
-          <div className="flex items-center justify-center gap-2">
+          <p
+            className="text-sm mb-2 text-center"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text)',
+            }}
+          >
+            {venue.hall}
+          </p>
+          <div className="flex items-center justify-center gap-2 mb-1">
             <p
               className="text-sm"
               style={{
@@ -138,6 +147,15 @@ export function Location() {
               )}
             </button>
           </div>
+          <p
+            className="text-sm mt-2 text-center"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text-light)',
+            }}
+          >
+            Tel. {venue.tel}
+          </p>
         </motion.div>
 
         {/* Navigation Buttons */}

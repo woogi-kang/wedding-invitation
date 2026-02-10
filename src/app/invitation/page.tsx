@@ -46,11 +46,11 @@ export default async function InvitationPage() {
         {/* 3. CoupleIntro */}
         <CoupleIntro />
 
-        {/* 4. Interview */}
-        <Interview />
-
-        {/* 5. Gallery */}
+        {/* 4. Gallery */}
         <Gallery images={galleryImages} />
+
+        {/* 5. Interview */}
+        <Interview />
 
         {/* 6. Video - 준비 후 주석 해제 */}
         {/* <Video /> */}
