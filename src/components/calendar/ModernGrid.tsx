@@ -5,9 +5,10 @@ import { WEDDING_INFO } from '@/lib/constants';
 
 interface CalendarProps {
   className?: string;
+  showDateHeader?: boolean;
 }
 
-export function ModernGrid({ className = '' }: CalendarProps) {
+export function ModernGrid({ className = '', showDateHeader = true }: CalendarProps) {
   const { dateDisplay } = WEDDING_INFO;
 
   // Generate mini calendar
@@ -35,41 +36,43 @@ export function ModernGrid({ className = '' }: CalendarProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className={`flex flex-col items-center justify-center py-4 px-4 ${className}`}
+      className={`flex flex-col items-center justify-center py-2 px-4 ${className}`}
     >
       {/* Date & Time Display */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-center mb-6"
-      >
-        <p
-          className="text-3xl sm:text-4xl font-light"
-          style={{
-            fontFamily: 'var(--font-accent)',
-            color: 'var(--color-text)',
-          }}
+      {showDateHeader && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-center mb-6"
         >
-          {dateDisplay.year}.{String(dateDisplay.month).padStart(2, '0')}.{String(dateDisplay.day).padStart(2, '0')}
-        </p>
-        <p
-          className="text-sm tracking-wider mt-2"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            color: 'var(--color-text-light)',
-          }}
-        >
-          {dateDisplay.time}
-        </p>
-      </motion.div>
+          <p
+            className="text-3xl sm:text-4xl font-light"
+            style={{
+              fontFamily: 'var(--font-accent)',
+              color: 'var(--color-text)',
+            }}
+          >
+            {dateDisplay.year}.{String(dateDisplay.month).padStart(2, '0')}.{String(dateDisplay.day).padStart(2, '0')}
+          </p>
+          <p
+            className="text-sm tracking-wider mt-2"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text-light)',
+            }}
+          >
+            {dateDisplay.time}
+          </p>
+        </motion.div>
+      )}
 
       {/* Mini Calendar Grid */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="w-full max-w-[280px] p-4 rounded-lg"
+        className="w-full max-w-[290px] p-5 rounded-lg"
         style={{
           backgroundColor: 'var(--color-white)',
           border: '1px solid var(--color-border-light)',
@@ -77,7 +80,7 @@ export function ModernGrid({ className = '' }: CalendarProps) {
       >
         {/* Month label */}
         <p
-          className="text-center text-sm mb-3"
+          className="text-center text-sm mb-4"
           style={{
             fontFamily: 'var(--font-heading)',
             color: 'var(--color-text)',
