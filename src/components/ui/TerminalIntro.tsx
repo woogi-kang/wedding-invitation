@@ -135,11 +135,11 @@ interface TerminalLine {
 }
 
 const TERMINAL_LINES: TerminalLine[] = [
-  { text: '$ flutter create wedding-invitation', type: 'command' },
+  { text: '$ npm create wedding@latest', type: 'command' },
   { text: '', type: 'empty' },
-  { text: '> flutter pub add happiness...', type: 'output' },
-  { text: '> flutter pub add new_beginning...', type: 'output' },
-  { text: '> flutter build new_chapter --release', type: 'output' },
+  { text: '> added happiness@forever', type: 'output' },
+  { text: '> added new-beginning@2026.04.05', type: 'output' },
+  { text: '> added love@infinite', type: 'output' },
   { text: '', type: 'empty' },
   { text: 'PROGRESS', type: 'progress' },
   { text: '', type: 'empty' },
@@ -148,7 +148,7 @@ const TERMINAL_LINES: TerminalLine[] = [
   { text: '[✓] 오후 2시 10분', type: 'output' },
   { text: '[✓] 라마다 호텔 하늘정원', type: 'output' },
   { text: '', type: 'empty' },
-  { text: '→ flutter run wedding 🚀', type: 'highlight' },
+  { text: '→ npm run start:wedding 🚀', type: 'highlight' },
   { text: '', type: 'empty' },
   { text: '> 새로운 시작을 함께 해주세요 💙', type: 'command' },
 ];
