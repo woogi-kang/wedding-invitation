@@ -33,7 +33,7 @@
   /* Fonts - Soft Handwriting Feel (Sample 1 Style) */
   --font-heading: 'Gowun Dodum', 'Nanum Myeongjo', serif;
   --font-body: 'Gowun Dodum', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-accent: 'Cormorant Garamond', 'Gowun Batang', Georgia, serif;
+  --font-accent: 'Gowun Batang', Georgia, serif;
   --font-caption: 'Gowun Dodum', 'Nanum Myeongjo', serif;
 
   /* Legacy aliases (for compatibility) */
