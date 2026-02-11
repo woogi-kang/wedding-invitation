@@ -146,7 +146,7 @@ const TERMINAL_LINES: TerminalLine[] = [
   { text: '[✓] 강태욱 ♥ 김선경', type: 'highlight' },
   { text: '[✓] 2026. 04. 05 (일)', type: 'output' },
   { text: '[✓] 오후 2시 10분', type: 'output' },
-  { text: '[✓] 라마다 호텔 하늘정원', type: 'output' },
+  { text: '[✓] 신도림 라마다 호텔 14F 하늘정원', type: 'output' },
   { text: '', type: 'empty' },
   { text: '→ npm run start:wedding 🚀', type: 'highlight' },
   { text: '', type: 'empty' },
