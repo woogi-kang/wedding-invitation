@@ -21,7 +21,7 @@ export function Greeting() {
           className="mb-10"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -67,7 +67,7 @@ export function Greeting() {
           className="mb-10"
         >
           <p
-            className="whitespace-pre-line text-[15px] leading-[2.4] tracking-wide"
+            className="whitespace-pre-line text-[17px] leading-[2.4] tracking-wide"
             style={{
               fontFamily: 'var(--font-body)',
               color: 'var(--color-text)',

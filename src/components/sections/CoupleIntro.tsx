@@ -21,7 +21,7 @@ export function CoupleIntro() {
           className="text-center mb-12"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -63,7 +63,7 @@ export function CoupleIntro() {
             {/* Info */}
             <div className="flex-1">
               <p
-                className="text-[10px] tracking-[0.3em] uppercase mb-1"
+                className="text-[11px] tracking-[0.3em] uppercase mb-1"
                 style={{
                   fontFamily: 'var(--font-accent)',
                   color: 'var(--color-groom)',
@@ -74,7 +74,7 @@ export function CoupleIntro() {
                 Groom
               </p>
               <p
-                className="text-xl mb-2"
+                className="text-[23px] mb-2"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -83,7 +83,7 @@ export function CoupleIntro() {
                 {groom.name}
               </p>
               <p
-                className="text-xs"
+                className="text-[13px]"
                 style={{
                   fontFamily: 'var(--font-body)',
                   color: 'var(--color-text-light)',
@@ -109,7 +109,7 @@ export function CoupleIntro() {
                 color: 'white',
               }}
             >
-              <span className="text-sm">&</span>
+              <span className="text-[15px]">&</span>
             </div>
           </motion.div>
 
@@ -135,7 +135,7 @@ export function CoupleIntro() {
             {/* Info */}
             <div className="flex-1 text-right">
               <p
-                className="text-[10px] tracking-[0.3em] uppercase mb-1"
+                className="text-[11px] tracking-[0.3em] uppercase mb-1"
                 style={{
                   fontFamily: 'var(--font-accent)',
                   color: 'var(--color-bride)',
@@ -146,7 +146,7 @@ export function CoupleIntro() {
                 Bride
               </p>
               <p
-                className="text-xl mb-2"
+                className="text-[23px] mb-2"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -155,7 +155,7 @@ export function CoupleIntro() {
                 {bride.name}
               </p>
               <p
-                className="text-xs"
+                className="text-[13px]"
                 style={{
                   fontFamily: 'var(--font-body)',
                   color: 'var(--color-text-light)',

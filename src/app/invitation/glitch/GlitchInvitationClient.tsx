@@ -5,13 +5,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   MatrixRain,
   CRTOverlay,
-  GlitchHero,
   GitLogTimeline,
   ConfigYamlInfo,
   GlitchGallery,
   CoordinatesMap,
   TransferAccount,
 } from '@/components/trick/glitch';
+import { TerminalIntro } from '@/components/ui/TerminalIntro';
 import { GlitchFooter } from '@/components/trick/glitch/GlitchFooter';
 import type { GalleryImage } from '@/lib/cloudinary';
 
@@ -38,10 +38,15 @@ export function GlitchInvitationClient({ galleryImages }: GlitchInvitationClient
         vignetteStrength={0.5}
       />
 
+      {/* Terminal Intro Overlay */}
+      {!showContent && (
+        <div className="fixed inset-0 z-50">
+          <TerminalIntro onEnter={() => setShowContent(true)} />
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="relative z-30">
-        {/* Hero - Boot Sequence */}
-        <GlitchHero onBootComplete={() => setShowContent(true)} />
 
         {/* Sections - appear after boot */}
         <AnimatePresence>

@@ -27,7 +27,7 @@ export function Footer() {
         {/* Names */}
         <div className="mb-4 flex items-center justify-center gap-3">
           <span
-            className="text-lg tracking-wider"
+            className="text-[19px] tracking-wider"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -36,13 +36,13 @@ export function Footer() {
             {groom.name}
           </span>
           <span
-            className="text-sm"
+            className="text-[15px]"
             style={{ color: 'var(--color-gold)' }}
           >
             &
           </span>
           <span
-            className="text-lg tracking-wider"
+            className="text-[19px] tracking-wider"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -54,7 +54,7 @@ export function Footer() {
 
         {/* Date */}
         <p
-          className="mb-8 text-sm tracking-wider"
+          className="mb-8 text-[15px] tracking-wider"
           style={{
             fontFamily: 'var(--font-heading)',
             color: 'var(--color-text-light)',
@@ -65,9 +65,9 @@ export function Footer() {
 
         {/* Thank you */}
         <p
-          className="mb-8 text-sm italic"
+          className="mb-8 text-[15px] italic"
           style={{
-            fontFamily: 'var(--font-accent)',
+            fontFamily: 'var(--font-heading)',
             color: 'var(--color-text-muted)',
           }}
         >
@@ -76,8 +76,8 @@ export function Footer() {
 
         {/* Copyright */}
         <p
-          className="text-xs tracking-wider"
-          style={{ color: 'var(--color-text-muted)' }}
+          className="text-[13px] tracking-wider"
+          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)' }}
         >
           © 2026 woogi & looppy. All rights reserved.
         </p>

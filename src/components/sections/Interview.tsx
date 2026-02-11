@@ -27,7 +27,7 @@ export function Interview() {
           className="text-center mb-12"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -36,7 +36,7 @@ export function Interview() {
             Interview
           </p>
           <h2
-            className="text-2xl mb-3"
+            className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -76,9 +76,9 @@ export function Interview() {
                   backgroundColor: openIndex === index ? 'var(--color-primary)' : 'transparent',
                 }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <span
-                    className="text-xs font-medium"
+                    className="text-[13px] font-medium"
                     style={{
                       color: openIndex === index ? 'white' : 'var(--color-primary)',
                     }}
@@ -86,7 +86,7 @@ export function Interview() {
                     Q.
                   </span>
                   <span
-                    className="text-sm"
+                    className="text-[17px]"
                     style={{
                       fontFamily: 'var(--font-body)',
                       color: openIndex === index ? 'white' : 'var(--color-text)',
@@ -118,9 +118,9 @@ export function Interview() {
                       {item.groomAnswer && (
                         <div className="rounded-lg p-3" style={{ backgroundColor: 'white' }}>
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-sm flex-shrink-0 leading-none">🤵</span>
+                            <span className="text-[13px] flex-shrink-0 leading-none">🤵</span>
                             <span
-                              className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                              className="text-[12px] font-medium px-2 py-0.5 rounded-full"
                               style={{
                                 backgroundColor: 'var(--color-groom)',
                                 color: 'white',
@@ -130,7 +130,7 @@ export function Interview() {
                             </span>
                           </div>
                           <p
-                            className="text-sm leading-relaxed whitespace-pre-line pl-6"
+                            className="text-[17px] leading-relaxed whitespace-pre-line pl-6"
                             style={{
                               fontFamily: 'var(--font-body)',
                               color: 'var(--color-text-light)',
@@ -144,9 +144,9 @@ export function Interview() {
                       {item.brideAnswer && (
                         <div className="rounded-lg p-3" style={{ backgroundColor: 'white' }}>
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-sm flex-shrink-0 leading-none">👰</span>
+                            <span className="text-[13px] flex-shrink-0 leading-none">👰</span>
                             <span
-                              className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                              className="text-[12px] font-medium px-2 py-0.5 rounded-full"
                               style={{
                                 backgroundColor: 'var(--color-bride)',
                                 color: 'white',
@@ -156,7 +156,7 @@ export function Interview() {
                             </span>
                           </div>
                           <p
-                            className="text-sm leading-relaxed whitespace-pre-line pl-6"
+                            className="text-[17px] leading-relaxed whitespace-pre-line pl-6"
                             style={{
                               fontFamily: 'var(--font-body)',
                               color: 'var(--color-text-light)',

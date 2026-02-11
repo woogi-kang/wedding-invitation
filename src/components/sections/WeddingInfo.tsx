@@ -26,7 +26,7 @@ export function WeddingInfo() {
           className={`${DESIGN_VARIANT === 'summary' ? 'mb-6' : 'mb-12'} text-center`}
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -35,7 +35,7 @@ export function WeddingInfo() {
             Schedule
           </p>
           <h2
-            className="text-2xl mb-3"
+            className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -71,7 +71,7 @@ export function WeddingInfo() {
               className="text-center mb-8"
             >
               <p
-                className="text-base"
+                className="text-[15px]"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -80,7 +80,7 @@ export function WeddingInfo() {
                 {venue.name}
               </p>
               <p
-                className="text-sm mt-1"
+                className="text-[13px] mt-1"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text-light)',
@@ -123,7 +123,7 @@ export function WeddingInfo() {
                 />
                 <div className="flex items-baseline gap-3">
                   <span
-                    className="text-lg tracking-wider shrink-0"
+                    className="text-[17px] tracking-wider shrink-0"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text)',
@@ -132,7 +132,7 @@ export function WeddingInfo() {
                     13:40
                   </span>
                   <span
-                    className="text-sm"
+                    className="text-[13px]"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text-light)',
@@ -142,7 +142,7 @@ export function WeddingInfo() {
                   </span>
                 </div>
                 <p
-                  className="text-xs mt-1"
+                  className="text-[11px] mt-1"
                   style={{ color: 'var(--color-text-muted)' }}
                 >
                   뷔페 식사 가능
@@ -157,7 +157,7 @@ export function WeddingInfo() {
                 />
                 <div className="flex items-baseline gap-3">
                   <span
-                    className="text-lg tracking-wider shrink-0 font-medium"
+                    className="text-[17px] tracking-wider shrink-0 font-medium"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-primary)',
@@ -166,7 +166,7 @@ export function WeddingInfo() {
                     14:10
                   </span>
                   <span
-                    className="text-sm font-medium"
+                    className="text-[13px] font-medium"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text)',
@@ -188,7 +188,7 @@ export function WeddingInfo() {
                 />
                 <div className="flex items-baseline gap-3">
                   <span
-                    className="text-lg tracking-wider shrink-0"
+                    className="text-[17px] tracking-wider shrink-0"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text)',
@@ -197,7 +197,7 @@ export function WeddingInfo() {
                     16:00
                   </span>
                   <span
-                    className="text-sm"
+                    className="text-[13px]"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text-light)',
@@ -214,7 +214,7 @@ export function WeddingInfo() {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xs text-center mt-8"
+              className="text-[11px] text-center mt-8"
               style={{ color: 'var(--color-text-muted)' }}
             >
               귀한 걸음 해주시는 하객분들을 위해 정성껏 식사를 준비하였습니다
@@ -231,7 +231,7 @@ export function WeddingInfo() {
               className="text-center mb-10"
             >
               <p
-                className="text-lg sm:text-xl font-light"
+                className="text-[19px] sm:text-[23px] font-light"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -240,9 +240,9 @@ export function WeddingInfo() {
                 {dateDisplay.year}년 {dateDisplay.month}월 {dateDisplay.day}일 {dateDisplay.dayOfWeek}
               </p>
               <p
-                className="text-sm sm:text-base mt-1.5 tracking-wider"
+                className="text-[17px] sm:text-[19px] mt-1.5 tracking-wider"
                 style={{
-                  fontFamily: 'var(--font-accent)',
+                  fontFamily: 'var(--font-heading)',
                   color: 'var(--color-gold)',
                 }}
               >
@@ -253,7 +253,7 @@ export function WeddingInfo() {
               <div className="my-5" />
 
               <p
-                className="text-[15px]"
+                className="text-[17px]"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -262,7 +262,7 @@ export function WeddingInfo() {
                 {venue.name}
               </p>
               <p
-                className="text-sm mt-0.5"
+                className="text-[15px] mt-0.5"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text-light)',
@@ -271,7 +271,7 @@ export function WeddingInfo() {
                 14층 하늘정원
               </p>
               <p
-                className="text-[10px] mt-1.5 tracking-[0.3em] uppercase"
+                className="text-[11px] mt-1.5 tracking-[0.3em] uppercase"
                 style={{
                   fontFamily: 'var(--font-accent)',
                   color: 'var(--color-text-muted)',
@@ -319,7 +319,7 @@ export function WeddingInfo() {
                     style={{ color: 'var(--color-primary)' }}
                   />
                   <span
-                    className="text-lg"
+                    className="text-[19px]"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text)',
@@ -331,7 +331,7 @@ export function WeddingInfo() {
 
                 {/* 감성 문구 */}
                 <p
-                  className="text-sm leading-relaxed mb-5"
+                  className="text-[17px] leading-relaxed mb-5"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: 'var(--color-text)',
@@ -351,7 +351,7 @@ export function WeddingInfo() {
                 {/* 핵심 정보 */}
                 <div className="flex items-center justify-center gap-4 mb-3">
                   <span
-                    className="text-sm"
+                    className="text-[17px]"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text)',
@@ -360,13 +360,13 @@ export function WeddingInfo() {
                     뷔페
                   </span>
                   <span
-                    className="text-xs"
+                    className="text-[11px]"
                     style={{ color: 'var(--color-gold)' }}
                   >
                     |
                   </span>
                   <span
-                    className="text-sm tracking-wider"
+                    className="text-[17px] tracking-wider"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--color-text)',
@@ -378,7 +378,7 @@ export function WeddingInfo() {
 
                 {/* 보조 설명 */}
                 <p
-                  className="text-xs"
+                  className="text-[15px]"
                   style={{ color: 'var(--color-text-muted)' }}
                 >
                   예식 30분 전부터 이용하실 수 있습니다

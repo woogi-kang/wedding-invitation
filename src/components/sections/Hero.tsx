@@ -146,7 +146,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY, duration: 0.8 }}
-            className="mb-6 sm:mb-8 text-xs sm:text-[28px] tracking-[0.3em] uppercase text-center"
+            className="mb-6 sm:mb-8 text-[13px] sm:text-[30px] tracking-[0.3em] uppercase text-center"
             style={heroTextAccent}
           >
             We are getting married
@@ -169,11 +169,11 @@ export function Hero() {
             className="mb-3 sm:mb-4 text-center"
           >
             <h1
-              className="text-2xl min-[375px]:text-3xl sm:text-5xl tracking-wider"
+              className="text-[29px] min-[375px]:text-[34px] sm:text-[46px] tracking-wider"
               style={heroTextHeadingLarge}
             >
               <span>{groom.name}</span>
-              <span className="mx-2 sm:mx-3 text-xl sm:text-2xl" style={{ color: 'var(--color-gold)' }}>
+              <span className="mx-2 sm:mx-3 text-[23px] sm:text-[29px]" style={{ color: 'var(--color-gold)' }}>
                 &
               </span>
               <span>{bride.name}</span>
@@ -185,7 +185,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY + STAGGER * 3, duration: 0.8 }}
-            className="hidden sm:block mb-8 sm:mb-12 text-xs sm:text-lg tracking-[0.2em] text-center"
+            className="hidden sm:block mb-8 sm:mb-12 text-[13px] sm:text-[19px] tracking-[0.2em] text-center"
             style={heroTextAccent}
           >
             {groom.englishName} & {bride.englishName}
@@ -199,13 +199,13 @@ export function Hero() {
             className="mb-6 sm:mb-8 text-center"
           >
             <p
-              className="text-base min-[375px]:text-lg sm:text-xl mb-1 sm:mb-2 tracking-wider"
+              className="text-[17px] min-[375px]:text-[19px] sm:text-[23px] mb-1 sm:mb-2 tracking-wider"
               style={heroTextHeading}
             >
               {dateDisplay.year}. {String(dateDisplay.month).padStart(2, '0')}. {String(dateDisplay.day).padStart(2, '0')}
             </p>
             <p
-              className="text-xs sm:text-sm tracking-wider"
+              className="text-[15px] sm:text-[17px] tracking-wider"
               style={heroTextHeading}
             >
               {dateDisplay.dayOfWeek} {dateDisplay.time}
@@ -217,7 +217,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={isLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: BASE_DELAY + STAGGER * 5, duration: 0.8 }}
-            className="text-xs sm:text-sm tracking-wider text-center"
+            className="text-[15px] sm:text-[17px] tracking-wider text-center"
             style={heroTextHeading}
           >
             신도림 라마다 호텔 14층 하늘정원홀

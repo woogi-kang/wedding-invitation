@@ -88,10 +88,10 @@ export function Gallery({ images }: GalleryProps) {
           transition={{ duration: 0.8 }}
           className="mb-12 text-center"
         >
-          <p className="text-[11px] tracking-[0.4em] uppercase mb-3" style={{ fontFamily: 'var(--font-accent)', color: 'var(--color-primary)' }}>
+          <p className="text-[12px] tracking-[0.4em] uppercase mb-3" style={{ fontFamily: 'var(--font-accent)', color: 'var(--color-primary)' }}>
             Gallery
           </p>
-          <h2 className="text-2xl mb-3" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+          <h2 className="text-[27px] sm:text-[30px] md:text-[34px] mb-3" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
             우리의 순간
           </h2>
           <div className="flex items-center justify-center gap-3">
@@ -170,7 +170,7 @@ export function Gallery({ images }: GalleryProps) {
 
               {/* Page indicator */}
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
-                <span className="text-sm text-white/60 bg-black/30 px-4 py-2 rounded-full">
+                <span className="text-[15px] text-white/60 bg-black/30 px-4 py-2 rounded-full">
                   {selectedIndex + 1} / {images.length}
                 </span>
               </div>
@@ -238,7 +238,7 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: Gall
             onLoad={() => setMainLoaded(true)}
           />
         </motion.div>
-        <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">
+        <p className="text-center text-[13px] text-[var(--color-text-muted)] mt-2" style={{ fontFamily: 'var(--font-body)' }}>
           사진을 터치하면 크게 볼 수 있어요
         </p>
       </div>

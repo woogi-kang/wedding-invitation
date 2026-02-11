@@ -140,8 +140,8 @@ export function Guestbook() {
               <MessageSquare className="h-4 w-4 min-[375px]:h-5 min-[375px]:w-5 text-[var(--color-primary)]" />
             </div>
             <div>
-              <p className="text-sm min-[375px]:text-base font-medium text-[var(--color-text)]">축하 메시지</p>
-              <p className="text-[10px] min-[375px]:text-xs text-[var(--color-text-muted)]">
+              <p className="text-[15px] min-[375px]:text-[17px] font-medium text-[var(--color-text)]">축하 메시지</p>
+              <p className="text-[13px] min-[375px]:text-[15px] text-[var(--color-text-muted)]">
                 신랑 신부에게 축하의 말씀을 전해주세요
               </p>
             </div>
@@ -158,7 +158,7 @@ export function Guestbook() {
                 placeholder="이름"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="flex-1 min-w-0 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="flex-1 min-w-0 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-[15px] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                 maxLength={20}
               />
               <input
@@ -166,7 +166,7 @@ export function Guestbook() {
                 placeholder="비밀번호 (삭제용)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="flex-1 min-w-0 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="flex-1 min-w-0 rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-[15px] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                 maxLength={10}
               />
             </div>
@@ -176,7 +176,7 @@ export function Guestbook() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={3}
-                className="flex-1 resize-none rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="flex-1 resize-none rounded-lg border border-[var(--color-border-light)] px-3 py-2 text-[15px] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                 maxLength={500}
               />
               <button
@@ -193,7 +193,7 @@ export function Guestbook() {
         {/* Messages List */}
         <div className="max-h-[400px] overflow-y-auto p-4 min-[375px]:p-6">
           {messages.length === 0 ? (
-            <p className="text-center text-sm text-[var(--color-text-muted)]">
+            <p className="text-center text-[15px] text-[var(--color-text-muted)]">
               첫 번째 축하 메시지를 남겨주세요!
             </p>
           ) : (
@@ -212,12 +212,12 @@ export function Guestbook() {
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-botanical-light)]">
                           <User className="h-3.5 w-3.5 text-[var(--color-primary)]" />
                         </div>
-                        <span className="text-sm font-medium text-[var(--color-text)]">
+                        <span className="text-[15px] font-medium text-[var(--color-text)]">
                           {msg.name}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-[var(--color-text-muted)]">
+                        <span className="text-[13px] text-[var(--color-text-muted)]">
                           {formatDate(msg.createdAt)}
                         </span>
                         <button
@@ -228,7 +228,7 @@ export function Guestbook() {
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm leading-relaxed text-[var(--color-text-light)] whitespace-pre-wrap">
+                    <p className="text-[17px] leading-relaxed text-[var(--color-text-light)] whitespace-pre-wrap">
                       {msg.message}
                     </p>
 
@@ -245,11 +245,11 @@ export function Guestbook() {
                           placeholder="비밀번호 확인"
                           value={deletePassword}
                           onChange={(e) => setDeletePassword(e.target.value)}
-                          className="flex-1 rounded border border-[var(--color-border-light)] px-2 py-1.5 text-xs focus:border-[var(--color-primary)] focus:outline-none"
+                          className="flex-1 rounded border border-[var(--color-border-light)] px-2 py-1.5 text-[13px] focus:border-[var(--color-primary)] focus:outline-none"
                         />
                         <button
                           onClick={() => handleDelete(msg.id, msg.password)}
-                          className="flex-1 rounded bg-red-500 px-2 py-1.5 text-xs text-white hover:bg-red-600"
+                          className="flex-1 rounded bg-red-500 px-2 py-1.5 text-[13px] text-white hover:bg-red-600"
                         >
                           삭제
                         </button>
@@ -258,7 +258,7 @@ export function Guestbook() {
                             setDeleteId(null);
                             setDeletePassword('');
                           }}
-                          className="flex-1 rounded bg-gray-300 px-2 py-1.5 text-xs text-gray-700 hover:bg-gray-400"
+                          className="flex-1 rounded bg-gray-300 px-2 py-1.5 text-[13px] text-gray-700 hover:bg-gray-400"
                         >
                           취소
                         </button>

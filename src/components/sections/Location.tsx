@@ -54,7 +54,7 @@ export function Location() {
           className="mb-12 text-center"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -63,7 +63,7 @@ export function Location() {
             Location
           </p>
           <h2
-            className="text-2xl mb-3"
+            className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -107,7 +107,7 @@ export function Location() {
           <div className="flex items-center justify-center gap-2 mb-1">
             <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
             <span
-              className="text-base"
+              className="text-[17px]"
               style={{
                 fontFamily: 'var(--font-heading)',
                 color: 'var(--color-text)',
@@ -117,7 +117,7 @@ export function Location() {
             </span>
           </div>
           <p
-            className="text-sm mb-2 text-center"
+            className="text-[17px] mb-2 text-center"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -127,7 +127,7 @@ export function Location() {
           </p>
           <div className="flex items-center justify-center gap-2 mb-1">
             <p
-              className="text-sm"
+              className="text-[17px]"
               style={{
                 fontFamily: 'var(--font-heading)',
                 color: 'var(--color-text-light)',
@@ -148,7 +148,7 @@ export function Location() {
             </button>
           </div>
           <p
-            className="text-sm mt-2 text-center"
+            className="text-[17px] mt-2 text-center"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text-light)',
@@ -178,7 +178,7 @@ export function Location() {
               />
             </div>
             <span
-              className="text-xs"
+              className="text-[13px]"
               style={{ color: 'var(--color-text-light)' }}
             >
               네이버맵
@@ -197,7 +197,7 @@ export function Location() {
               />
             </div>
             <span
-              className="text-xs"
+              className="text-[13px]"
               style={{ color: 'var(--color-text-light)' }}
             >
               카카오내비
@@ -216,7 +216,7 @@ export function Location() {
               />
             </div>
             <span
-              className="text-xs"
+              className="text-[13px]"
               style={{ color: 'var(--color-text-light)' }}
             >
               티맵
@@ -247,7 +247,7 @@ export function Location() {
             </div>
             <div>
               <p
-                className="text-sm font-medium mb-1"
+                className="text-[15px] font-medium mb-1"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -256,8 +256,8 @@ export function Location() {
                 지하철
               </p>
               <p
-                className="text-sm leading-relaxed whitespace-pre-line"
-                style={{ color: 'var(--color-text-light)' }}
+                className="text-[17px] leading-relaxed whitespace-pre-line"
+                style={{ color: 'var(--color-text-light)', fontFamily: 'var(--font-body)' }}
               >
                 {venue.subway}
               </p>
@@ -274,7 +274,7 @@ export function Location() {
             </div>
             <div>
               <p
-                className="text-sm font-medium mb-1"
+                className="text-[15px] font-medium mb-1"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -283,8 +283,8 @@ export function Location() {
                 버스
               </p>
               <p
-                className="text-sm leading-relaxed whitespace-pre-line"
-                style={{ color: 'var(--color-text-light)' }}
+                className="text-[17px] leading-relaxed whitespace-pre-line"
+                style={{ color: 'var(--color-text-light)', fontFamily: 'var(--font-body)' }}
               >
                 {venue.bus}
               </p>
@@ -302,7 +302,7 @@ export function Location() {
               </div>
               <div className="flex-1">
                 <p
-                  className="text-sm font-medium mb-1"
+                  className="text-[13px] font-medium mb-1"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: 'var(--color-text)',
@@ -311,7 +311,7 @@ export function Location() {
                   주차
                 </p>
                 <p
-                  className="text-sm leading-relaxed whitespace-pre-line"
+                  className="text-[15px] leading-relaxed whitespace-pre-line"
                   style={{ color: 'var(--color-text-light)' }}
                 >
                   {venue.parking}
@@ -320,7 +320,7 @@ export function Location() {
             </div>
             {venue.parkingNotice && (
               <p
-                className="text-xs leading-relaxed whitespace-pre-line text-center mt-3 pt-3 border-t border-[var(--color-border-light)]"
+                className="text-[15px] leading-relaxed whitespace-pre-line text-center mt-3 pt-3 border-t border-[var(--color-border-light)]"
                 style={{ color: 'var(--color-text-muted)' }}
               >
                 {venue.parkingNotice}
@@ -340,7 +340,7 @@ export function Location() {
             {/* Section Header */}
             <div className="text-center mb-6">
               <p
-                className="text-[11px] tracking-[0.3em] uppercase mb-2"
+                className="text-[12px] tracking-[0.3em] uppercase mb-2"
                 style={{
                   fontFamily: 'var(--font-accent)',
                   color: 'var(--color-primary)',
@@ -349,7 +349,7 @@ export function Location() {
                 Shuttle Bus
               </p>
               <h3
-                className="text-lg"
+                className="text-[19px]"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -388,7 +388,7 @@ export function Location() {
                         <MapPin className="w-4 h-4 text-white" />
                       </div>
                       <p
-                        className="text-xs font-medium text-center"
+                        className="text-[13px] font-medium text-center"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: 'var(--color-text)',
@@ -397,7 +397,7 @@ export function Location() {
                         신도림역
                       </p>
                       <p
-                        className="text-[10px]"
+                        className="text-[13px]"
                         style={{ color: 'var(--color-text-muted)' }}
                       >
                         1번 출구
@@ -412,7 +412,7 @@ export function Location() {
                           style={{ backgroundColor: 'var(--color-gold)' }}
                         />
                         <div
-                          className="absolute left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px]"
+                          className="absolute left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[11px]"
                           style={{
                             backgroundColor: 'white',
                             border: '1px solid var(--color-gold)',
@@ -439,10 +439,10 @@ export function Location() {
                         className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
                         style={{ backgroundColor: 'var(--color-bride)' }}
                       >
-                        <span className="text-white text-sm">♥</span>
+                        <span className="text-white text-[13px]">♥</span>
                       </div>
                       <p
-                        className="text-xs font-medium text-center"
+                        className="text-[13px] font-medium text-center"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: 'var(--color-text)',
@@ -451,7 +451,7 @@ export function Location() {
                         예식장
                       </p>
                       <p
-                        className="text-[10px]"
+                        className="text-[13px]"
                         style={{ color: 'var(--color-text-muted)' }}
                       >
                         라마다호텔
@@ -463,9 +463,9 @@ export function Location() {
                   <div className="flex items-center justify-center gap-3 mb-4">
                     <div className="h-px flex-1" style={{ backgroundColor: 'var(--color-border-light)' }} />
                     <span
-                      className="text-[10px] tracking-wider uppercase"
+                      className="text-[13px] tracking-wider uppercase"
                       style={{
-                        fontFamily: 'var(--font-accent)',
+                        fontFamily: 'var(--font-heading)',
                         color: 'var(--color-text-muted)',
                       }}
                     >
@@ -478,7 +478,7 @@ export function Location() {
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-2">
                       <span
-                        className="text-xl tracking-wider"
+                        className="text-[23px] tracking-wider"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: 'var(--color-text)',
@@ -487,13 +487,13 @@ export function Location() {
                         {route.timeStart}
                       </span>
                       <span
-                        className="text-sm"
+                        className="text-[13px]"
                         style={{ color: 'var(--color-gold)' }}
                       >
                         ―
                       </span>
                       <span
-                        className="text-xl tracking-wider"
+                        className="text-[23px] tracking-wider"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: 'var(--color-text)',
@@ -503,7 +503,7 @@ export function Location() {
                       </span>
                     </div>
                     <p
-                      className="text-xs"
+                      className="text-[13px]"
                       style={{ color: 'var(--color-text-light)' }}
                     >
                       {route.interval} 간격으로 운행합니다

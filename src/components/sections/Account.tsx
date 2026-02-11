@@ -43,7 +43,7 @@ function AccountGroup({ title, accounts, isOpen, onToggle, accentColor }: Accoun
         className="w-full flex items-center justify-between py-5 px-4 transition-colors hover:bg-[var(--color-secondary)]/50"
       >
         <span
-          className="text-base"
+          className="text-[17px]"
           style={{
             fontFamily: 'var(--font-heading)',
             color: accentColor,
@@ -76,13 +76,13 @@ function AccountGroup({ title, accounts, isOpen, onToggle, accentColor }: Accoun
                 >
                   <div>
                     <p
-                      className="text-xs mb-1"
+                      className="text-[15px] mb-1"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
                       {account.bank}
                     </p>
                     <p
-                      className="text-sm tracking-wider mb-1"
+                      className="text-[17px] tracking-wider mb-1"
                       style={{
                         fontFamily: 'var(--font-heading)',
                         color: 'var(--color-text)',
@@ -91,7 +91,7 @@ function AccountGroup({ title, accounts, isOpen, onToggle, accentColor }: Accoun
                       {account.number}
                     </p>
                     <p
-                      className="text-sm"
+                      className="text-[17px]"
                       style={{ color: 'var(--color-text-light)' }}
                     >
                       {account.holder}
@@ -99,7 +99,7 @@ function AccountGroup({ title, accounts, isOpen, onToggle, accentColor }: Accoun
                   </div>
                   <button
                     onClick={() => handleCopy(account, index)}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-sm border transition-all hover:opacity-70"
+                    className="flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-sm border transition-all hover:opacity-70"
                     style={{
                       borderColor: accentColor,
                       color: accentColor,
@@ -156,7 +156,7 @@ export function Account() {
           className="mb-10 text-center"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -165,7 +165,7 @@ export function Account() {
             Blessings
           </p>
           <h2
-            className="text-2xl mb-3"
+            className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -179,7 +179,7 @@ export function Account() {
             <div className="h-px w-8" style={{ backgroundColor: 'var(--color-primary)' }} />
           </div>
           <p
-            className="text-sm leading-relaxed"
+            className="text-[17px] leading-relaxed"
             style={{
               fontFamily: 'var(--font-body)',
               color: 'var(--color-text-light)',

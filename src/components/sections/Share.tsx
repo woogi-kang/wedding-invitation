@@ -96,7 +96,7 @@ export function Share() {
           className="mb-12 text-center"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -105,7 +105,7 @@ export function Share() {
             Share
           </p>
           <h2
-            className="text-2xl mb-3"
+            className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -139,7 +139,7 @@ export function Share() {
             </div>
             <div className="text-left">
               <p
-                className="text-sm font-medium"
+                className="text-[15px] font-medium"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--color-text)',
@@ -147,7 +147,7 @@ export function Share() {
               >
                 캘린더에 저장
               </p>
-              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              <p className="text-[13px]" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)' }}>
                 결혼식 일정을 캘린더에 추가합니다
               </p>
             </div>
@@ -171,7 +171,7 @@ export function Share() {
             >
               <KakaoIcon className="h-6 w-6 text-[#3C1E1E]" />
             </div>
-            <span className="text-xs" style={{ color: 'var(--color-text-light)' }}>
+            <span className="text-[13px]" style={{ color: 'var(--color-text-light)', fontFamily: 'var(--font-body)' }}>
               카카오톡
             </span>
           </button>
@@ -183,7 +183,7 @@ export function Share() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-[var(--color-border)]">
               <Link2 className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
             </div>
-            <span className="text-xs" style={{ color: 'var(--color-text-light)' }}>
+            <span className="text-[13px]" style={{ color: 'var(--color-text-light)', fontFamily: 'var(--font-body)' }}>
               링크 복사
             </span>
           </button>
@@ -195,7 +195,7 @@ export function Share() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-[var(--color-border)]">
               <Share2 className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
             </div>
-            <span className="text-xs" style={{ color: 'var(--color-text-light)' }}>
+            <span className="text-[13px]" style={{ color: 'var(--color-text-light)', fontFamily: 'var(--font-body)' }}>
               공유
             </span>
           </button>

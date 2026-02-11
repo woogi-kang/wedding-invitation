@@ -129,7 +129,7 @@ export function SectionTitle({
     >
       {subtitle && (
         <p
-          className="text-[11px] tracking-[0.4em] uppercase mb-3"
+          className="text-[12px] tracking-[0.4em] uppercase mb-3"
           style={{
             fontFamily: 'var(--font-accent)',
             color: 'var(--color-primary)',
@@ -139,7 +139,7 @@ export function SectionTitle({
         </p>
       )}
       <h2
-        className="text-2xl mb-3"
+        className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
         style={{
           fontFamily: 'var(--font-heading)',
           color: 'var(--color-text)',

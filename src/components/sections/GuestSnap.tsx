@@ -84,7 +84,7 @@ export function GuestSnap() {
           className="mb-12 text-center"
         >
           <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            className="text-[12px] tracking-[0.4em] uppercase mb-3"
             style={{
               fontFamily: 'var(--font-accent)',
               color: 'var(--color-primary)',
@@ -93,7 +93,7 @@ export function GuestSnap() {
             {messages.sectionSubtitle}
           </p>
           <h2
-            className="text-2xl mb-3"
+            className="text-[27px] sm:text-[30px] md:text-[34px] mb-3"
             style={{
               fontFamily: 'var(--font-heading)',
               color: 'var(--color-text)',
@@ -135,13 +135,13 @@ export function GuestSnap() {
                     style={{ color: 'var(--color-primary)', opacity: 0.6 }}
                   />
                   <p
-                    className="text-lg text-center mb-3"
+                    className="text-[19px] text-center mb-3"
                     style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
                   >
                     몰래 찍어주셔도 좋아요,<br />아니 제발 찍어주세요
                   </p>
                   <p
-                    className="text-sm text-center"
+                    className="text-[15px] text-center"
                     style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-light)' }}
                   >
                     셀카든 몰카든<br />그 순간이 저희에겐 전부예요
@@ -151,7 +151,7 @@ export function GuestSnap() {
                 {/* Caption Area */}
                 <div className="text-center">
                   <p
-                    className="text-sm mb-3"
+                    className="text-[15px] mb-3"
                     style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text)' }}
                   >
                     이런 사진이면 완벽해요 ✨
@@ -161,7 +161,7 @@ export function GuestSnap() {
                     {['우는 신랑', '눈맞춤', '단체컷', '풍경', '아무거나'].map((tag, i) => (
                       <span
                         key={i}
-                        className="px-3 py-1 rounded-full text-xs"
+                        className="px-3 py-1 rounded-full text-[11px]"
                         style={{
                           backgroundColor: 'var(--color-botanical-light)',
                           color: 'var(--color-primary)',
@@ -174,7 +174,7 @@ export function GuestSnap() {
                   </div>
 
                   <p
-                    className="text-xs mb-4"
+                    className="text-[13px] mb-4"
                     style={{ fontFamily: 'var(--font-body)', color: 'var(--color-primary)' }}
                   >
                     MVP 스냅작가에겐 특별한 감사선물을 전달드릴게요
@@ -184,7 +184,7 @@ export function GuestSnap() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleUploadClick}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[15px]"
                     style={{
                       backgroundColor: 'var(--color-primary)',
                       color: 'white',
@@ -203,10 +203,10 @@ export function GuestSnap() {
                       className="mt-4 rounded-lg px-4 py-3"
                       style={{ backgroundColor: 'var(--color-secondary)' }}
                     >
-                      <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                      <p className="text-[15px] font-medium" style={{ color: 'var(--color-text)' }}>
                         {messages.notYetOpen}
                       </p>
-                      <p className="mt-1 text-xs" style={{ color: 'var(--color-text-light)' }}>
+                      <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-light)' }}>
                         {messages.notYetOpenSubtitle}
                       </p>
                     </motion.div>
@@ -227,14 +227,14 @@ export function GuestSnap() {
               {/* Main Content */}
               <div className="text-center px-4">
                 <p
-                  className="text-xl mb-6"
+                  className="text-[23px] mb-6"
                   style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
                 >
                   찍어주신 소중한 사진을 공유해주세요
                 </p>
 
                 <p
-                  className="text-[15px] leading-loose mb-8"
+                  className="text-[17px] leading-loose mb-8"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-light)' }}
                 >
                   그 순간을 감사히 간직하겠습니다
@@ -246,7 +246,7 @@ export function GuestSnap() {
                   style={{ borderLeft: '2px solid var(--color-primary)' }}
                 >
                   <p
-                    className="text-xs uppercase tracking-wider mb-4"
+                    className="text-[13px] uppercase tracking-wider mb-4"
                     style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-accent)' }}
                   >
                     Photo Guide
@@ -255,7 +255,7 @@ export function GuestSnap() {
                     {['신랑이 우는 장면 (제보 환영)', '둘이 눈 마주치는 순간', '예식장 분위기가 담긴 풍경', '하객분들끼리 찍는 단체컷', '아무거나 다 좋아요 진짜로'].map((tip, i) => (
                       <p
                         key={i}
-                        className="text-sm"
+                        className="text-[15px]"
                         style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text)' }}
                       >
                         {tip}
@@ -266,13 +266,13 @@ export function GuestSnap() {
 
                 {/* Reward */}
                 <p
-                  className="text-sm mb-2"
+                  className="text-[15px] mb-2"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--color-primary)' }}
                 >
                   MVP 스냅작가에겐 특별한 감사선물을 전달드릴게요
                 </p>
                 <p
-                  className="text-xs mb-8"
+                  className="text-[13px] mb-8"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}
                 >
                   아래 버튼으로 바로 공유 가능
@@ -284,7 +284,7 @@ export function GuestSnap() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleUploadClick}
-                    className="inline-flex items-center gap-3 px-8 py-4 text-sm"
+                    className="inline-flex items-center gap-3 px-8 py-4 text-[15px]"
                     style={{
                       border: '1px solid var(--color-primary)',
                       color: 'var(--color-primary)',
@@ -306,10 +306,10 @@ export function GuestSnap() {
                     className="mt-6 rounded-lg px-4 py-3"
                     style={{ backgroundColor: 'var(--color-secondary)' }}
                   >
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                    <p className="text-[15px] font-medium" style={{ color: 'var(--color-text)' }}>
                       {messages.notYetOpen}
                     </p>
-                    <p className="mt-1 text-xs" style={{ color: 'var(--color-text-light)' }}>
+                    <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-light)' }}>
                       {messages.notYetOpenSubtitle}
                     </p>
                   </motion.div>
