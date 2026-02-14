@@ -189,8 +189,8 @@ export const WEDDING_INFO = {
   // Hero 이미지 (로컬 asset - LCP 최적화)
   hero: {
     // 데스크탑: 신랑/신부 각각
-    groom: '/images/hero/groom.webp',
-    bride: '/images/hero/bride.webp',
+    groom: '/images/hero/groom.jpg',
+    bride: '/images/hero/bride.jpg',
     // 모바일: 커플 사진
     couple: '/images/hero/couple.jpg',
   },

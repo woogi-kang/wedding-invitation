@@ -60,13 +60,13 @@ export default function RootLayout({
         {/* Desktop: groom & bride split view */}
         <link
           rel="preload"
-          href="/images/hero/groom.webp"
+          href="/images/hero/groom.jpg"
           as="image"
           media="(min-width: 640px)"
         />
         <link
           rel="preload"
-          href="/images/hero/bride.webp"
+          href="/images/hero/bride.jpg"
           as="image"
           media="(min-width: 640px)"
         />

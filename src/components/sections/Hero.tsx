@@ -89,7 +89,7 @@ export function Hero() {
             role="img"
             aria-label="신랑 사진"
             style={{
-              backgroundImage: 'url(/images/hero/groom.webp)',
+              backgroundImage: 'url(/images/hero/groom.jpg)',
               willChange: 'auto',
             }}
           />
@@ -109,7 +109,7 @@ export function Hero() {
             role="img"
             aria-label="신부 사진"
             style={{
-              backgroundImage: 'url(/images/hero/bride.webp)',
+              backgroundImage: 'url(/images/hero/bride.jpg)',
               willChange: 'auto',
             }}
           />
