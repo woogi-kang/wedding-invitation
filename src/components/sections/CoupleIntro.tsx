@@ -56,7 +56,7 @@ export function CoupleIntro() {
             <div
               className="w-24 h-24 rounded-full bg-cover bg-center flex-shrink-0"
               style={{
-                backgroundImage: 'url(/images/hero/groom.jpg)',
+                backgroundImage: 'url(/images/hero/groom.webp)',
                 border: '3px solid var(--color-groom)',
               }}
             />
@@ -128,7 +128,7 @@ export function CoupleIntro() {
             <div
               className="w-24 h-24 rounded-full bg-cover bg-center flex-shrink-0"
               style={{
-                backgroundImage: 'url(/images/hero/bride.jpg)',
+                backgroundImage: 'url(/images/hero/bride.webp)',
                 border: '3px solid var(--color-bride)',
               }}
             />
