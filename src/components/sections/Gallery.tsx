@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Section } from '@/components/common/Section';
-import type { GalleryImage } from '@/lib/cloudinary';
+import type { GalleryImage } from '@/lib/gallery';
 
 // Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -148,16 +148,13 @@ export function Gallery({ images }: GalleryProps) {
                 className="w-full h-full"
               >
                 {images.map((image, i) => (
-                  <SwiperSlide key={image.publicId} className="flex items-center justify-center">
+                  <SwiperSlide key={image.src} className="flex items-center justify-center">
                     <div className="flex items-center justify-center w-full h-full px-2 py-16 md:p-16">
-                      <CldImage
-                        src={image.publicId}
+                      <Image
+                        src={image.src}
                         alt={image.alt}
                         width={1600}
                         height={Math.round(1600 * (image.height / image.width))}
-                        format="auto"
-                        quality="auto:best"
-                        crop="limit"
                         className="max-h-[80vh] max-w-[96vw] md:max-h-[80vh] md:max-w-[90vw] w-auto h-auto object-contain select-none"
                         draggable={false}
                         priority={i === selectedIndex}
@@ -224,15 +221,11 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: Gall
           {!mainLoaded && (
             <ImageSkeleton className="absolute inset-0 rounded-xl" />
           )}
-          <CldImage
-            src={images[mainIndex].publicId}
+          <Image
+            src={images[mainIndex].src}
             alt={images[mainIndex].alt}
             fill
             sizes="280px"
-            format="auto"
-            quality="auto:good"
-            crop="fill"
-            gravity="auto"
             className={`object-cover transition-opacity duration-300 ${mainLoaded ? 'opacity-100' : 'opacity-0'}`}
             loading="eager"
             onLoad={() => setMainLoaded(true)}
@@ -248,7 +241,7 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: Gall
         <div className="flex gap-2 overflow-x-auto pb-2 thumbnail-scrollbar">
           {images.map((image, i) => (
             <button
-              key={image.publicId}
+              key={image.src}
               onClick={() => setMainIndex(i)}
               className={`relative flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden transition-all duration-300 ${
                 i === mainIndex
@@ -260,15 +253,11 @@ function MainThumbnailGallery({ images, onImageClick, isInView }: { images: Gall
               {!loadedThumbnails.has(i) && (
                 <ImageSkeleton className="absolute inset-0" />
               )}
-              <CldImage
-                src={image.publicId}
+              <Image
+                src={image.src}
                 alt={image.alt}
                 width={64}
                 height={64}
-                format="auto"
-                quality="auto:low"
-                crop="fill"
-                gravity="auto"
                 className={`object-cover transition-opacity duration-300 ${loadedThumbnails.has(i) ? 'opacity-100' : 'opacity-0'}`}
                 loading="lazy"
                 onLoad={() => handleThumbnailLoad(i)}

@@ -1,10 +1,6 @@
-import { getGalleryImages } from '@/lib/cloudinary';
+import { galleryImages } from '@/lib/gallery';
 import { GlitchInvitationClient } from './GlitchInvitationClient';
 
-export const revalidate = 60;
-
-export default async function GlitchInvitationPage() {
-  const galleryImages = await getGalleryImages('wedding/gallery');
-
+export default function GlitchInvitationPage() {
   return <GlitchInvitationClient galleryImages={galleryImages} />;
 }

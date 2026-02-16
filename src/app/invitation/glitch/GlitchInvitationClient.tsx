@@ -13,7 +13,7 @@ import {
   TransferAccount,
 } from '@/components/trick/glitch';
 import { GlitchFooter } from '@/components/trick/glitch/GlitchFooter';
-import type { GalleryImage } from '@/lib/cloudinary';
+import type { GalleryImage } from '@/lib/gallery';
 
 interface GlitchInvitationClientProps {
   galleryImages: GalleryImage[];

@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react';
-import { CldImage } from 'next-cloudinary';
-import type { GalleryImage } from '@/lib/cloudinary';
+import Image from 'next/image';
+import type { GalleryImage } from '@/lib/gallery';
 import { TerminalWindow } from '../shared/TerminalWindow';
 
 interface GlitchGalleryProps {
@@ -60,7 +60,7 @@ export function GlitchGallery({ images: propImages }: GlitchGalleryProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {images.map((image, index) => (
               <motion.div
-                key={image.publicId}
+                key={image.src}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -70,8 +70,8 @@ export function GlitchGallery({ images: propImages }: GlitchGalleryProps) {
               >
                 {/* Image */}
                 <div className="aspect-square relative overflow-hidden rounded border border-[#00ff41]/20 bg-black">
-                  <CldImage
-                    src={image.publicId}
+                  <Image
+                    src={image.src}
                     alt={image.alt}
                     fill
                     className="object-cover transition-transform group-hover:scale-105"
@@ -155,8 +155,8 @@ export function GlitchGallery({ images: propImages }: GlitchGalleryProps) {
                 className="relative max-w-[95vw] sm:max-w-4xl max-h-[85vh] sm:max-h-[80vh] w-full h-full"
                 onClick={(e) => e.stopPropagation()}
               >
-                <CldImage
-                  src={images[selectedIndex].publicId}
+                <Image
+                  src={images[selectedIndex].src}
                   alt={images[selectedIndex].alt}
                   fill
                   className="object-contain"

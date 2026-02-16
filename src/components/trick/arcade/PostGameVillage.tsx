@@ -2,11 +2,11 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import Link from 'next/link';
 import { WEDDING_INFO } from '@/lib/constants';
 import { ARCADE_COLORS } from './shared/RetroText';
-import type { GalleryImage } from '@/lib/cloudinary';
+import type { GalleryImage } from '@/lib/gallery';
 
 // -- Types --
 
@@ -365,7 +365,7 @@ function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
       <div className="grid grid-cols-3 gap-2">
         {galleryImages.map((img, i) => (
           <motion.button
-            key={img.publicId}
+            key={img.src}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setLightboxIdx(i)}
@@ -376,15 +376,11 @@ function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
             }}
             aria-label={`View ${img.alt}`}
           >
-            <CldImage
-              src={img.publicId}
+            <Image
+              src={img.src}
               alt={img.alt}
               width={200}
               height={200}
-              crop="fill"
-              gravity="auto"
-              format="auto"
-              quality="auto"
               className="w-full h-full object-cover"
               style={{ imageRendering: 'auto' }}
             />
@@ -422,14 +418,11 @@ function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
               className="relative max-w-lg w-full max-h-[80vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <CldImage
-                src={galleryImages[lightboxIdx].publicId}
+              <Image
+                src={galleryImages[lightboxIdx].src}
                 alt={galleryImages[lightboxIdx].alt}
                 width={800}
                 height={1000}
-                crop="fit"
-                format="auto"
-                quality="auto"
                 className="w-full h-auto object-contain max-h-[75vh]"
               />
               {/* Close button */}

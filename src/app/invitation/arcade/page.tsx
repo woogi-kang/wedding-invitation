@@ -1,10 +1,6 @@
-import { getGalleryImages } from '@/lib/cloudinary';
+import { galleryImages } from '@/lib/gallery';
 import { ArcadeInvitationClient } from './ArcadeInvitationClient';
 
-export const revalidate = 60;
-
-export default async function ArcadeInvitationPage() {
-  const galleryImages = await getGalleryImages('wedding/gallery');
-
+export default function ArcadeInvitationPage() {
   return <ArcadeInvitationClient galleryImages={galleryImages} />;
 }

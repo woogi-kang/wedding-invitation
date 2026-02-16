@@ -10,7 +10,7 @@ import { BossBattle } from '@/components/trick/arcade/BossBattle';
 import { EndingSequence } from '@/components/trick/arcade/EndingSequence';
 import { PostGameVillage } from '@/components/trick/arcade/PostGameVillage';
 import { BattleTransition } from '@/components/trick/arcade/shared';
-import type { GalleryImage } from '@/lib/cloudinary';
+import type { GalleryImage } from '@/lib/gallery';
 
 type GamePhase =
   | 'title'
