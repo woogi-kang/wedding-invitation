@@ -195,22 +195,6 @@ export const WEDDING_INFO = {
     couple: '/images/hero/couple.jpg',
   },
 
-  // 갤러리 이미지
-  // Cloudinary public ID 형식: 'wedding/gallery/파일명' (확장자 제외)
-  // 예: photo1.jpg → 'wedding/gallery/photo1'
-  gallery: {
-    // Cloudinary 폴더 경로
-    folder: 'wedding/gallery',
-    images: [
-      { publicId: 'wedding/gallery/photo1', alt: '웨딩 사진 1' },
-      { publicId: 'wedding/gallery/photo2', alt: '웨딩 사진 2' },
-      { publicId: 'wedding/gallery/photo3', alt: '웨딩 사진 3' },
-      { publicId: 'wedding/gallery/photo4', alt: '웨딩 사진 4' },
-      { publicId: 'wedding/gallery/photo5', alt: '웨딩 사진 5' },
-      { publicId: 'wedding/gallery/photo6', alt: '웨딩 사진 6' },
-    ],
-  },
-
   // 영상 URL (YouTube)
   video: {
     enabled: true,
