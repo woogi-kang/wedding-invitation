@@ -111,24 +111,23 @@ const CAFE_COLORS: Record<number, string> = {
   5: '#6B4226',
 };
 
-const RESTAURANT_GRID = [
-  [0, 0, 4, 4, 4, 0, 0],
-  [0, 4, 4, 4, 4, 4, 0],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 2, 2, 1, 2, 2, 1],
-  [1, 2, 2, 1, 2, 2, 1],
-  [1, 1, 1, 3, 1, 1, 1],
-  [1, 1, 3, 3, 3, 1, 1],
-  [5, 5, 5, 5, 5, 5, 5],
+// 다리 (Bridge) 스프라이트 - 고백 스테이지
+const BRIDGE_GRID = [
+  [0, 0, 3, 3, 3, 3, 3, 3, 0, 0],
+  [0, 3, 1, 1, 1, 1, 1, 1, 3, 0],
+  [3, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+  [0, 2, 0, 0, 0, 0, 0, 0, 2, 0],
+  [0, 2, 0, 0, 0, 0, 0, 0, 2, 0],
+  [0, 2, 0, 0, 0, 0, 0, 0, 2, 0],
 ];
-const RESTAURANT_COLORS: Record<number, string> = {
-  1: '#3A3A6E',
-  2: '#FFE4B5',
-  3: '#FFD700',
-  4: '#3A3A6E',
-  5: '#2A2A5E',
+const BRIDGE_COLORS: Record<number, string> = {
+  1: '#D4A574',
+  2: '#8B6E4E',
+  3: '#C49A6C',
 };
 
+// 우산 (Umbrella) 스프라이트 - 시련 스테이지
 const MOON_GRID = [
   [0, 1, 1, 0, 0],
   [1, 1, 0, 0, 0],
@@ -191,24 +190,51 @@ function CafeScene() {
   );
 }
 
-function RestaurantScene() {
+function SunsetScene() {
   return (
-    <div className="flex items-end gap-2">
-      <PixelSprite grid={RESTAURANT_GRID} colorMap={RESTAURANT_COLORS} scale={3} />
-      {/* Candle flicker */}
+    <div className="flex items-end gap-2 relative">
+      {/* 석양 빛 효과 */}
       <motion.div
-        className="mb-6"
-        style={{ width: 4, height: 4, background: '#FFD700', borderRadius: '50%' }}
-        animate={{
-          boxShadow: [
-            '0 0 4px #FFD700, 0 0 8px #FFA500',
-            '0 0 6px #FFD700, 0 0 12px #FFA500',
-            '0 0 4px #FFD700, 0 0 8px #FFA500',
-          ],
-          scale: [1, 1.2, 0.9, 1],
+        className="absolute -inset-2 rounded-full"
+        style={{
+          background: 'radial-gradient(circle, rgba(255,140,50,0.15) 0%, transparent 70%)',
         }}
-        transition={{ duration: 0.8, repeat: Infinity }}
+        animate={{
+          opacity: [0.5, 0.8, 0.5],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
       />
+      <PixelSprite grid={BRIDGE_GRID} colorMap={BRIDGE_COLORS} scale={3} />
+      {/* 벚꽃 파티클 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              width: 4,
+              height: 4,
+              borderRadius: '50% 0 50% 50%',
+              background: ['#FFB7C5', '#FF9BAA', '#FFDDE1', '#FFB7C5', '#FF9BAA'][i],
+              left: `${15 + i * 18}%`,
+              top: '-5%',
+            }}
+            animate={{
+              y: [0, 60],
+              x: [0, (i % 2 === 0 ? 1 : -1) * 15],
+              opacity: [0.8, 0],
+              rotate: [0, 180],
+            }}
+            transition={{
+              duration: 2.5 + i * 0.3,
+              delay: i * 0.6,
+              repeat: Infinity,
+              ease: 'easeIn',
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -254,12 +280,12 @@ function NightScene() {
   );
 }
 
-type LandmarkType = 'park' | 'cafe' | 'restaurant' | 'night';
+type LandmarkType = 'park' | 'cafe' | 'sunset' | 'night';
 
 const LANDMARK_COMPONENTS: Record<LandmarkType, React.FC> = {
   park: ParkScene,
   cafe: CafeScene,
-  restaurant: RestaurantScene,
+  sunset: SunsetScene,
   night: NightScene,
 };
 
@@ -279,7 +305,7 @@ function createZoneParticles(theme: LandmarkType, count: number): Particle[] {
   const colorSets: Record<string, string[]> = {
     park: ['#4A9A40', '#5AAA50', '#FF6B9D', '#FFCC00'],
     cafe: ['#8B6E4E60', '#FFE4B540', '#FFFFFF30'],
-    restaurant: ['#FFD70040', '#FFA50030', '#FF6B9D20'],
+    sunset: ['#FF8C32', '#FF6B9D', '#FFD700', '#FFB07040'],
     night: ['#FFFFFF', '#4A9EFF80', '#FFE4B560'],
   };
   const colors = colorSets[theme] || colorSets.park;
@@ -367,39 +393,39 @@ interface StageInfo {
 const STAGE_INFO: StageInfo[] = [
   {
     id: 0,
-    name: 'First Encounter',
+    name: '첫만남',
     subtitle: '2022 봄',
-    description: '야생의 김선경이 나타났다! 심장 박동수: ???',
+    description: '야생의 김선경이 나타났다!\n심장 박동수: ???',
     difficulty: 1,
     reward: '호감도 MAX',
     warning: '심장이 약하신 분 주의',
   },
   {
     id: 1,
-    name: 'Butterfly Effect',
-    subtitle: '2023',
-    description: '상태이상: LOVE_STRUCK Duration: PERMANENT',
+    name: '썸',
+    subtitle: '2022',
+    description: '상태이상에 걸렸다!\n5분마다 카톡 확인 중...',
     difficulty: 2,
     reward: '사랑 포인트 +9999',
-    warning: '부작용: 5분마다 카톡 확인',
+    warning: '이불킥 주의',
   },
   {
     id: 2,
-    name: 'Side Quests',
-    subtitle: '2024',
-    description: '커플 잠옷 획득! (해제 불가) IKEA 조립 퀘스트 발생!',
+    name: '고백',
+    subtitle: '2023',
+    description: '용기 Lv.3 vs 겁쟁이 Lv.99\n승산이 없어 보인다...',
     difficulty: 3,
-    reward: '맛집 리스트 x147',
-    warning: '위장 용량 초과 가능',
+    reward: '용기 MAX',
+    warning: '심장 폭발 주의',
   },
   {
     id: 3,
-    name: 'The Proposal',
+    name: '프로포즈',
     subtitle: '2025',
-    description: 'ERROR: NO 버튼을 찾을 수 없습니다',
+    description: '거절 버튼을 찾을 수 없습니다',
     difficulty: 5,
-    reward: 'Ring of Eternal Promise',
-    warning: 'NO.exe has been deleted',
+    reward: '영원의 반지',
+    warning: '눈물 주의',
   },
 ];
 
@@ -528,7 +554,7 @@ function StageInfoCard({
               className="font-['Press_Start_2P',monospace] text-[10px]"
               style={{ color: ARCADE_COLORS.gray }}
             >
-              REWARD
+              보상
             </span>
             <p
               className="font-['Press_Start_2P',monospace] text-[10px] mt-0.5"
@@ -571,7 +597,7 @@ function StageInfoCard({
               boxShadow: '3px 3px 0px #b38f00',
             }}
           >
-            {isCompleted ? '▶ REPLAY' : '▶ START'}
+            {isCompleted ? '▶ 다시보기' : '▶ 시작'}
           </motion.button>
         </div>
       </motion.div>
@@ -593,7 +619,7 @@ interface StageZone {
 const ZONES: StageZone[] = [
   {
     id: 0,
-    name: 'First Encounter',
+    name: '첫만남',
     subtitle: '2022 봄',
     icon: '♥',
     landmark: 'park',
@@ -601,23 +627,23 @@ const ZONES: StageZone[] = [
   },
   {
     id: 1,
-    name: 'Butterfly Effect',
-    subtitle: '2023',
+    name: '썸',
+    subtitle: '2022',
     icon: '★',
     landmark: 'cafe',
     bgGradient: 'linear-gradient(180deg, #1a100f 0%, #251a15 50%, #1a100f 100%)',
   },
   {
     id: 2,
-    name: 'Side Quests',
-    subtitle: '2024',
+    name: '고백',
+    subtitle: '2023',
     icon: '◆',
-    landmark: 'restaurant',
-    bgGradient: 'linear-gradient(180deg, #0f0f1a 0%, #151525 50%, #0f0f1a 100%)',
+    landmark: 'sunset',
+    bgGradient: 'linear-gradient(180deg, #1a0f15 0%, #25151a 50%, #1a0f15 100%)',
   },
   {
     id: 3,
-    name: 'The Proposal',
+    name: '프로포즈',
     subtitle: '2025',
     icon: '♛',
     landmark: 'night',
@@ -747,7 +773,7 @@ export function WorldMap({
 
   return (
     <div
-      className="relative w-full min-h-screen flex flex-col overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col overflow-x-hidden"
       style={{ background: ARCADE_COLORS.bg }}
     >
       {/* Header */}
@@ -769,7 +795,7 @@ export function WorldMap({
             textShadow: `0 0 8px ${ARCADE_COLORS.gold}40`,
           }}
         >
-          DESTINY
+          우리의 이야기
         </p>
         <div className="flex items-center justify-center gap-2 mt-2">
           <p
@@ -801,7 +827,7 @@ export function WorldMap({
       </motion.div>
 
       {/* Map zones */}
-      <div className="flex-1 flex flex-col justify-center px-4 pb-4">
+      <div className="flex-1 flex flex-col justify-evenly px-4 pb-4">
         {reversedZones.map((zone, reverseIdx) => {
           const isCompleted = completedStages.includes(zone.id);
           const isCurrent = currentStage === zone.id && !isCompleted;
@@ -1005,7 +1031,7 @@ export function WorldMap({
         animate={prefersReducedMotion ? undefined : { opacity: [0.3, 0.6, 0.3] }}
         transition={prefersReducedMotion ? undefined : { duration: 2.5, repeat: Infinity }}
       >
-        TAP A STAGE TO BEGIN
+        스테이지를 터치하세요
       </motion.p>
 
       {/* 미니 이벤트 팝업 */}

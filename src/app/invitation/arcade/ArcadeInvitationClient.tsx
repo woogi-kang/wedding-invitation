@@ -6,7 +6,7 @@ import { TitleScreen } from '@/components/trick/arcade/TitleScreen';
 import { CharacterSelect } from '@/components/trick/arcade/CharacterSelect';
 import { WorldMap } from '@/components/trick/arcade/WorldMap';
 import { StageEvent } from '@/components/trick/arcade/StageEvent';
-import { BossBattle } from '@/components/trick/arcade/BossBattle';
+import { BossSequence } from '@/components/trick/arcade/BossSequence';
 import { EndingSequence } from '@/components/trick/arcade/EndingSequence';
 import { PostGameVillage } from '@/components/trick/arcade/PostGameVillage';
 import { BattleTransition } from '@/components/trick/arcade/shared';
@@ -206,7 +206,7 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
 
         {phase === 'boss-battle' && (
           <PhaseWrapper key="boss">
-            <BossBattle onVictory={() => setPhase('ending')} />
+            <BossSequence onVictory={() => setPhase('ending')} />
           </PhaseWrapper>
         )}
 

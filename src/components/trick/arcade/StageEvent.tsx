@@ -97,6 +97,18 @@ const STAR_GRID = [
 ];
 const STAR_COLORS: Record<number, string> = { 1: '#FFE4B5' };
 
+// --- 새 배경용 스프라이트 데이터 ---
+
+const CHERRY_BLOSSOM_GRID = [
+  [0,1,0,1,0],
+  [1,2,1,2,1],
+  [0,1,2,1,0],
+  [1,2,1,2,1],
+  [0,1,0,1,0],
+];
+const CHERRY_BLOSSOM_COLORS: Record<number, string> = { 1: '#FFB7C5', 2: '#FF8FA3' };
+
+
 // --- 스테이지별 필드 배경 ---
 
 function ParkField() {
@@ -241,94 +253,89 @@ function CafeField() {
   );
 }
 
-function RestaurantField() {
+function SunsetField() {
   return (
     <>
-      {/* 천장 샹들리에 */}
-      <div className="absolute top-[3%] left-[50%]" style={{ transform: 'translateX(-50%)' }}>
-        <div style={{ width: 2, height: 12, background: '#4A4A8E', margin: '0 auto' }} />
-        <div style={{ width: 30, height: 6, background: '#5A5A9E', borderRadius: '0 0 50% 50%' }} />
-        {[0, 1, 2].map((i) => (
-          <motion.div key={`ch-light-${i}`} className="absolute" style={{
-            bottom: -4, left: 4 + i * 10, width: 4, height: 4, borderRadius: '50%', background: '#FFD700',
-          }}
-            animate={{ opacity: [0.5, 1, 0.5], boxShadow: ['0 0 3px #FFD700', '0 0 8px #FFD700', '0 0 3px #FFD700'] }}
-            transition={{ duration: 1.2, delay: i * 0.3, repeat: Infinity }}
-          />
-        ))}
-      </div>
-      {/* 벽면 커튼 */}
-      {[5, 85].map((l, i) => (
-        <div key={`curtain-${i}`} className="absolute" style={{
-          left: `${l}%`, top: 0, width: 20, height: '70%',
-          background: 'linear-gradient(180deg, #4A2040 0%, #3A1030 100%)',
-          borderRadius: '0 0 30% 30%', opacity: 0.5,
+      {/* 태양 (석양) */}
+      <motion.div
+        className="absolute top-[15%] left-[50%]"
+        style={{ transform: 'translateX(-50%)' }}
+        animate={{
+          boxShadow: [
+            '0 0 30px rgba(255,140,0,0.4), 0 0 60px rgba(255,100,50,0.2)',
+            '0 0 50px rgba(255,140,0,0.6), 0 0 90px rgba(255,100,50,0.3)',
+            '0 0 30px rgba(255,140,0,0.4), 0 0 60px rgba(255,100,50,0.2)',
+          ],
+        }}
+        transition={{ duration: 3, repeat: Infinity }}
+      >
+        <div style={{
+          width: 50, height: 50, borderRadius: '50%',
+          background: 'radial-gradient(circle, #FFD700 0%, #FF8C00 50%, #FF4500 100%)',
         }} />
-      ))}
-      {/* 벽면 그림 */}
-      <div className="absolute top-[15%] left-[25%]" style={{
-        width: 24, height: 20, background: '#2a2a4e', border: '2px solid #8B8B8B',
-        boxShadow: 'inset 0 0 6px rgba(255,200,100,0.1)',
-      }} />
-      <div className="absolute top-[15%] right-[25%]" style={{
-        width: 24, height: 20, background: '#2a2a4e', border: '2px solid #8B8B8B',
-        boxShadow: 'inset 0 0 6px rgba(255,200,100,0.1)',
-      }} />
-      {/* 테이블 */}
-      <div className="absolute bottom-2 left-[28%]">
-        <div style={{ width: 100, height: 10, background: '#3A3A6E', border: '2px solid #4A4A8E', borderRadius: 2 }} />
-      </div>
-      {/* 테이블 다리 */}
-      {[0, 1].map((i) => (
-        <div key={`rleg-${i}`} className="absolute" style={{
-          bottom: 0, left: `${32 + i * 20}%`, width: 4, height: 8, background: '#2A2A4E',
-        }} />
-      ))}
-      {/* 테이블보 */}
-      <div className="absolute bottom-3 left-[28%]" style={{
-        width: 100, height: 4, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)',
-      }} />
-      {/* 촛불들 */}
-      <div className="absolute bottom-5 left-[36%]">
-        <PixelSprite grid={CANDLE_GRID} colorMap={CANDLE_COLORS} scale={2} />
-      </div>
-      <div className="absolute bottom-5 left-[55%]">
-        <PixelSprite grid={CANDLE_GRID} colorMap={CANDLE_COLORS} scale={2} />
-      </div>
-      {/* 와인 글라스 */}
-      {[40, 50].map((l, i) => (
-        <div key={`wine-${i}`} className="absolute" style={{ bottom: 12, left: `${l}%` }}>
-          <div style={{ width: 6, height: 8, background: i === 0 ? 'rgba(180,40,40,0.6)' : 'rgba(180,40,40,0.4)', borderRadius: '50% 50% 0 0' }} />
-          <div style={{ width: 2, height: 5, background: '#aaa', margin: '0 auto' }} />
-          <div style={{ width: 8, height: 2, background: '#aaa', marginLeft: -1 }} />
-        </div>
-      ))}
-      {/* 접시 */}
-      {[42, 52].map((l, i) => (
-        <div key={`plate-${i}`} className="absolute" style={{
-          bottom: 12, left: `${l}%`, width: 14, height: 4, background: '#ddd', borderRadius: '50%', opacity: 0.5,
-        }} />
-      ))}
-      {/* 촛불 빛 */}
-      {['36%', '55%'].map((left, i) => (
+      </motion.div>
+      {/* 수면 반사 */}
+      <div className="absolute bottom-0 w-full" style={{ height: '30%', background: 'linear-gradient(180deg, rgba(255,140,0,0.15) 0%, rgba(255,100,50,0.25) 50%, rgba(100,50,20,0.4) 100%)' }} />
+      {/* 수면 반짝임 */}
+      {[15, 30, 45, 60, 75, 85].map((l, i) => (
         <motion.div
-          key={`glow-${i}`}
-          className="absolute rounded-full"
-          style={{ left, bottom: '38%', width: 8, height: 8, background: '#FFD700' }}
-          animate={{ boxShadow: ['0 0 6px #FFD700, 0 0 12px #FFA500', '0 0 12px #FFD700, 0 0 24px #FFA500', '0 0 6px #FFD700, 0 0 12px #FFA500'], scale: [1, 1.3, 1] }}
-          transition={{ duration: 0.8, repeat: Infinity }}
+          key={`reflect-${i}`}
+          className="absolute"
+          style={{ left: `${l}%`, bottom: `${5 + (i % 3) * 4}%`, width: 12 + i * 2, height: 2, background: 'rgba(255,200,100,0.3)', borderRadius: '50%' }}
+          animate={{ opacity: [0.2, 0.6, 0.2], scaleX: [0.8, 1.2, 0.8] }}
+          transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.4 }}
         />
       ))}
-      {/* 바닥 타일 */}
-      {Array.from({ length: 10 }).map((_, i) => (
-        <div key={`rtile-${i}`} className="absolute" style={{
-          bottom: 0, left: `${i * 10}%`, width: '10%', height: 4,
-          background: i % 2 === 0 ? '#1a1a3e' : '#22224e', opacity: 0.5,
+      {/* 다리 난간 */}
+      <div className="absolute bottom-[28%] w-full" style={{ height: 4, background: '#8B6E4E', opacity: 0.7 }} />
+      {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((l, i) => (
+        <div key={`rail-${i}`} className="absolute" style={{
+          left: `${l}%`, bottom: '28%', width: 3, height: 16, background: '#7B5E3E', opacity: 0.6,
         }} />
       ))}
+      {/* 벚꽃 꽃잎 떨어지는 효과 */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={`petal-${i}`}
+          className="absolute"
+          style={{ left: `${5 + i * 8}%`, top: '-5%' }}
+          animate={{
+            y: [0, 300],
+            x: [0, 20 * (i % 2 === 0 ? 1 : -1), -10, 15 * (i % 2 === 0 ? -1 : 1)],
+            rotate: [0, 180, 360],
+            opacity: [0.8, 0.6, 0],
+          }}
+          transition={{ duration: 5 + i * 0.5, repeat: Infinity, delay: i * 0.8, ease: 'easeIn' }}
+        >
+          <PixelSprite grid={CHERRY_BLOSSOM_GRID} colorMap={CHERRY_BLOSSOM_COLORS} scale={1} />
+        </motion.div>
+      ))}
+      {/* 구름 (석양 색) */}
+      {[{ l: 5, t: 5, s: 3 }, { l: 70, t: 8, s: 2.5 }].map((c, i) => (
+        <motion.div
+          key={`sunset-cloud-${i}`}
+          className="absolute"
+          style={{ left: `${c.l}%`, top: `${c.t}%` }}
+          animate={{ x: [0, 10, 0] }}
+          transition={{ duration: 10 + i * 4, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div style={{ width: 14 * c.s, height: 5 * c.s, background: 'rgba(255,150,80,0.35)', borderRadius: '50%' }} />
+          <div style={{ width: 9 * c.s, height: 3.5 * c.s, background: 'rgba(255,120,60,0.25)', borderRadius: '50%', marginTop: -2.5 * c.s, marginLeft: 3 * c.s }} />
+        </motion.div>
+      ))}
+      {/* 원거리 산 실루엣 */}
+      <div className="absolute bottom-[28%] w-full" style={{ height: 30, opacity: 0.2 }}>
+        {[{ l: 0, w: 35, h: 25 }, { l: 25, w: 40, h: 30 }, { l: 55, w: 45, h: 20 }].map((m, i) => (
+          <div key={`mountain-${i}`} className="absolute" style={{
+            left: `${m.l}%`, bottom: 0, width: `${m.w}%`, height: m.h,
+            background: '#5a2a1a', borderRadius: '40% 40% 0 0',
+          }} />
+        ))}
+      </div>
     </>
   );
 }
+
 
 function NightField() {
   const stars = useMemo(() =>
@@ -435,7 +442,7 @@ function NightField() {
 const STAGE_BACKGROUNDS: Record<number, { gradient: string; Field: React.FC }> = {
   0: { gradient: 'linear-gradient(180deg, #87CEEB 0%, #90EE90 65%, #228B22 85%, #1a5c1a 100%)', Field: ParkField },
   1: { gradient: 'linear-gradient(180deg, #5C3D2E 0%, #8B6E4E 40%, #D2B48C 70%, #6B4226 100%)', Field: CafeField },
-  2: { gradient: 'linear-gradient(180deg, #0f0f2e 0%, #1a1a4e 50%, #2a2a5e 80%, #1a1a3e 100%)', Field: RestaurantField },
+  2: { gradient: 'linear-gradient(180deg, #FF7043 0%, #FF8A65 25%, #FFAB91 50%, #FFB74D 70%, #E65100 100%)', Field: SunsetField },
   3: { gradient: 'linear-gradient(180deg, #000011 0%, #050520 30%, #0a0a30 60%, #101040 100%)', Field: NightField },
 };
 
@@ -534,7 +541,7 @@ function MiniDialog({
 const EMOTION_BUBBLES: Partial<Record<EmotionType, string>> = {
   surprised: '!',
   nervous: '?',
-  love: '♥',
+  love: '\u2665',
   happy: '^^',
 };
 
@@ -609,72 +616,73 @@ const ESCAPE_LINES = [
 ];
 
 const STAGE_SCRIPTS: StageScript[] = [
+  // ===== STAGE 1: 첫만남 =====
   {
-    title: 'STAGE 1: First Encounter',
+    title: 'STAGE 1: 첫만남',
     brideEntrance: true,
     steps: [
       { type: 'dialog', speaker: 'SYSTEM', text: '야생의 김선경이(가) 나타났다!', groomEmotion: 'surprised', brideEmotion: 'idle' },
       { type: 'dialog', speaker: 'SYSTEM', text: '...잠깐, 심장 박동수가 180을 넘었다', groomEmotion: 'nervous' },
-      { type: 'dialog', speaker: 'SYSTEM', text: 'WARNING: cardiac_event.exe 실행 중...', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: '김선경', text: '(이 사람 왜 이렇게 떨고 있지...?)', brideEmotion: 'surprised' },
       { type: 'choice', prompt: '어떻게 하시겠습니까?', options: ['말을 건다', '도망친다'], escapeIdx: 1 },
-      { type: 'dialog', speaker: '강태욱', text: '안...안녕하세요! 저는 강태욱이라고...', groomEmotion: 'nervous' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '(내면의 소리: 아 왜 목소리가 옥타브가 올라가지)', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: '강태욱', text: '안...안녕하세요!\n저는 강태욱이라고...', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '(왜 목소리가 옥타브가 올라가지)', groomEmotion: 'nervous' },
       { type: 'dialog', speaker: '김선경', text: '안녕하세요! 반가워요 :)', brideEmotion: 'happy' },
       { type: 'dialog', speaker: 'SYSTEM', text: '(강태욱의 뇌가 3초간 정지했다)', groomEmotion: 'surprised' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '(김선경은 이 어색함을 못 느낀 것 같다)', brideEmotion: 'happy' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '(아니 느꼈다)', brideEmotion: 'surprised' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '호감도가 급상승했다!\nDEBUG: 호감도 = Integer.MAX_VALUE', groomEmotion: 'love', brideEmotion: 'happy' },
-      { type: 'result', text: '첫 만남 이벤트 클리어!' },
+      { type: 'dialog', speaker: '김선경', text: '(귀엽긴 한데... 괜찮은 건가)', brideEmotion: 'happy' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '호감도가 급상승했다!', groomEmotion: 'love', brideEmotion: 'happy' },
+      { type: 'result', text: '첫만남 클리어!' },
     ],
   },
+  // ===== STAGE 2: 썸 =====
   {
-    title: 'STAGE 2: Butterfly Effect',
+    title: 'STAGE 2: 썸',
     steps: [
       { type: 'dialog', speaker: 'SYSTEM', text: '강태욱에게 상태이상이 걸렸다!', groomEmotion: 'surprised' },
-      { type: 'dialog', speaker: 'SYSTEM', text: 'STATUS: LOVE_STRUCK\nDURATION: PERMANENT', groomEmotion: 'love', brideEmotion: 'happy' },
       { type: 'effect', effectType: 'hp_drain' },
-      { type: 'dialog', speaker: 'SYSTEM', text: 'HP가 줄어들고 있다...!', groomEmotion: 'nervous' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '부작용 발현 중...' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '- 5분마다 카톡 확인\n- 이유 없이 웃음\n- 갑자기 연애 노래가 이해됨', groomEmotion: 'happy' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '치료 시도: 친구에게 상담' },
-      { type: 'dialog', speaker: '친구', text: '야 너 완전 빠졌다 ㅋㅋㅋㅋ 치료 불가 ㅋㅋ' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '치료 실패! ...하지만 사랑의 HP는 무한이었다!', groomEmotion: 'love', brideEmotion: 'love' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '사랑 포인트 +9999! (이미 오버플로우)', groomEmotion: 'happy', brideEmotion: 'happy' },
-      { type: 'result', text: '사랑 성장 이벤트 클리어!' },
+      { type: 'dialog', speaker: 'SYSTEM', text: 'HP가 줄어들고 있다...!\n(사랑에 빠지는 중)', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '증상:\n- 5분마다 카톡 확인\n- 이유 없이 웃음\n- 연애 노래가 갑자기 이해됨', groomEmotion: 'happy' },
+      { type: 'dialog', speaker: '김선경', text: '(나도 5분마다 확인하는 건 비밀)', brideEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '첫 카페 데이트!\n(둘 다 30분 전에 도착해서 숨어있었다)', groomEmotion: 'nervous', brideEmotion: 'nervous' },
+      { type: 'choice', prompt: '카톡이 왔다!', options: ['바로 답장한다', '쿨하게 참는다'], escapeIdx: 1 },
+      { type: 'dialog', speaker: 'SYSTEM', text: '(그날 밤, 이불킥 3회 발생)', groomEmotion: 'happy', brideEmotion: 'happy' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '치료 불가!\n사랑의 HP는 무한이었다!', groomEmotion: 'love', brideEmotion: 'love' },
+      { type: 'result', text: '썸 클리어!' },
     ],
   },
+  // ===== STAGE 3: 고백 =====
   {
-    title: 'STAGE 3: Side Quests',
+    title: 'STAGE 3: 고백',
     steps: [
-      { type: 'dialog', speaker: 'SYSTEM', text: '사이드 퀘스트 보상 정산 중...' },
-      { type: 'effect', effectType: 'items' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '커플 잠옷을 획득했다! (착용 필수, 해제 불가)', groomEmotion: 'happy', brideEmotion: 'happy' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '서로의 폰 비밀번호 획득! (신뢰 +999)', brideEmotion: 'love' },
-      { type: 'dialog', speaker: 'SYSTEM', text: 'IKEA 가구 공동 조립 퀘스트 클리어! (인내 +500, 관계 위기 +1)', groomEmotion: 'nervous', brideEmotion: 'nervous' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '첫 싸움을 경험했다!' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '...30분 만에 화해했다! 스킬 습득: 화해의 기술 Lv.MAX', groomEmotion: 'love', brideEmotion: 'love' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '맛집 리스트 x147 획득! (위장 용량 초과 경고)', groomEmotion: 'happy', brideEmotion: 'happy' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '숨겨진 업적 달성: "서로 없으면 안 되는 사이"', groomEmotion: 'love', brideEmotion: 'love' },
-      { type: 'result', text: '기념일 이벤트 클리어!' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '강태욱의 내면에서 전투 시작!', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '용기 Lv.3 vs 겁쟁이 Lv.99\n...승산이 없어 보인다', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '아이템 사용: 고백 대사 메모장', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '...떨어뜨렸다!\n메모장을 잃어버렸다!', groomEmotion: 'surprised' },
+      { type: 'choice', prompt: '어떻게 하시겠습니까?', options: ['고백한다', '다음에...'], escapeIdx: 1 },
+      { type: 'dialog', speaker: '강태욱', text: '준비한 말이 있었는데\n다 까먹었어...', groomEmotion: 'nervous', brideEmotion: 'surprised' },
+      { type: 'dialog', speaker: '강태욱', text: '그냥... 너 없으면 안 될 것 같아.\n나랑 사귀어 줄래?', groomEmotion: 'nervous', brideEmotion: 'surprised' },
+      { type: 'dialog', speaker: '김선경', text: '...바보야, 메모까지 했어?\n응, 좋아!', brideEmotion: 'love', groomEmotion: 'happy' },
+      { type: 'effect', effectType: 'hearts' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '고백 대성공!\n용기가 MAX가 되었다!', groomEmotion: 'love', brideEmotion: 'love' },
+      { type: 'result', text: '고백 클리어!' },
     ],
   },
+  // ===== STAGE 4: 프로포즈 =====
   {
-    title: 'STAGE 4: The Proposal',
+    title: 'STAGE 4: 프로포즈',
     steps: [
       { type: 'dialog', speaker: 'SYSTEM', text: '강태욱이 긴장 상태에 돌입했다!', groomEmotion: 'nervous' },
       { type: 'dialog', speaker: 'SYSTEM', text: '(손이 떨리고 있다)\n(무릎이 떨리고 있다)\n(전부 떨리고 있다)', groomEmotion: 'nervous' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '아이템 사용: Ring of Eternal Promise', groomEmotion: 'nervous' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '아이템 사용: 영원의 반지', groomEmotion: 'nervous' },
       { type: 'dialog', speaker: 'SYSTEM', text: '손이 너무 떨려서 반지를 떨어뜨렸다!', groomEmotion: 'surprised', brideEmotion: 'surprised' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '...어쨌든 반지를 주웠다', groomEmotion: 'nervous' },
-      { type: 'dialog', speaker: 'SYSTEM', text: 'ERROR: NO 버튼을 찾을 수 없습니다' },
-      { type: 'dialog', speaker: 'SYSTEM', text: 'NO.exe has been permanently deleted' },
-      { type: 'choice', prompt: '결혼해 주시겠습니까?', options: ['YES', '당연하지', '빨리 반지 줘', '이미 YES'] },
+      { type: 'dialog', speaker: 'SYSTEM', text: '...어쨌든 반지를 주웠다\n(김선경이 웃고 있다)', groomEmotion: 'nervous', brideEmotion: 'happy' },
+      { type: 'choice', prompt: '결혼해 주시겠습니까?', options: ['네!', '당연하지', '빨리 반지 줘', '이미 네!'] },
       { type: 'dialog', speaker: 'SYSTEM', text: '효과는 굉장했다!', groomEmotion: 'happy', brideEmotion: 'happy' },
-      { type: 'effect', effectType: 'hearts' },
       { type: 'dialog', speaker: '김선경', text: '...바보야. 당연하지!', brideEmotion: 'love', groomEmotion: 'love' },
+      { type: 'effect', effectType: 'hearts' },
       { type: 'dialog', speaker: 'SYSTEM', text: '강태욱이 울었다!\n김선경도 울었다!\n(근처 테이블 손님도 울었다)', groomEmotion: 'happy', brideEmotion: 'happy' },
-      { type: 'dialog', speaker: 'SYSTEM', text: '프로포즈 대성공!\ncommit -m "feat: 영원의 약속"', groomEmotion: 'love', brideEmotion: 'love' },
-      { type: 'result', text: '프로포즈 이벤트 클리어!' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '프로포즈 대성공!', groomEmotion: 'love', brideEmotion: 'love' },
+      { type: 'result', text: '프로포즈 클리어!' },
     ],
   },
 ];
@@ -914,7 +922,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
                 animate={{ y: -(80 + Math.random() * 100), opacity: [1, 1, 0], scale: [0.5, 1.2, 0.8], x: (Math.random() - 0.5) * 60 }}
                 transition={{ duration: 1.5 + Math.random() * 0.5, delay: Math.random() * 0.5, ease: 'easeOut' }}
               >
-                {'♥'}
+                {'\u2665'}
               </motion.span>
             ))}
           </div>
@@ -1094,7 +1102,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
               className="mt-6 px-8 py-3.5 font-['Press_Start_2P',monospace] text-[12px] sm:text-[13px]"
               style={{ color: '#000', background: ARCADE_COLORS.gold, border: '2px solid #b38f00', boxShadow: '4px 4px 0px #b38f00' }}
             >
-              CONTINUE
+              다음으로
             </motion.button>
           </motion.div>
         )}
