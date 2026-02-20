@@ -46,16 +46,23 @@ export function Guestbook() {
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newMessages: GuestMessage[] = [];
-      snapshot.forEach((doc) => {
-        newMessages.push({
-          id: doc.id,
-          ...doc.data(),
-        } as GuestMessage);
-      });
-      setMessages(newMessages);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const newMessages: GuestMessage[] = [];
+        snapshot.forEach((doc) => {
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+          } as GuestMessage);
+        });
+        setMessages(newMessages);
+      },
+      (error) => {
+        console.error('Guestbook onSnapshot error:', error);
+        toast.error('방명록을 불러오는데 실패했습니다');
+      }
+    );
 
     return () => unsubscribe();
   }, [guestbook.enabled]);
