@@ -20,11 +20,11 @@ export function BattleTransition({
 
   useEffect(() => {
     if (!isActive) {
-      setPhase('idle');
-      return;
+      const resetTimer = setTimeout(() => setPhase('idle'), 0);
+      return () => clearTimeout(resetTimer);
     }
 
-    setPhase('enter');
+    const enterTimer = setTimeout(() => setPhase('enter'), 0);
 
     const holdTimer = setTimeout(() => setPhase('hold'), duration * 0.45);
     const exitTimer = setTimeout(() => setPhase('exit'), duration * 0.65);
@@ -34,6 +34,7 @@ export function BattleTransition({
     }, duration);
 
     return () => {
+      clearTimeout(enterTimer);
       clearTimeout(holdTimer);
       clearTimeout(exitTimer);
       clearTimeout(completeTimer);

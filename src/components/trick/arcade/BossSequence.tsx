@@ -5,6 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PixelCharacter, ARCADE_COLORS } from './shared';
 import { WEDDING_INFO } from '@/lib/constants';
 
+function hash01(seed: number): number {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+const EMPTY_SPRITE = [[0]];
+const EMPTY_COLORS: Record<number, string> = {};
+
 // --- Types ---
 
 interface EliteFourAttack {
@@ -442,8 +450,8 @@ function BossSprite({
   isShadow?: boolean;
 }) {
   const data = BOSS_SPRITE_DATA[bossIndex];
-  if (!data) return null;
-  const { sprite, colors } = data;
+  const sprite = data?.sprite ?? EMPTY_SPRITE;
+  const colors = data?.colors ?? EMPTY_COLORS;
   const scale = 5;
   const rows = sprite.length;
   const cols = sprite[0].length;
@@ -461,6 +469,8 @@ function BossSprite({
     }
     return result.join(',');
   }, [sprite, colors, rows, cols]);
+
+  if (!data) return null;
 
   return (
     <motion.div
@@ -796,7 +806,14 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
   const [championWhiteFlash, setChampionWhiteFlash] = useState(false);
 
   // Boss 4 darkness vignette
-  const [boss4Darkness, setBoss4Darkness] = useState(0);
+  const boss4Darkness = useMemo(() => {
+    if (seqPhase.type === 'elite-battle' && seqPhase.bossIndex === 3) {
+      const boss = ELITE_FOUR[3];
+      const hpPct = battleState.bossHp / boss.hp;
+      return 1 - hpPct;
+    }
+    return 0;
+  }, [seqPhase, battleState.bossHp]);
   const [boss4LightBurst, setBoss4LightBurst] = useState(false);
 
   // setTimeout 추적 및 언마운트 시 정리
@@ -823,18 +840,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
     safeTimeout(() => {
       setDamageNumbers((prev) => prev.filter((d) => d.id !== id));
     }, 1200);
-  }, []);
-
-  // 보스4 어둠 효과
-  useEffect(() => {
-    if (seqPhase.type === 'elite-battle' && seqPhase.bossIndex === 3) {
-      const boss = ELITE_FOUR[3];
-      const hpPct = battleState.bossHp / boss.hp;
-      setBoss4Darkness(1 - hpPct);
-    } else {
-      setBoss4Darkness(0);
-    }
-  }, [seqPhase, battleState.bossHp]);
+  }, [safeTimeout]);
 
   // 전투 전환 애니메이션
   const doTransition = useCallback((text: string, callback: () => void) => {
@@ -846,7 +852,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
         setShowTransition(false);
       }, 800);
     }, 1200);
-  }, []);
+  }, [safeTimeout]);
 
   // --- Phase: elite-intro ---
   const handleIntroDialogAdvance = useCallback(() => {
@@ -899,7 +905,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
         setSeqPhase({ type: 'elite-defeat', bossIndex: seqPhase.bossIndex });
       }
     }
-  }, [logIdx, battleState.log.length, battleState.state, battleState.turn, currentBoss, seqPhase, addDamageNumber]);
+  }, [logIdx, battleState.log.length, battleState.state, battleState.turn, currentBoss, seqPhase, addDamageNumber, safeTimeout]);
 
   // 플레이어 커맨드
   const handleCommand = useCallback(
@@ -951,7 +957,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
       dispatch({ type: 'PLAYER_ACTION', actionIndex, boss: currentBoss, damage });
       setLogIdx(0);
     },
-    [battleState.state, battleState.groomMp, battleState.brideMp, isAnimating, currentBoss, addDamageNumber, seqPhase],
+    [battleState.state, battleState.groomMp, battleState.brideMp, isAnimating, currentBoss, addDamageNumber, seqPhase, safeTimeout],
   );
 
   // 도망
@@ -1042,7 +1048,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
       setDialogIdx(0);
       setSeqPhase({ type: 'victory' });
     }
-  }, [seqPhase]);
+  }, [seqPhase, safeTimeout]);
 
   // --- Phase: victory ---
   const [victoryDialogIdx, setVictoryDialogIdx] = useState(0);
@@ -1057,38 +1063,50 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
   }, [victoryDialogIdx]);
 
   // 렌더 시 Math.random() 호출 방지를 위한 메모이제이션
-  const combineHeartsData = useMemo(() =>
-    Array.from({ length: 15 }, () => ({
-      left: 10 + Math.random() * 80,
-      yOffset: -80 - Math.random() * 60,
-      xOffset: (Math.random() - 0.5) * 80,
-      delay: Math.random() * 0.3,
-      fontSize: 16 + Math.random() * 12,
-    })), []);
+  const combineHeartsData = useMemo(
+    () =>
+      Array.from({ length: 15 }, (_, i) => ({
+        left: 10 + hash01(i * 17 + 3) * 80,
+        yOffset: -80 - hash01(i * 19 + 7) * 60,
+        xOffset: (hash01(i * 23 + 11) - 0.5) * 80,
+        delay: hash01(i * 29 + 13) * 0.3,
+        fontSize: 16 + hash01(i * 31 + 17) * 12,
+      })),
+    [],
+  );
 
-  const championSparklesData = useMemo(() =>
-    Array.from({ length: 20 }, () => ({
-      left: 5 + Math.random() * 90,
-      top: 5 + Math.random() * 80,
-      size: 3 + Math.random() * 3,
-      duration: 1.5 + Math.random(),
-      delay: Math.random() * 2,
-    })), []);
+  const championSparklesData = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, i) => ({
+        left: 5 + hash01(i * 37 + 3) * 90,
+        top: 5 + hash01(i * 41 + 7) * 80,
+        size: 3 + hash01(i * 43 + 11) * 3,
+        duration: 1.5 + hash01(i * 47 + 13),
+        delay: hash01(i * 53 + 17) * 2,
+      })),
+    [],
+  );
 
-  const victorySparklesData = useMemo(() =>
-    Array.from({ length: 30 }, () => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      size: 2 + Math.random() * 4,
-      duration: 2 + Math.random() * 2,
-      delay: Math.random() * 3,
-    })), []);
+  const victorySparklesData = useMemo(
+    () =>
+      Array.from({ length: 30 }, (_, i) => ({
+        left: hash01(i * 59 + 3) * 100,
+        top: hash01(i * 61 + 7) * 100,
+        size: 2 + hash01(i * 67 + 11) * 4,
+        duration: 2 + hash01(i * 71 + 13) * 2,
+        delay: hash01(i * 73 + 17) * 3,
+      })),
+    [],
+  );
 
-  const victoryHeartsData = useMemo(() =>
-    Array.from({ length: 8 }, () => ({
-      fontSize: 12 + Math.random() * 10,
-      yOffset: -20 - Math.random() * 30,
-    })), []);
+  const victoryHeartsData = useMemo(
+    () =>
+      Array.from({ length: 8 }, (_, i) => ({
+        fontSize: 12 + hash01(i * 79 + 3) * 10,
+        yOffset: -20 - hash01(i * 83 + 7) * 30,
+      })),
+    [],
+  );
 
   // 배틀 배경 그라디언트
   const battleBgGradient = useMemo(() => {
