@@ -69,6 +69,9 @@
 html {
   /* Use smooth scroll only for anchor links, not JS scroll */
   scroll-behavior: auto;
+  /* Prevent Android text autosizing across all routes */
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
 }
 
 /* Enable smooth scroll only for anchor navigation */
