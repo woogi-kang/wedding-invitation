@@ -357,10 +357,10 @@ export const GUEST_SNAP_CONFIG = {
     cookieName: 'guestsnap_session',
   },
 
-  // NAS configuration (actual values from env vars)
-  nas: {
-    basePath: '/GuestSnap',
-    createFolderIfNotExists: true,
+  // Storage configuration
+  storage: {
+    provider: 'google-drive',
+    guestsFolderName: 'guests',
   },
 };
 

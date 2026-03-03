@@ -157,6 +157,9 @@ private-key*
 logs/
 .uv-cache/
 .aws/credentials
+# Local Google service account key files
+guestsnap-service-account*.json
+secrets/
 # Python Cache & Bytecode
 *~
 # Build Artifacts & Distribution

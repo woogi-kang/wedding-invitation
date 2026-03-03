@@ -1,6 +1,6 @@
 /**
  * Guest Snap Upload API Route
- * POST: Upload a file to Synology NAS
+ * POST: Upload a file to Google Drive
  *
  * Handles:
  * - File validation (type, size, magic bytes)
@@ -181,7 +181,7 @@ export async function POST(
     // Get file buffer
     const fileBuffer = await file.arrayBuffer();
 
-    // Upload to NAS
+    // Upload to Google Drive
     const uploadResult = await uploadFile(
       fileBuffer,
       file.name,
@@ -205,7 +205,8 @@ export async function POST(
     }
 
     // Update session upload count
-    await updateSessionUploadCount(currentCount + 1);
+    const newUploadCount = currentCount + 1;
+    await updateSessionUploadCount(newUploadCount);
 
     return NextResponse.json({
       success: true,

@@ -19,7 +19,7 @@
 - **RSVP**: Google Forms 연동 참석 의사 확인
 - **방명록**: Giscus (GitHub Discussions) 기반
 - **모바일 저장**: 연락처 저장 (vCard), 일정 저장 (ICS)
-- **Guest Snap**: 하객 사진/영상 업로드 (Synology NAS 연동)
+- **Guest Snap**: 하객 사진/영상 업로드 (Google Drive 연동)
 
 ## Tech Stack
 
@@ -166,26 +166,49 @@ npx serve out
 
 ### Guest Snap (하객 사진 업로드)
 
-하객들이 결혼식 사진/영상을 Synology NAS에 직접 업로드할 수 있는 기능입니다.
+하객들이 결혼식 사진/영상을 Google Drive에 직접 업로드할 수 있는 기능입니다.
 
-1. Synology NAS에서 WebDAV 서비스 활성화
+1. 인증 방식 선택
+   - 내 드라이브(My Drive): OAuth 사용자 토큰 방식 권장
+   - Shared Drive: 서비스 계정 방식 권장
 2. 환경 변수 설정:
    ```bash
-   SYNOLOGY_HOST=your-nas-ip-or-domain
-   SYNOLOGY_WEBDAV_PORT=5006
-   SYNOLOGY_USERNAME=webdav-user
-   SYNOLOGY_PASSWORD=webdav-password
-   SYNOLOGY_BASE_PATH=/wedding-photos
+   # 권장(내 드라이브)
+   GOOGLE_DRIVE_OAUTH_CLIENT_ID=...
+   GOOGLE_DRIVE_OAUTH_CLIENT_SECRET=...
+   GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN=...
+
+   # 권장(Shared Drive)
+   GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH=/absolute/path/to/guestsnap-service-account.json
+
+   # 대안
+   # GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
+
+   # 레거시 대안(호환용)
+   # GOOGLE_DRIVE_CLIENT_EMAIL=...
+   # GOOGLE_DRIVE_PRIVATE_KEY=...
+
+   GOOGLE_DRIVE_ROOT_FOLDER_ID=your_google_drive_root_folder_id
+   GOOGLE_DRIVE_SHARED_DRIVE_ID=   # Shared Drive 사용 시 선택
    ```
 
-3. `src/lib/constants.ts`에서 Guest Snap 설정:
+3. 업로드 폴더 구조(자동 생성):
+   ```text
+   {GOOGLE_DRIVE_ROOT_FOLDER_ID}/
+   └── {guestName[_n]}/
+       ├── IMG_001_*.jpg
+       └── VID_001_*.mp4
+   ```
+
+4. `src/lib/constants.ts`에서 Guest Snap 설정:
    ```typescript
-   guestSnap: {
+   GUEST_SNAP_CONFIG: {
      enabled: true,
-     maxFileSizeMB: 50,
-     maxUploadsPerGuest: 20,
-     allowedImageTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'],
-     allowedVideoTypes: ['video/mp4', 'video/quicktime', 'video/webm'],
+     limits: {
+       maxFilesPerSession: 50,
+       maxImageSizeMB: 30,
+       maxVideoSizeMB: 500,
+     },
    },
    ```
 

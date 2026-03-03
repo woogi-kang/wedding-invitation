@@ -60,7 +60,7 @@ export interface GuestSnapSession {
   uploadCount: number;
   /** Maximum allowed uploads */
   uploadLimit: number;
-  /** NAS folder path for this guest */
+  /** Storage folder identifier for this guest (Google Drive folder ID) */
   guestFolder: string;
   /** Files in the current session */
   files: GuestSnapFile[];

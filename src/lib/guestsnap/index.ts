@@ -18,19 +18,13 @@ export {
   validateGuestName,
 } from './file-validator';
 
-// Synology NAS client
+// Google Drive client
 export {
-  authenticate,
-  logout,
-  folderExists,
-  createFolder,
-  listFolders,
-  getUniqueGuestFolderName,
   createGuestFolder,
   uploadFile,
-  checkNasStatus,
+  checkStorageStatus,
   getGuestUploadCount,
-} from './synology-client';
+} from './google-drive-client';
 
 // Queue manager (client-side only)
 export {

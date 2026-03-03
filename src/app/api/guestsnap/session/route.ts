@@ -1,6 +1,6 @@
 /**
  * Guest Snap Session API Route
- * POST: Create a new session and guest folder on NAS
+ * POST: Create a new session and guest folder on Google Drive
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
     // Sanitize the name
     const sanitizedName = sanitizeGuestName(guestName);
 
-    // Create guest folder on NAS
+    // Create guest folder on Google Drive
     const folderResult = await createGuestFolder(sanitizedName);
 
     if (!folderResult.success) {
