@@ -1,10 +1,10 @@
 /**
  * Guest Snap Status API Route
- * GET: Check service status and NAS availability
+ * GET: Check service status and storage availability
  */
 
 import { NextResponse } from 'next/server';
-import { checkNasStatus } from '@/lib/guestsnap';
+import { checkStorageStatus } from '@/lib/guestsnap';
 import { GUEST_SNAP_CONFIG } from '@/lib/constants';
 import type { StatusResponse } from '@/types/guestsnap';
 
@@ -20,12 +20,12 @@ export async function GET(): Promise<NextResponse<StatusResponse>> {
       });
     }
 
-    // Check NAS status
-    const nasStatus = await checkNasStatus();
+    // Check Google Drive status
+    const storageStatus = await checkStorageStatus();
 
     return NextResponse.json({
       serviceEnabled: GUEST_SNAP_CONFIG.enabled,
-      storageAvailable: nasStatus.available,
+      storageAvailable: storageStatus.available,
       currentUploads: 0, // Could track this with a counter if needed
       maxConcurrentUploads: GUEST_SNAP_CONFIG.limits.maxConcurrentUploads,
     });
@@ -50,9 +50,9 @@ export async function HEAD(): Promise<NextResponse> {
       return new NextResponse(null, { status: 503 });
     }
 
-    const nasStatus = await checkNasStatus();
+    const storageStatus = await checkStorageStatus();
 
-    if (!nasStatus.available) {
+    if (!storageStatus.available) {
       return new NextResponse(null, { status: 503 });
     }
 

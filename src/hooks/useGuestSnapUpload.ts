@@ -19,7 +19,11 @@ import type {
 interface UseGuestSnapUploadOptions {
   onUploadComplete?: (file: GuestSnapFile) => void;
   onUploadError?: (file: GuestSnapFile, error: string) => void;
-  onAllComplete?: () => void;
+  onAllComplete?: (summary: {
+    uploadedCount: number;
+    failedCount: number;
+    totalCount: number;
+  }) => void;
 }
 
 interface UseGuestSnapUploadReturn {
@@ -73,6 +77,12 @@ export function useGuestSnapUpload(
   // Refs for managing upload process
   const isProcessingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const queueStateRef = useRef<UploadQueueState>(queueState);
+
+  // Keep a ref to the latest queue state for async upload loop logic.
+  useEffect(() => {
+    queueStateRef.current = queueState;
+  }, [queueState]);
 
   // Calculate total progress
   const totalProgress = useCallback(() => {
@@ -286,103 +296,107 @@ export function useGuestSnapUpload(
    */
   const processQueue = useCallback(async () => {
     if (isProcessingRef.current) return;
+    if (queueStateRef.current.queue.length === 0) return;
+
     isProcessingRef.current = true;
 
-    setQueueState((prev) => ({ ...prev, isProcessing: true }));
+    const processingState: UploadQueueState = {
+      ...queueStateRef.current,
+      isProcessing: true,
+    };
+    queueStateRef.current = processingState;
+    setQueueState(processingState);
     setUploadState('uploading');
 
     while (true) {
-      // Get next file from queue
-      let nextFile: GuestSnapFile | undefined;
-
-      setQueueState((prev) => {
-        if (prev.queue.length === 0) {
-          return prev;
-        }
-
-        nextFile = prev.queue[0];
-        return {
-          ...prev,
-          currentFile: { ...nextFile, status: 'uploading', progress: 0 },
-          queue: prev.queue.slice(1),
-        };
-      });
-
-      // Check if queue is empty
-      if (!nextFile) {
+      const queueSnapshot = queueStateRef.current;
+      if (queueSnapshot.queue.length === 0) {
         break;
       }
+
+      const nextFile = queueSnapshot.queue[0];
+      const nextQueueState: UploadQueueState = {
+        ...queueSnapshot,
+        currentFile: { ...nextFile, status: 'uploading', progress: 0 },
+        queue: queueSnapshot.queue.slice(1),
+      };
+      queueStateRef.current = nextQueueState;
+      setQueueState(nextQueueState);
 
       // Upload the file
       const result = await uploadFile(nextFile);
 
       if (result.success) {
-        // Move to completed
-        setQueueState((prev) => ({
-          ...prev,
-          currentFile: null,
-          completed: [
-            ...prev.completed,
-            {
-              ...nextFile!,
-              status: 'completed',
-              progress: 100,
-              uploadedAt: new Date(),
-            },
-          ],
-        }));
-
-        onUploadComplete?.({
+        const completedFile: GuestSnapFile = {
           ...nextFile,
           status: 'completed',
           progress: 100,
           uploadedAt: new Date(),
-        });
-      } else {
-        // Move to failed
-        setQueueState((prev) => ({
-          ...prev,
-          currentFile: null,
-          failed: [
-            ...prev.failed,
-            {
-              ...nextFile!,
-              status: 'failed',
-              error: result.error,
-            },
-          ],
-        }));
+        };
 
+        const successState: UploadQueueState = {
+          ...queueStateRef.current,
+          currentFile: null,
+          completed: [...queueStateRef.current.completed, completedFile],
+        };
+        queueStateRef.current = successState;
+        setQueueState(successState);
+
+        // Move to completed
+        onUploadComplete?.(completedFile);
+      } else {
+        const failedFile: GuestSnapFile = {
+          ...nextFile,
+          status: 'failed',
+          error: result.error,
+        };
+
+        const failedState: UploadQueueState = {
+          ...queueStateRef.current,
+          currentFile: null,
+          failed: [...queueStateRef.current.failed, failedFile],
+        };
+        queueStateRef.current = failedState;
+        setQueueState(failedState);
+
+        // Move to failed
         onUploadError?.(nextFile, result.error || '업로드 실패');
       }
     }
 
     // All files processed
     isProcessingRef.current = false;
-    setQueueState((prev) => ({ ...prev, isProcessing: false, currentFile: null }));
+    const finalizedState: UploadQueueState = {
+      ...queueStateRef.current,
+      isProcessing: false,
+      currentFile: null,
+    };
+    queueStateRef.current = finalizedState;
+    setQueueState(finalizedState);
 
     // Determine final state
-    setQueueState((prev) => {
-      if (prev.failed.length > 0 && prev.completed.length === 0) {
-        setUploadState('error');
-      } else if (prev.failed.length === 0) {
-        setUploadState('completed');
-        onAllComplete?.();
-      } else {
-        setUploadState('completed');
-        onAllComplete?.();
-      }
-      return prev;
-    });
+    const summary = {
+      uploadedCount: finalizedState.completed.length,
+      failedCount: finalizedState.failed.length,
+      totalCount: finalizedState.completed.length + finalizedState.failed.length,
+    };
+
+    if (finalizedState.failed.length > 0 && finalizedState.completed.length === 0) {
+      setUploadState('error');
+      return;
+    }
+
+    setUploadState('completed');
+    onAllComplete?.(summary);
   }, [uploadFile, onUploadComplete, onUploadError, onAllComplete]);
 
   /**
    * Start uploading files
    */
   const startUpload = useCallback(() => {
-    if (queueState.queue.length === 0) return;
+    if (queueStateRef.current.queue.length === 0) return;
     processQueue();
-  }, [queueState.queue.length, processQueue]);
+  }, [processQueue]);
 
   /**
    * Pause the upload
@@ -406,10 +420,10 @@ export function useGuestSnapUpload(
    * Resume the upload
    */
   const resumeUpload = useCallback(() => {
-    if (queueState.queue.length > 0) {
+    if (queueStateRef.current.queue.length > 0) {
       processQueue();
     }
-  }, [queueState.queue.length, processQueue]);
+  }, [processQueue]);
 
   /**
    * Retry a specific failed file

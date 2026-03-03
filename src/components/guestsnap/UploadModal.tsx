@@ -52,6 +52,23 @@ export function UploadModal({
     message: messages.confirmLeave,
   });
 
+  const notifyBatchUploadComplete = useCallback(
+    async (summary: { uploadedCount: number; failedCount: number; totalCount: number }) => {
+      try {
+        await fetch('/api/guestsnap/notify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(summary),
+        });
+      } catch (error) {
+        console.error('Failed to send GuestSnap batch notify:', error);
+      }
+    },
+    []
+  );
+
   // Initialize upload hook
   const {
     session,
@@ -79,23 +96,65 @@ export function UploadModal({
         description: error || '다시 시도해 주세요',
       });
     },
-    onAllComplete: () => {
+    onAllComplete: (summary) => {
       setUploadComplete(true);
       setIsUploading(false);
       // Success haptic and toast on completion
       haptic.success();
+
+      const description =
+        summary.failedCount > 0
+          ? `${summary.uploadedCount}개 성공, ${summary.failedCount}개 실패`
+          : `${summary.uploadedCount}개 파일이 업로드되었어요`;
+
       toast.success(messages.uploadComplete, {
-        description: `${uploadedCount}개 파일이 업로드되었어요`,
+        description,
       });
+
+      // Send one webhook notification per upload batch
+      void notifyBatchUploadComplete(summary);
     },
   });
 
   // Create session when modal opens with guest name
   useEffect(() => {
-    if (isOpen && guestName && !session && !isSessionLoading) {
+    const shouldCreateSession =
+      isOpen &&
+      !!guestName &&
+      !isSessionLoading &&
+      (!session || session.guestName !== guestName);
+
+    if (shouldCreateSession) {
       createSession(guestName);
     }
   }, [isOpen, guestName, session, isSessionLoading, createSession]);
+
+  // Start queue processing only after files are actually committed to queue state.
+  // This avoids a race where startUpload() runs before addFiles() state update is applied.
+  useEffect(() => {
+    if (!isUploading || uploadComplete || isSessionLoading || !!sessionError) {
+      return;
+    }
+
+    if (queueState.isProcessing || queueState.currentFile) {
+      return;
+    }
+
+    if (queueState.queue.length === 0) {
+      return;
+    }
+
+    startUpload();
+  }, [
+    isUploading,
+    uploadComplete,
+    isSessionLoading,
+    sessionError,
+    queueState.isProcessing,
+    queueState.currentFile,
+    queueState.queue.length,
+    startUpload,
+  ]);
 
   // Reset states when modal closes - valid pattern for modal state reset
   const prevIsOpenRef = useRef(isOpen);
@@ -104,7 +163,6 @@ export function UploadModal({
       // Modal just closed - reset state
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsUploading(false);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUploadComplete(false);
     }
     prevIsOpenRef.current = isOpen;
@@ -685,7 +743,6 @@ export function UploadModal({
                       haptic.medium();
                       setIsUploading(true);
                       addFiles(selectedFiles);
-                      startUpload();
                       toast.info('업로드를 시작합니다', {
                         description: `${selectedFiles.length}개 파일`,
                       });
