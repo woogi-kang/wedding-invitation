@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelCharacter, ARCADE_COLORS } from './shared';
 import type { EmotionType } from './shared';
@@ -491,7 +491,7 @@ function CafeField() {
             boxShadow: '0 0 12px rgba(0,0,0,0.2)',
           }}
         >
-          <p className="font-['Press_Start_2P',monospace] text-[7px] leading-5 pt-3 text-center" style={{ color: '#f6e2ca' }}>
+          <p className="font-['Press_Start_2P',monospace] text-[10px] leading-4 pt-3 text-center" style={{ color: '#f6e2ca' }}>
             {board.text}
           </p>
         </div>
@@ -1190,8 +1190,6 @@ function NightField() {
       />
 
       {/* 가랜드 조명 */}
-      <div className="absolute left-[2%] right-[2%] top-[10%] h-[2px]" style={{ background: 'rgba(94, 78, 129, 0.62)', transform: 'rotate(-1deg)' }} />
-      <div className="absolute left-[4%] right-[4%] top-[15%] h-[2px]" style={{ background: 'rgba(94, 78, 129, 0.56)', transform: 'rotate(0.8deg)' }} />
       {fairyBulbs.map((bulb) => (
         <motion.div
           key={`proposal-bulb-${bulb.id}`}
@@ -1650,6 +1648,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
   const [showClear, setShowClear] = useState(false);
   const [escapeAttempt, setEscapeAttempt] = useState(false);
   const [escapeCount, setEscapeCount] = useState(0);
+  const escapeResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 캐릭터 상태
   const [groomVisible] = useState(true);
@@ -1700,8 +1699,8 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
         timers.push(setTimeout(() => setBrideEmotion(emotion), 0));
       }
 
-      // "나타났다" 대사에서 신부 슬라이드 인
-      if (script.brideEntrance && currentStep.text.includes('나타났다') && !brideVisible) {
+      // Stage 1에서는 초반 대화가 시작되면 신부를 슬라이드 인
+      if (script.brideEntrance && stepIdx >= 1 && !brideVisible) {
         timers.push(setTimeout(() => setBrideVisible(true), 300));
       }
     }
@@ -1764,11 +1763,15 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
 
     if (currentStep.effectType === 'items') {
       const items = ['1주년 케이크', '추억의 사진 x99', '2주년 반지'];
+      const itemTimers: Array<ReturnType<typeof setTimeout>> = [];
       items.forEach((item, i) => {
-        setTimeout(() => setShownItems((prev) => [...prev, item]), 600 * (i + 1));
+        itemTimers.push(setTimeout(() => setShownItems((prev) => [...prev, item]), 600 * (i + 1)));
       });
       const timer = setTimeout(advanceStep, 2500);
-      return () => clearTimeout(timer);
+      return () => {
+        itemTimers.forEach((id) => clearTimeout(id));
+        clearTimeout(timer);
+      };
     }
 
     if (currentStep.effectType === 'hearts') {
@@ -1790,12 +1793,24 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
     }
   }, [currentStep]);
 
+  useEffect(
+    () => () => {
+      if (escapeResetTimerRef.current) {
+        clearTimeout(escapeResetTimerRef.current);
+      }
+    },
+    [],
+  );
+
   const handleChoice = (choiceIdx: number) => {
     if (!currentStep || currentStep.type !== 'choice') return;
     if (currentStep.escapeIdx !== undefined && choiceIdx === currentStep.escapeIdx) {
       setEscapeAttempt(true);
       setEscapeCount((prev) => prev + 1);
-      setTimeout(() => setEscapeAttempt(false), 1200);
+      if (escapeResetTimerRef.current) {
+        clearTimeout(escapeResetTimerRef.current);
+      }
+      escapeResetTimerRef.current = setTimeout(() => setEscapeAttempt(false), 1200);
       return;
     }
     advanceStep();
@@ -1857,8 +1872,8 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
           <div className="absolute top-2 left-3 right-3 z-10">
             <div className="w-full max-w-xs">
               <div className="flex justify-between mb-1">
-                <span className="font-['Press_Start_2P',monospace] text-[9px]" style={{ color: ARCADE_COLORS.text }}>HP</span>
-                <span className="font-['Press_Start_2P',monospace] text-[9px]" style={{ color: hpPercent > 30 ? ARCADE_COLORS.green : ARCADE_COLORS.red }}>
+                <span className="font-['Press_Start_2P',monospace] text-[10px]" style={{ color: ARCADE_COLORS.text }}>HP</span>
+                <span className="font-['Press_Start_2P',monospace] text-[10px]" style={{ color: hpPercent > 30 ? ARCADE_COLORS.green : ARCADE_COLORS.red }}>
                   {hpPercent}%
                 </span>
               </div>
@@ -1881,7 +1896,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
                 className="px-2 py-1"
                 style={{ background: `${ARCADE_COLORS.gold}20`, border: `2px solid ${ARCADE_COLORS.gold}` }}
               >
-                <span className="font-['Press_Start_2P',monospace] text-[9px]" style={{ color: ARCADE_COLORS.gold }}>
+                <span className="font-['Press_Start_2P',monospace] text-[10px]" style={{ color: ARCADE_COLORS.gold }}>
                   {item}
                 </span>
               </motion.div>
@@ -1907,59 +1922,62 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
           </div>
         )}
 
-        {/* 캐릭터: 신랑 (좌측) */}
-        <AnimatePresence>
-          {groomVisible && (
-            <motion.div
-              className="absolute z-[5]"
-              style={{ bottom: '5%', left: '12%' }}
-              initial={{ x: -80, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-            >
-              <PixelCharacter character="groom" size="full" scale={4} emotion={groomEmotion} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* 캐릭터 + 말풍선: 중앙 고정폭 레인으로 데스크톱/모바일 간격 일관화 */}
+        <div className="absolute inset-x-0 z-[5] pointer-events-none" style={{ bottom: '5%' }}>
+          <div className="mx-auto flex items-end justify-between" style={{ width: 'min(92vw, 440px)' }}>
+            <div className="relative flex w-[116px] sm:w-[128px] items-end justify-center">
+              <AnimatePresence>
+                {groomVisible && (
+                  <motion.div
+                    initial={{ x: -80, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+                  >
+                    <PixelCharacter character="groom" size="full" scale={4} emotion={groomEmotion} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-        {/* 캐릭터: 신부 (우측) */}
-        <AnimatePresence>
-          {brideVisible && (
-            <motion.div
-              className="absolute z-[5]"
-              style={{ bottom: '5%', right: '12%' }}
-              initial={{ x: 80, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 120, damping: 15, delay: script.brideEntrance ? 0.5 : 0 }}
-            >
-              <PixelCharacter character="bride" size="full" scale={4} emotion={brideEmotion} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <AnimatePresence>
+                {groomBubble && groomVisible && (
+                  <motion.div
+                    key={`groom-bubble-${groomBubble}`}
+                    className="absolute z-10 left-1/2 -translate-x-1/2"
+                    style={{ bottom: 96 }}
+                  >
+                    <SpeechBubble emoticon={groomBubble} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-        {/* 말풍선 이모티콘 */}
-        <AnimatePresence>
-          {groomBubble && groomVisible && (
-            <motion.div
-              key={`groom-bubble-${groomBubble}`}
-              className="absolute z-10"
-              style={{ bottom: 'calc(5% + 96px)', left: '12%' }}
-            >
-              <SpeechBubble emoticon={groomBubble} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {brideBubble && brideVisible && (
-            <motion.div
-              key={`bride-bubble-${brideBubble}`}
-              className="absolute z-10"
-              style={{ bottom: 'calc(5% + 96px)', right: '12%' }}
-            >
-              <SpeechBubble emoticon={brideBubble} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            <div className="relative flex w-[116px] sm:w-[128px] items-end justify-center">
+              <AnimatePresence>
+                {brideVisible && (
+                  <motion.div
+                    initial={{ x: 80, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 15, delay: script.brideEntrance ? 0.5 : 0 }}
+                  >
+                    <PixelCharacter character="bride" size="full" scale={4} emotion={brideEmotion} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {brideBubble && brideVisible && (
+                  <motion.div
+                    key={`bride-bubble-${brideBubble}`}
+                    className="absolute z-10 left-1/2 -translate-x-1/2"
+                    style={{ bottom: 96 }}
+                  >
+                    <SpeechBubble emoticon={brideBubble} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 대화/선택 영역 (하단 ~45%) */}

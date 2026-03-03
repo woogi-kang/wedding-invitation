@@ -75,7 +75,7 @@ function StatBar({
   return (
     <div className="flex items-center gap-2">
       <span
-        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] w-8 text-right"
+        className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] w-8 text-right"
         style={{ color: ARCADE_COLORS.gray }}
       >
         {label}
@@ -93,7 +93,7 @@ function StatBar({
         />
       </div>
       <span
-        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] w-7"
+        className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] w-7"
         style={{ color }}
       >
         {value}
@@ -150,7 +150,7 @@ function CharacterCard({
           {character.englishName}
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[12px] mt-0.5"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[12px] mt-0.5"
           style={{ color: ARCADE_COLORS.gray }}
         >
           {character.name}
@@ -166,7 +166,7 @@ function CharacterCard({
         }}
       >
         <span
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: side === 'left' ? ARCADE_COLORS.blue : ARCADE_COLORS.pink }}
         >
           {character.className}
@@ -189,13 +189,13 @@ function CharacterCard({
       {/* Special ability */}
       <div className="text-center mt-1">
         <p
-          className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           SPECIAL
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.gold }}
         >
           {character.specialAbility}
@@ -205,13 +205,13 @@ function CharacterCard({
       {/* Equipment */}
       <div className="text-center">
         <p
-          className="font-['Press_Start_2P',monospace] text-[8px] sm:text-[9px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           EQUIP
         </p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.green }}
         >
           {character.equipment}

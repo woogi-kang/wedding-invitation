@@ -337,7 +337,7 @@ function CreditsRoll({ onSkip }: { onSkip: () => void }) {
         className="absolute bottom-6 left-0 right-0 text-center font-['Press_Start_2P',monospace] z-20"
         style={{
           color: ARCADE_COLORS.gray,
-          fontSize: '9px',
+          fontSize: '10px',
         }}
         animate={{ opacity: [0.2, 0.5, 0.2] }}
         transition={{ duration: 2.5, repeat: Infinity }}

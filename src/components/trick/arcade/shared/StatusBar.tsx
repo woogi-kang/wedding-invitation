@@ -76,7 +76,7 @@ export function StatusBar({
 
       {/* Values */}
       <span
-        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] w-16 sm:w-20 shrink-0"
+        className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] w-16 sm:w-20 shrink-0"
         style={{ color: ARCADE_COLORS.text }}
       >
         {current}/{max}

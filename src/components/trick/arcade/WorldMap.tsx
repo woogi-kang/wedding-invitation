@@ -448,6 +448,8 @@ function StageInfoCard({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
+  const titleId = `stage-info-title-${stage.id}`;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -460,6 +462,7 @@ function StageInfoCard({
       <motion.div
         role="dialog"
         aria-modal="true"
+        aria-labelledby={titleId}
         initial={{ scale: 0.8, y: 30 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.8, y: 30 }}
@@ -499,6 +502,7 @@ function StageInfoCard({
             STAGE {stage.id + 1}
           </p>
           <p
+            id={titleId}
             className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[16px] mt-0.5"
             style={{ color: ARCADE_COLORS.gold }}
           >
@@ -722,12 +726,16 @@ export function WorldMap({
   useEffect(() => {
     if (completedStages.length === 0) return;
     if (Math.random() > 0.6) return;
+    let hideTimer: ReturnType<typeof setTimeout> | null = null;
     const delay = setTimeout(() => {
       const evt = MINI_EVENTS[Math.floor(Math.random() * MINI_EVENTS.length)];
       setMiniEvent(evt);
-      setTimeout(() => setMiniEvent(null), 3000);
+      hideTimer = setTimeout(() => setMiniEvent(null), 3000);
     }, 800);
-    return () => clearTimeout(delay);
+    return () => {
+      clearTimeout(delay);
+      if (hideTimer) clearTimeout(hideTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1056,7 +1064,7 @@ export function WorldMap({
             >
               <span className="text-[16px] sm:text-[18px] shrink-0">{miniEvent.icon}</span>
               <p
-                className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] leading-[16px]"
+                className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] leading-[16px]"
                 style={{ color: miniEvent.color }}
               >
                 {miniEvent.text}

@@ -137,7 +137,7 @@ export function DialogBox({
           }}
         >
           <span
-            className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+            className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
             style={{ color: ARCADE_COLORS.gold }}
           >
             {currentLine.speaker}

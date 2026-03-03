@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -68,7 +68,7 @@ function CopyButton({ text }: { text: string }) {
     <motion.button
       onClick={handleCopy}
       whileTap={{ scale: 0.9 }}
-      className="px-2 py-1 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] shrink-0"
+      className="px-2 py-1 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] shrink-0"
       style={{
         color: copied ? ARCADE_COLORS.green : ARCADE_COLORS.gold,
         background: copied ? `${ARCADE_COLORS.green}20` : `${ARCADE_COLORS.gold}20`,
@@ -93,7 +93,7 @@ function AccountRow({ account }: { account: AccountInfo }) {
     >
       <div className="flex items-center justify-between gap-2">
         <span
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.blue }}
         >
           [{account.bank}]
@@ -227,7 +227,7 @@ function NavButton({ label, color, href }: { label: string; color: string; href:
       target="_blank"
       rel="noopener noreferrer"
       whileTap={{ scale: 0.95 }}
-      className="flex items-center justify-center py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+      className="flex items-center justify-center py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
       style={{
         color: '#000',
         background: color,
@@ -264,7 +264,7 @@ function ShopContent() {
       <div className="flex mb-3">
         <button
           onClick={() => setActiveTab('groom')}
-          className="flex-1 py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] transition-colors"
+          className="flex-1 py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] transition-colors"
           style={{
             color: activeTab === 'groom' ? '#000' : ARCADE_COLORS.blue,
             background: activeTab === 'groom' ? ARCADE_COLORS.blue : 'transparent',
@@ -277,7 +277,7 @@ function ShopContent() {
         </button>
         <button
           onClick={() => setActiveTab('bride')}
-          className="flex-1 py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] transition-colors"
+          className="flex-1 py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] transition-colors"
           style={{
             color: activeTab === 'bride' ? '#000' : ARCADE_COLORS.pink,
             background: activeTab === 'bride' ? ARCADE_COLORS.pink : 'transparent',
@@ -291,7 +291,7 @@ function ShopContent() {
 
       {/* Party label */}
       <p
-        className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] mb-2"
+        className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] mb-2"
         style={{ color: activeTab === 'groom' ? ARCADE_COLORS.blue : ARCADE_COLORS.pink }}
       >
         {activeTab === 'groom' ? "Groom's Party" : "Bride's Party"}
@@ -351,9 +351,24 @@ function InnContent() {
 function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLightboxIdx(null);
+      } else if (e.key === 'ArrowLeft' && lightboxIdx > 0) {
+        setLightboxIdx(lightboxIdx - 1);
+      } else if (e.key === 'ArrowRight' && lightboxIdx < galleryImages.length - 1) {
+        setLightboxIdx(lightboxIdx + 1);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [lightboxIdx, galleryImages.length]);
+
   if (galleryImages.length === 0) {
     return (
-      <p className="text-center py-4 font-['Press_Start_2P',monospace] text-[9px]" style={{ color: ARCADE_COLORS.gray }}>
+      <p className="text-center py-4 font-['Press_Start_2P',monospace] text-[10px]" style={{ color: ARCADE_COLORS.gray }}>
         No photos collected yet...
       </p>
     );
@@ -386,7 +401,7 @@ function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
             />
             {/* COLLECTED badge */}
             <span
-              className="absolute bottom-0 left-0 right-0 py-0.5 text-center font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px]"
+              className="absolute bottom-0 left-0 right-0 py-0.5 text-center font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
               style={{
                 color: ARCADE_COLORS.gold,
                 background: 'rgba(0, 0, 0, 0.75)',
@@ -409,6 +424,7 @@ function TrophyContent({ galleryImages }: { galleryImages: GalleryImage[] }) {
             style={{ background: 'rgba(0, 0, 0, 0.92)' }}
             onClick={() => setLightboxIdx(null)}
             role="dialog"
+            aria-modal="true"
             aria-label="Image viewer"
           >
             <motion.div
@@ -530,6 +546,7 @@ function GuildBoardContent() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={12}
+          aria-label="작성자 이름"
           className="w-full px-2 py-1.5 mb-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] outline-none"
           style={{
             background: ARCADE_COLORS.darkGray,
@@ -544,6 +561,7 @@ function GuildBoardContent() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             maxLength={60}
+            aria-label="축하 메시지"
             onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
             className="flex-1 px-2 py-1.5 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] outline-none"
             style={{
@@ -555,7 +573,7 @@ function GuildBoardContent() {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={handleSubmit}
-            className="px-3 py-1.5 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] shrink-0"
+            className="px-3 py-1.5 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] shrink-0"
             style={{
               color: '#000',
               background: ARCADE_COLORS.gold,
@@ -571,7 +589,7 @@ function GuildBoardContent() {
       {/* 메시지 목록 */}
       {messages.length === 0 ? (
         <p
-          className="text-center py-4 font-['Press_Start_2P',monospace] text-[9px]"
+          className="text-center py-4 font-['Press_Start_2P',monospace] text-[10px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           No messages yet...
@@ -589,13 +607,13 @@ function GuildBoardContent() {
             >
               <div className="flex items-center gap-2 mb-1">
                 <span
-                  className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+                  className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
                   style={{ color: ARCADE_COLORS.gold }}
                 >
                   {msg.name}
                 </span>
                 <span
-                  className="font-['Press_Start_2P',monospace] text-[7px]"
+                  className="font-['Press_Start_2P',monospace] text-[10px]"
                   style={{ color: ARCADE_COLORS.gray }}
                 >
                   {new Date(msg.timestamp).toLocaleDateString()}
@@ -693,7 +711,7 @@ export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVill
           SKY GARDEN VILLAGE
         </motion.p>
         <p
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] mt-2 max-w-xs mx-auto leading-[18px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] mt-2 max-w-xs mx-auto leading-[18px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           Welcome, Adventurer!
@@ -814,7 +832,7 @@ export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVill
           style={{ borderTop: `1px dashed ${ARCADE_COLORS.gray}40` }}
         >
           <p
-            className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+            className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
             style={{ color: ARCADE_COLORS.gray }}
           >
             WARP ZONE
@@ -826,7 +844,7 @@ export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVill
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onNavigate('/invitation')}
-                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
                   style={{
                     color: ARCADE_COLORS.text,
                     background: 'transparent',
@@ -840,7 +858,7 @@ export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVill
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onNavigate('/invitation/glitch')}
-                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
                   style={{
                     color: ARCADE_COLORS.green,
                     background: 'transparent',
@@ -855,7 +873,7 @@ export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVill
               <>
                 <Link
                   href="/invitation"
-                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] inline-block"
+                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] inline-block"
                   style={{
                     color: ARCADE_COLORS.text,
                     background: 'transparent',
@@ -867,7 +885,7 @@ export function PostGameVillage({ onNavigate, galleryImages = [] }: PostGameVill
                 </Link>
                 <Link
                   href="/invitation/glitch"
-                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px] inline-block"
+                  className="px-4 py-2 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] inline-block"
                   style={{
                     color: ARCADE_COLORS.green,
                     background: 'transparent',

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import { TitleScreen } from '@/components/trick/arcade/TitleScreen';
 import { CharacterSelect } from '@/components/trick/arcade/CharacterSelect';
 import { WorldMap } from '@/components/trick/arcade/WorldMap';
@@ -61,15 +61,10 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
   const [completedStages, setCompletedStages] = useState<number[]>([]);
   const [currentStage, setCurrentStage] = useState(0);
   const [activeStage, setActiveStage] = useState<number | null>(null);
-  const [hasSaveData, setHasSaveData] = useState(false);
-
-  // 마운트 시 저장된 진행 상태 확인
-  useEffect(() => {
+  const [hasSaveData, setHasSaveData] = useState(() => {
     const saved = loadProgress();
-    if (saved && saved.completedStages.length > 0) {
-      setHasSaveData(true);
-    }
-  }, []);
+    return !!(saved && saved.completedStages.length > 0);
+  });
 
   // 진행 상태 자동 저장 (title, character-select 제외)
   useEffect(() => {
@@ -122,17 +117,17 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
 
   const handleStageSelect = useCallback(
     (stageIndex: number) => {
-      if (completedStages.includes(stageIndex)) return;
+      if (transitioning) return;
       // 전환 효과와 함께 스테이지 진입
       transitionToPhase('stage-event', stageIndex);
     },
-    [completedStages, transitionToPhase],
+    [transitioning, transitionToPhase],
   );
 
   const handleStageComplete = useCallback(() => {
     if (activeStage === null) return;
 
-    const newCompleted = [...completedStages, activeStage];
+    const newCompleted = Array.from(new Set([...completedStages, activeStage]));
     setCompletedStages(newCompleted);
     setActiveStage(null);
 
@@ -152,77 +147,79 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
   }, []);
 
   return (
-    <div
-      className="min-h-screen overflow-x-hidden"
-      style={{
-        background: '#0f0f23',
-        color: '#ffffff',
-        imageRendering: 'auto',
-      }}
-    >
-      {/* 포켓몬 스타일 배틀 전환 효과 */}
-      <BattleTransition
-        isActive={transitioning}
-        onComplete={handleTransitionComplete}
-      />
+    <MotionConfig reducedMotion="user">
+      <div
+        className="min-h-screen overflow-x-hidden"
+        style={{
+          background: '#0f0f23',
+          color: '#ffffff',
+          imageRendering: 'auto',
+        }}
+      >
+        {/* 포켓몬 스타일 배틀 전환 효과 */}
+        <BattleTransition
+          isActive={transitioning}
+          onComplete={handleTransitionComplete}
+        />
 
-      <AnimatePresence mode="wait">
-        {phase === 'title' && (
-          <PhaseWrapper key="title">
-            <TitleScreen
-              onStart={() => setPhase('character-select')}
-              hasSaveData={hasSaveData}
-              onContinue={handleContinue}
-              onNewGame={handleNewGame}
-            />
-          </PhaseWrapper>
-        )}
+        <AnimatePresence mode="wait">
+          {phase === 'title' && (
+            <PhaseWrapper key="title">
+              <TitleScreen
+                onStart={() => setPhase('character-select')}
+                hasSaveData={hasSaveData}
+                onContinue={handleContinue}
+                onNewGame={handleNewGame}
+              />
+            </PhaseWrapper>
+          )}
 
-        {phase === 'character-select' && (
-          <PhaseWrapper key="char-select">
-            <CharacterSelect onComplete={() => setPhase('world-map')} />
-          </PhaseWrapper>
-        )}
+          {phase === 'character-select' && (
+            <PhaseWrapper key="char-select">
+              <CharacterSelect onComplete={() => setPhase('world-map')} />
+            </PhaseWrapper>
+          )}
 
-        {phase === 'world-map' && (
-          <PhaseWrapper key="world-map">
-            <WorldMap
-              currentStage={currentStage}
-              completedStages={completedStages}
-              onStageSelect={handleStageSelect}
-            />
-          </PhaseWrapper>
-        )}
+          {phase === 'world-map' && (
+            <PhaseWrapper key="world-map">
+              <WorldMap
+                currentStage={currentStage}
+                completedStages={completedStages}
+                onStageSelect={handleStageSelect}
+              />
+            </PhaseWrapper>
+          )}
 
-        {phase === 'stage-event' && activeStage !== null && (
-          <PhaseWrapper key={`stage-${activeStage}`}>
-            <StageEvent
-              stageIndex={activeStage}
-              onComplete={handleStageComplete}
-              onClose={handleStageClose}
-            />
-          </PhaseWrapper>
-        )}
+          {phase === 'stage-event' && activeStage !== null && (
+            <PhaseWrapper key={`stage-${activeStage}`}>
+              <StageEvent
+                stageIndex={activeStage}
+                onComplete={handleStageComplete}
+                onClose={handleStageClose}
+              />
+            </PhaseWrapper>
+          )}
 
-        {phase === 'boss-battle' && (
-          <PhaseWrapper key="boss">
-            <BossSequence onVictory={() => setPhase('ending')} />
-          </PhaseWrapper>
-        )}
+          {phase === 'boss-battle' && (
+            <PhaseWrapper key="boss">
+              <BossSequence onVictory={() => setPhase('ending')} />
+            </PhaseWrapper>
+          )}
 
-        {phase === 'ending' && (
-          <PhaseWrapper key="ending">
-            <EndingSequence onComplete={() => setPhase('post-game')} />
-          </PhaseWrapper>
-        )}
+          {phase === 'ending' && (
+            <PhaseWrapper key="ending">
+              <EndingSequence onComplete={() => setPhase('post-game')} />
+            </PhaseWrapper>
+          )}
 
-        {phase === 'post-game' && (
-          <PhaseWrapper key="post-game">
-            <PostGameVillage galleryImages={galleryImages} />
-          </PhaseWrapper>
-        )}
-      </AnimatePresence>
-    </div>
+          {phase === 'post-game' && (
+            <PhaseWrapper key="post-game">
+              <PostGameVillage galleryImages={galleryImages} />
+            </PhaseWrapper>
+          )}
+        </AnimatePresence>
+      </div>
+    </MotionConfig>
   );
 }
 

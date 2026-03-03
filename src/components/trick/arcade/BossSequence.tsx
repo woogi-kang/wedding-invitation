@@ -378,14 +378,14 @@ function HpBar({
     <div className="w-full">
       <div className="flex justify-between mb-0.5">
         <span
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.text }}
         >
           {label}
         </span>
         {showNumbers && (
           <span
-            className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+            className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
             style={{ color: pct > 25 ? color : ARCADE_COLORS.red }}
           >
             {current}/{max}
@@ -1363,7 +1363,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
             >
               <div className="flex justify-between items-center mb-0.5">
                 <span
-                  className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[11px]"
+                  className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
                   style={{ color: ARCADE_COLORS.red }}
                 >
                   {currentBoss.name} Lv.{currentBoss.level}
@@ -1488,7 +1488,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
                     whileTap={!isDisabled ? { scale: 0.95 } : undefined}
                     onClick={() => handleCommand(idx)}
                     disabled={isDisabled}
-                    className="w-full text-left px-2 py-1.5 font-['Press_Start_2P',monospace] text-[9px] sm:text-[11px] disabled:opacity-30 transition-opacity"
+                    className="w-full text-left px-2 py-1.5 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] disabled:opacity-30 transition-opacity"
                     style={{
                       color: !isDisabled ? act.color : ARCADE_COLORS.gray,
                       background: 'transparent',
@@ -1503,7 +1503,7 @@ export function BossSequence({ onVictory }: BossSequenceProps) {
                 whileHover={battleState.state === 'idle' ? { x: 2 } : undefined}
                 onClick={handleEscape}
                 disabled={battleState.state !== 'idle' || isAnimating}
-                className="w-full text-center pt-1 font-['Press_Start_2P',monospace] text-[7px] sm:text-[8px] disabled:opacity-30 transition-opacity"
+                className="w-full text-center pt-1 font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px] disabled:opacity-30 transition-opacity"
                 style={{ color: ARCADE_COLORS.gray, background: 'transparent' }}
               >
                 도망

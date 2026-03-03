@@ -19,7 +19,7 @@ export const ARCADE_COLORS = {
 type ArcadeColor = keyof typeof ARCADE_COLORS;
 
 const SIZE_MAP = {
-  xs: 'text-[8px] leading-[12px]',
+  xs: 'text-[10px] leading-[14px]',
   sm: 'text-[10px] leading-[14px]',
   md: 'text-[12px] leading-[18px]',
   lg: 'text-[16px] leading-[22px]',

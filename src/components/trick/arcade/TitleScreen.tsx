@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { PixelCharacter } from './shared/PixelCharacter';
 
 const ARCADE_COLORS = {
@@ -50,6 +50,7 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const starsRef = useRef(stars.map((s) => ({ ...s })));
+  const prefersReducedMotion = useReducedMotion();
 
   // Starfield animation on canvas for performance
   useEffect(() => {
@@ -58,13 +59,32 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const drawStaticFrame = () => {
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      ctx.clearRect(0, 0, w, h);
+      for (const star of starsRef.current) {
+        const px = (star.x / 100) * w;
+        const py = (star.y / 100) * h;
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.fillRect(Math.floor(px), Math.floor(py), star.size, star.size);
+      }
+    };
+
     const resize = () => {
       canvas.width = canvas.offsetWidth * window.devicePixelRatio;
       canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      drawStaticFrame();
     };
     resize();
     window.addEventListener('resize', resize);
+
+    if (prefersReducedMotion) {
+      return () => {
+        window.removeEventListener('resize', resize);
+      };
+    }
 
     const animate = () => {
       const w = canvas.offsetWidth;
@@ -88,7 +108,7 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animRef.current);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleStart = useCallback(() => {
     if (hasSaveData && !showMenu) {
@@ -102,6 +122,7 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (showMenu) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault();
       handleStart();
     };
@@ -153,13 +174,15 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
               imageRendering: 'pixelated',
             }}
             animate={{
-              textShadow: [
-                `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40, 0 0 40px ${ARCADE_COLORS.gold}20, 4px 4px 0px #b38f00`,
-                `0 0 14px ${ARCADE_COLORS.gold}a0, 0 0 28px ${ARCADE_COLORS.gold}60, 0 0 50px ${ARCADE_COLORS.gold}30, 4px 4px 0px #b38f00`,
-                `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40, 0 0 40px ${ARCADE_COLORS.gold}20, 4px 4px 0px #b38f00`,
-              ],
+              textShadow: prefersReducedMotion
+                ? `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40, 0 0 40px ${ARCADE_COLORS.gold}20, 4px 4px 0px #b38f00`
+                : [
+                    `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40, 0 0 40px ${ARCADE_COLORS.gold}20, 4px 4px 0px #b38f00`,
+                    `0 0 14px ${ARCADE_COLORS.gold}a0, 0 0 28px ${ARCADE_COLORS.gold}60, 0 0 50px ${ARCADE_COLORS.gold}30, 4px 4px 0px #b38f00`,
+                    `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40, 0 0 40px ${ARCADE_COLORS.gold}20, 4px 4px 0px #b38f00`,
+                  ],
             }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
             WEDDING
             <br />
@@ -200,9 +223,9 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
             <motion.p
               key="press-start"
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 1, 0] }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { opacity: [0, 1, 1, 0] }}
               exit={{ opacity: 0 }}
-              transition={{ delay: 1.2, duration: 1.5, repeat: Infinity, times: [0, 0.1, 0.7, 1] }}
+              transition={prefersReducedMotion ? { delay: 1.2, duration: 0 } : { delay: 1.2, duration: 1.5, repeat: Infinity, times: [0, 0.1, 0.7, 1] }}
               className="font-['Press_Start_2P',monospace] text-[13px] sm:text-[18px] mt-8"
               style={{ color: ARCADE_COLORS.text }}
             >
@@ -247,13 +270,13 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
       {/* Bottom bar */}
       <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between items-end z-10">
         <span
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           {'CREDIT: \u221E'}
         </span>
         <span
-          className="font-['Press_Start_2P',monospace] text-[9px] sm:text-[10px]"
+          className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
           style={{ color: ARCADE_COLORS.gray }}
         >
           &copy; 2026 LOVE STUDIO
