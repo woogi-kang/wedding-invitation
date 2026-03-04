@@ -3,7 +3,6 @@ import {
   Greeting,
   CoupleIntro,
   Interview,
-  Video,
   Gallery,
   WeddingInfo,
   Location,
@@ -16,9 +15,18 @@ import {
 import { MouseTrail } from '@/components/ui/MouseTrail';
 import { RSVPDialog } from '@/components/ui/RSVPDialog';
 import { GuestSnapDialog } from '@/components/ui/GuestSnapDialog';
+import { SecretRoutePrompt } from '@/components/ui/SecretRoutePrompt';
 import { galleryImages } from '@/lib/gallery';
 
-export default function InvitationPage() {
+interface InvitationPageProps {
+  searchParams?: Promise<{ secretVariant?: string }>;
+}
+
+export default async function InvitationPage({ searchParams }: InvitationPageProps) {
+  const params = searchParams ? await searchParams : undefined;
+  const secretVariant =
+    params?.secretVariant === 'omen' ? 'omen' : 'cipher';
+
   return (
     <>
       {/* Mouse Trail - petal effect following cursor */}
@@ -29,6 +37,9 @@ export default function InvitationPage() {
 
       {/* GuestSnap Dialog - 결혼식 시작 후 2초 후 자동 표시 */}
       <GuestSnapDialog />
+
+      {/* Scroll-triggered secret route teaser */}
+      <SecretRoutePrompt variant={secretVariant} />
 
       <main className="min-h-screen main-content">
 
