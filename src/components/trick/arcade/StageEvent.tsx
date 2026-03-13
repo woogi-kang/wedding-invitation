@@ -1958,6 +1958,8 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
   const ceremonyEntranceOffset = stepIdx <= 1 ? 194 : stepIdx === 2 ? 146 : stepIdx === 3 ? 108 : 82;
   const ceremonyEntranceY = stepIdx <= 1 ? 26 : stepIdx === 2 ? 16 : stepIdx === 3 ? 8 : 0;
   const ceremonyScale = stepIdx <= 1 ? 1.08 : stepIdx === 2 ? 1.14 : stepIdx === 3 ? 1.2 : 1.26;
+  const ceremonyBrideOffset = stepIdx <= 1 ? 176 : stepIdx === 2 ? 134 : stepIdx === 3 ? 98 : 72;
+  const ceremonyBrideY = stepIdx <= 1 ? 22 : stepIdx === 2 ? 14 : stepIdx === 3 ? 6 : -2;
   const currentStep = script.steps[stepIdx];
 
   useEffect(() => {
@@ -2270,7 +2272,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
                     {brideVisible && (
                       <motion.div
                         initial={{ x: 250, y: 36, opacity: 0 }}
-                        animate={{ x: ceremonyEntranceOffset, y: ceremonyEntranceY, opacity: 1, scale: ceremonyScale }}
+                        animate={{ x: ceremonyBrideOffset, y: ceremonyBrideY, opacity: 1, scale: ceremonyScale }}
                         transition={{ type: 'spring', stiffness: 110, damping: 16, delay: script.brideEntrance ? 0.5 : 0 }}
                         className="absolute bottom-0 left-1/2"
                         style={{ filter: 'drop-shadow(0 10px 18px rgba(77, 58, 49, 0.28)) drop-shadow(0 0 6px rgba(255,255,255,0.18))' }}
@@ -2285,7 +2287,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
                       <motion.div
                         key={`bride-bubble-${brideBubble}`}
                         className="absolute z-10"
-                        style={{ left: 'calc(50% + 116px)', bottom: 138 }}
+                        style={{ left: 'calc(50% + 104px)', bottom: 142 }}
                       >
                         <SpeechBubble emoticon={brideBubble} />
                       </motion.div>
