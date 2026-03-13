@@ -1,538 +1,199 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PixelButton } from './shared';
-import { PixelCharacter } from './shared/PixelCharacter';
-
-const ARCADE_COLORS = {
-  bg: '#0f0f23',
-  bgLight: '#1a1a3e',
-  text: '#ffffff',
-  gold: '#ffcc00',
-  pink: '#ff6b9d',
-  green: '#00ff41',
-  blue: '#4a9eff',
-  red: '#ff4444',
-  gray: '#8b8b8b',
-  darkGray: '#333333',
-} as const;
-
-// -- Sparkle particle system --
-
-interface Sparkle {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  duration: number;
-  delay: number;
-}
-
-function createSparkles(count: number): Sparkle[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 2 + 1.5,
-    delay: Math.random() * 3,
-  }));
-}
-
-function SparkleField({ count = 40 }: { count?: number }) {
-  const sparkles = useMemo(() => createSparkles(count), [count]);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {sparkles.map((s) => (
-        <motion.div
-          key={s.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: s.size,
-            height: s.size,
-            background: ARCADE_COLORS.gold,
-            boxShadow: `0 0 ${s.size * 2}px ${ARCADE_COLORS.gold}`,
-          }}
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0.5, 1.2, 0.5],
-          }}
-          transition={{
-            duration: s.duration,
-            delay: s.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// -- Credits data --
-
-interface CreditBlock {
-  heading: string;
-  icon: string;
-  lines: { name: string; role: string }[];
-}
-
-const CREDITS: CreditBlock[] = [
-  {
-    heading: 'CAST',
-    icon: '\u2694',
-    lines: [
-      { name: '\uAC15\uD0DC\uC6B1', role: 'as The Groom' },
-      { name: '\uAE40\uC120\uACBD', role: 'as The Bride' },
-    ],
-  },
-  {
-    heading: 'PRODUCED BY',
-    icon: '\u2605',
-    lines: [
-      { name: '\uAC15\uC2B9\uD638 & \uC774\uC9C0\uC21C', role: "Groom's Family" },
-      { name: '\uAE40\uC885\uD0DC & \uC2E0\uD604\uC784', role: "Bride's Family" },
-    ],
-  },
-  {
-    heading: 'SPECIAL THANKS',
-    icon: '\u2665',
-    lines: [
-      { name: '\uC18C\uC911\uD55C \uD558\uAC1D \uC5EC\uB7EC\uBD84', role: 'Our Beloved Guests' },
-    ],
-  },
-  {
-    heading: 'DEVELOPED BY',
-    icon: '\u2726',
-    lines: [
-      { name: 'LOVE STUDIO', role: 'Since 2022' },
-    ],
-  },
-  {
-    heading: 'POWERED BY',
-    icon: '\u25C6',
-    lines: [
-      { name: '\uC0AC\uB791 & \uBFFF\uC74C & \uCEE4\uD53C', role: 'Love & Trust & Coffee' },
-    ],
-  },
-];
-
-// -- Phase types --
-
-type Phase = 'victory' | 'credits' | 'final';
-
-// -- Phase 1: Victory Screen --
-
-function VictoryScreen({ onSkip }: { onSkip: () => void }) {
-  return (
-    <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center px-4"
-      style={{ background: ARCADE_COLORS.bg }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      onClick={onSkip}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSkip();
-        }
-      }}
-      aria-label="Victory screen - tap to continue"
-    >
-      <SparkleField count={50} />
-
-      {/* Characters celebrating */}
-      <motion.div
-        className="relative z-10 flex items-end gap-4 sm:gap-6 mb-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-      >
-        <PixelCharacter character="groom" size="full" scale={4} animate />
-        <motion.span
-          className="text-[20px] sm:text-[28px] mb-6"
-          style={{ color: ARCADE_COLORS.pink }}
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 0.8, repeat: Infinity }}
-        >
-          {'♥'}
-        </motion.span>
-        <PixelCharacter character="bride" size="full" scale={4} animate />
-      </motion.div>
-
-      {/* QUEST COMPLETE */}
-      <motion.h1
-        className="relative z-10 text-center font-['Press_Start_2P',monospace]"
-        style={{
-          color: ARCADE_COLORS.gold,
-          fontSize: 'clamp(16px, 5vw, 28px)',
-          lineHeight: 1.4,
-        }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{
-          opacity: 1,
-          scale: 1,
-          textShadow: [
-            `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40`,
-            `0 0 20px ${ARCADE_COLORS.gold}A0, 0 0 40px ${ARCADE_COLORS.gold}60`,
-            `0 0 10px ${ARCADE_COLORS.gold}80, 0 0 20px ${ARCADE_COLORS.gold}40`,
-          ],
-        }}
-        transition={{
-          opacity: { duration: 1 },
-          scale: { duration: 1 },
-          textShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-        }}
-      >
-        QUEST COMPLETE!
-      </motion.h1>
-
-      {/* NEW GAME+ */}
-      <motion.p
-        className="relative z-10 mt-6 text-center font-['Press_Start_2P',monospace]"
-        style={{
-          color: ARCADE_COLORS.text,
-          fontSize: 'clamp(10px, 3.2vw, 16px)',
-          lineHeight: 1.8,
-        }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.8 }}
-      >
-        NEW GAME+ UNLOCKED:
-        <br />
-        <span style={{ color: ARCADE_COLORS.pink }}>
-          {'\uACB0\uD63C \uC0DD\uD65C'}
-        </span>
-      </motion.p>
-
-      {/* Skip hint */}
-      <motion.p
-        className="absolute bottom-8 font-['Press_Start_2P',monospace] text-center"
-        style={{
-          color: ARCADE_COLORS.gray,
-          fontSize: '10px',
-        }}
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        TAP TO CONTINUE
-      </motion.p>
-    </motion.div>
-  );
-}
-
-// -- Phase 2: Credits Roll --
-
-function CreditsRoll({ onSkip }: { onSkip: () => void }) {
-  // Calculate total height for scroll: heading + lines + spacing
-  // Each credit block: heading + lines + gap
-  const CREDITS_DURATION = 22;
-
-  return (
-    <motion.div
-      className="absolute inset-0 overflow-hidden"
-      style={{ background: ARCADE_COLORS.bg }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
-      onClick={onSkip}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSkip();
-        }
-      }}
-      aria-label="Credits - tap to skip"
-    >
-      <SparkleField count={20} />
-
-      {/* Scrolling credits container */}
-      <div className="absolute inset-0 flex justify-center">
-        <motion.div
-          className="text-center px-4"
-          style={{ paddingTop: '100vh' }}
-          initial={{ y: 0 }}
-          animate={{ y: '-100%' }}
-          transition={{
-            duration: CREDITS_DURATION,
-            ease: 'linear',
-          }}
-        >
-          {CREDITS.map((block, blockIdx) => (
-            <div key={blockIdx} className="mb-12 sm:mb-16">
-              {/* Section heading */}
-              <p
-                className="font-['Press_Start_2P',monospace] mb-6 sm:mb-8"
-                style={{
-                  color: ARCADE_COLORS.gold,
-                  fontSize: 'clamp(10px, 3.2vw, 14px)',
-                  letterSpacing: '0.15em',
-                  textShadow: `0 0 8px ${ARCADE_COLORS.gold}40`,
-                }}
-              >
-                {block.icon} {block.heading} {block.icon}
-              </p>
-
-              {/* Names and roles */}
-              {block.lines.map((line, lineIdx) => (
-                <div key={lineIdx} className="mb-6 sm:mb-8">
-                  <p
-                    className="font-['Press_Start_2P',monospace]"
-                    style={{
-                      color: ARCADE_COLORS.text,
-                      fontSize: 'clamp(13px, 4vw, 18px)',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {line.name}
-                  </p>
-                  <p
-                    className="mt-1 font-['Press_Start_2P',monospace]"
-                    style={{
-                      color: ARCADE_COLORS.gray,
-                      fontSize: 'clamp(9px, 2.6vw, 12px)',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {line.role}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ))}
-
-          {/* Bottom padding so credits scroll fully off screen */}
-          <div className="h-[60vh]" />
-        </motion.div>
-      </div>
-
-      {/* Top/bottom gradient overlays for smooth edges */}
-      <div
-        className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10"
-        style={{
-          background: `linear-gradient(to bottom, ${ARCADE_COLORS.bg}, transparent)`,
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none z-10"
-        style={{
-          background: `linear-gradient(to top, ${ARCADE_COLORS.bg}, transparent)`,
-        }}
-      />
-
-      {/* Skip hint */}
-      <motion.p
-        className="absolute bottom-6 left-0 right-0 text-center font-['Press_Start_2P',monospace] z-20"
-        style={{
-          color: ARCADE_COLORS.gray,
-          fontSize: '10px',
-        }}
-        animate={{ opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 2.5, repeat: Infinity }}
-      >
-        TAP TO SKIP
-      </motion.p>
-    </motion.div>
-  );
-}
-
-// -- Phase 3: Final Message --
-
-function FinalMessage({ onComplete }: { onComplete: () => void }) {
-  const [step, setStep] = useState<'theend' | 'continued' | 'button'>('theend');
-
-  useEffect(() => {
-    if (step === 'theend') {
-      const timer = setTimeout(() => setStep('continued'), 2000);
-      return () => clearTimeout(timer);
-    }
-    if (step === 'continued') {
-      const timer = setTimeout(() => setStep('button'), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [step]);
-
-  return (
-    <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center px-4"
-      style={{ background: ARCADE_COLORS.bg }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
-      <div className="text-center">
-        <AnimatePresence mode="wait">
-          {step === 'theend' && (
-            <motion.p
-              key="theend"
-              className="font-['Press_Start_2P',monospace]"
-              style={{
-                color: ARCADE_COLORS.gray,
-                fontSize: 'clamp(18px, 5vw, 28px)',
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              THE END...?
-            </motion.p>
-          )}
-
-          {(step === 'continued' || step === 'button') && (
-            <motion.div
-              key="continued"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <motion.p
-                className="font-['Press_Start_2P',monospace]"
-                style={{
-                  color: ARCADE_COLORS.gold,
-                  fontSize: 'clamp(18px, 5vw, 28px)',
-                }}
-                animate={{
-                  textShadow: [
-                    `0 0 8px ${ARCADE_COLORS.gold}60, 0 0 16px ${ARCADE_COLORS.gold}30`,
-                    `0 0 16px ${ARCADE_COLORS.gold}90, 0 0 32px ${ARCADE_COLORS.gold}50`,
-                    `0 0 8px ${ARCADE_COLORS.gold}60, 0 0 16px ${ARCADE_COLORS.gold}30`,
-                  ],
-                }}
-                transition={{
-                  textShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-                }}
-              >
-                TO BE CONTINUED
-              </motion.p>
-
-              {/* Mini characters walking together */}
-              <motion.div
-                className="flex items-center justify-center gap-2 mt-6 sm:mt-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-              >
-                <PixelCharacter character="groom" size="mini" scale={3} animate />
-                <PixelCharacter character="bride" size="mini" scale={3} animate />
-              </motion.div>
-
-              <motion.p
-                className="mt-4"
-                style={{
-                  color: ARCADE_COLORS.pink,
-                  fontSize: 'clamp(12px, 3.2vw, 16px)',
-                  fontFamily: "'Press Start 2P', monospace",
-                  lineHeight: 1.8,
-                }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.6 }}
-              >
-                {'\u2192 \uC9C4\uC9DC \uC5D4\uB529\uC740 \uACB0\uD63C\uC2DD\uC5D0\uC11C!'}
-              </motion.p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Button appears after full sequence */}
-        <AnimatePresence>
-          {step === 'button' && (
-            <motion.div
-              className="mt-10 sm:mt-12"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-            >
-              <PixelButton variant="primary" size="md" onClick={onComplete}>
-                {'\uB2E4\uC74C\uC73C\uB85C'}
-              </PixelButton>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
-  );
-}
-
-// -- Main EndingSequence Component --
+import { motion } from 'framer-motion';
+import { PixelButton, PixelCharacter, ARCADE_COLORS } from './shared';
+import { WEDDING_INFO } from '@/lib/constants';
 
 interface EndingSequenceProps {
   onComplete: () => void;
 }
 
+const SPARKLES = Array.from({ length: 18 }, (_, i) => ({
+  id: i,
+  left: `${6 + (i * 91) % 88}%`,
+  top: `${8 + (i * 37) % 72}%`,
+  size: 2 + (i % 4),
+  delay: (i % 6) * 0.25,
+  duration: 1.8 + (i % 5) * 0.35,
+}));
+
+const PETALS = Array.from({ length: 10 }, (_, i) => ({
+  id: i,
+  left: `${12 + i * 8}%`,
+  drift: ((i % 5) - 2) * 14,
+  delay: i * 0.18,
+  duration: 3 + (i % 4) * 0.4,
+}));
+
 export function EndingSequence({ onComplete }: EndingSequenceProps) {
-  const [phase, setPhase] = useState<Phase>('victory');
-  const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Auto-advance from victory to credits after 3 seconds
-  useEffect(() => {
-    if (phase === 'victory') {
-      autoAdvanceRef.current = setTimeout(() => {
-        setPhase('credits');
-      }, 3000);
-      return () => {
-        if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
-      };
-    }
-  }, [phase]);
-
-  // Auto-advance from credits to final after credits duration
-  useEffect(() => {
-    if (phase === 'credits') {
-      autoAdvanceRef.current = setTimeout(() => {
-        setPhase('final');
-      }, 22000);
-      return () => {
-        if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
-      };
-    }
-  }, [phase]);
-
-  // Skip to next phase on tap/click
-  const skipToNext = useCallback(() => {
-    if (autoAdvanceRef.current) {
-      clearTimeout(autoAdvanceRef.current);
-      autoAdvanceRef.current = null;
-    }
-
-    setPhase((current) => {
-      if (current === 'victory') return 'credits';
-      if (current === 'credits') return 'final';
-      return current;
-    });
-  }, []);
+  const handleViewInvitation = () => {
+    window.location.assign('/invitation#location');
+  };
 
   return (
     <div
-      className="relative w-full min-h-screen overflow-hidden"
-      style={{ background: ARCADE_COLORS.bg }}
+      className="relative min-h-screen overflow-hidden px-4 py-8 sm:px-6"
+      style={{
+        background:
+          'radial-gradient(circle at top, rgba(255,218,164,0.12) 0%, transparent 28%), linear-gradient(180deg, #12091a 0%, #26111f 42%, #130912 100%)',
+      }}
     >
-      <AnimatePresence mode="wait">
-        {phase === 'victory' && (
-          <VictoryScreen key="victory" onSkip={skipToNext} />
-        )}
+      {SPARKLES.map((sparkle) => (
+        <motion.div
+          key={sparkle.id}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: sparkle.left,
+            top: sparkle.top,
+            width: sparkle.size,
+            height: sparkle.size,
+            background: sparkle.id % 3 === 0 ? ARCADE_COLORS.gold : sparkle.id % 3 === 1 ? ARCADE_COLORS.pink : '#fff4dd',
+            boxShadow: `0 0 ${sparkle.size * 4}px rgba(255,228,196,0.4)`,
+          }}
+          animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.3, 0.8] }}
+          transition={{ duration: sparkle.duration, delay: sparkle.delay, repeat: Infinity }}
+        />
+      ))}
 
-        {phase === 'credits' && (
-          <CreditsRoll key="credits" onSkip={skipToNext} />
-        )}
+      {PETALS.map((petal) => (
+        <motion.div
+          key={petal.id}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: petal.left,
+            top: '-4%',
+            width: 4,
+            height: 3,
+            background: petal.id % 2 === 0 ? 'rgba(255,183,197,0.88)' : 'rgba(255,239,219,0.82)',
+          }}
+          animate={{
+            x: [0, petal.drift, petal.drift * 0.4, 0],
+            y: ['0vh', '36vh', '74vh'],
+            rotate: [0, 28, -18, 8],
+            opacity: [0, 1, 0.2],
+          }}
+          transition={{ duration: petal.duration, delay: petal.delay, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      ))}
 
-        {phase === 'final' && (
-          <FinalMessage key="final" onComplete={onComplete} />
-        )}
-      </AnimatePresence>
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full overflow-hidden"
+          style={{
+            background: 'rgba(8, 6, 14, 0.82)',
+            border: `3px solid ${ARCADE_COLORS.gold}`,
+            boxShadow: '0 0 24px rgba(255,204,0,0.16), inset 0 0 0 2px rgba(255,255,255,0.05)',
+          }}
+        >
+          <div
+            className="px-5 py-3 text-center"
+            style={{
+              background: 'linear-gradient(90deg, rgba(255,204,0,0.16) 0%, rgba(255,107,157,0.14) 100%)',
+              borderBottom: `2px solid ${ARCADE_COLORS.gold}`,
+            }}
+          >
+            <p
+              className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
+              style={{ color: ARCADE_COLORS.gray }}
+            >
+              FINAL QUEST UPDATE
+            </p>
+            <h1
+              className="mt-2 font-['Press_Start_2P',monospace] text-[22px] leading-[1.5] sm:text-[34px]"
+              style={{
+                color: ARCADE_COLORS.gold,
+                textShadow: '0 0 12px rgba(255,204,0,0.5)',
+              }}
+            >
+              TO BE
+              <br />
+              CONTINUED
+            </h1>
+          </div>
+
+          <div className="px-5 py-6 sm:px-7">
+            <div className="flex items-end justify-center gap-3">
+              <PixelCharacter character="groom" size="full" scale={4} emotion="love" />
+              <motion.span
+                className="font-['Press_Start_2P',monospace] text-[20px] sm:text-[28px]"
+                style={{ color: ARCADE_COLORS.pink }}
+                animate={{ scale: [1, 1.18, 1] }}
+                transition={{ duration: 0.9, repeat: Infinity }}
+              >
+                ♥
+              </motion.span>
+              <PixelCharacter character="bride" size="full" scale={4} emotion="love" />
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <div
+                className="px-4 py-3"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${ARCADE_COLORS.gray}50`,
+                }}
+              >
+                <p
+                  className="font-['Press_Start_2P',monospace] text-[10px]"
+                  style={{ color: ARCADE_COLORS.gray }}
+                >
+                  NEXT CHAPTER
+                </p>
+                <p className="mt-2 text-[15px] sm:text-[16px]" style={{ color: ARCADE_COLORS.text }}>
+                  {WEDDING_INFO.dateDisplay.year}.{String(WEDDING_INFO.dateDisplay.month).padStart(2, '0')}.{String(WEDDING_INFO.dateDisplay.day).padStart(2, '0')} {WEDDING_INFO.dateDisplay.time}
+                </p>
+                <p className="mt-1 text-[14px] leading-[1.6]" style={{ color: ARCADE_COLORS.gray }}>
+                  이제 이야기는 화면 밖,
+                  <br />
+                  실제 예식에서 이어집니다.
+                </p>
+              </div>
+
+              <div
+                className="px-4 py-3"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${ARCADE_COLORS.gray}50`,
+                }}
+              >
+                <p
+                  className="font-['Press_Start_2P',monospace] text-[10px]"
+                  style={{ color: ARCADE_COLORS.gray }}
+                >
+                  LOCATION
+                </p>
+                <p className="mt-2 text-[15px] sm:text-[16px]" style={{ color: ARCADE_COLORS.text }}>
+                  {WEDDING_INFO.venue.name}
+                </p>
+                <p className="mt-1 text-[14px] leading-[1.6]" style={{ color: ARCADE_COLORS.gray }}>
+                  {WEDDING_INFO.venue.hall}
+                  <br />
+                  {WEDDING_INFO.venue.address}
+                </p>
+              </div>
+            </div>
+
+            <p
+              className="mt-6 text-center font-['Press_Start_2P',monospace] text-[10px] leading-[1.8] sm:text-[11px]"
+              style={{ color: ARCADE_COLORS.gray }}
+            >
+              PRESS START IN REAL LIFE
+            </p>
+
+            <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <PixelButton onClick={handleViewInvitation}>
+                예식 정보 보기
+              </PixelButton>
+              <PixelButton variant="secondary" onClick={onComplete}>
+                숨겨진 에필로그
+              </PixelButton>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

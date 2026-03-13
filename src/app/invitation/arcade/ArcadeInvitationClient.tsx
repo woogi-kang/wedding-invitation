@@ -6,7 +6,6 @@ import { TitleScreen } from '@/components/trick/arcade/TitleScreen';
 import { CharacterSelect } from '@/components/trick/arcade/CharacterSelect';
 import { WorldMap } from '@/components/trick/arcade/WorldMap';
 import { StageEvent } from '@/components/trick/arcade/StageEvent';
-import { BossSequence } from '@/components/trick/arcade/BossSequence';
 import { EndingSequence } from '@/components/trick/arcade/EndingSequence';
 import { PostGameVillage } from '@/components/trick/arcade/PostGameVillage';
 import { BattleTransition } from '@/components/trick/arcade/shared';
@@ -17,11 +16,10 @@ type GamePhase =
   | 'character-select'
   | 'world-map'
   | 'stage-event'
-  | 'boss-battle'
   | 'ending'
   | 'post-game';
 
-const TOTAL_STAGES = 4;
+const TOTAL_STAGES = 5;
 
 /* ── localStorage 진행 상태 저장 ── */
 const SAVE_KEY = 'wedding_arcade_progress';
@@ -78,7 +76,7 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
     if (saved) {
       setCompletedStages(saved.completedStages);
       setCurrentStage(saved.currentStage);
-      // stage-event, boss-battle 등 중간 phase는 world-map으로 복원
+      // stage-event, ending 등 중간 phase는 world-map으로 복원
       const restorePhase = saved.phase === 'post-game' ? 'post-game' : 'world-map';
       setPhase(restorePhase);
     }
@@ -132,8 +130,7 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
     setActiveStage(null);
 
     if (newCompleted.length >= TOTAL_STAGES) {
-      // 보스전 진입도 전환 효과 사용
-      transitionToPhase('boss-battle');
+      transitionToPhase('ending');
     } else {
       const nextStage = Math.min(activeStage + 1, TOTAL_STAGES - 1);
       setCurrentStage(nextStage);
@@ -197,12 +194,6 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
                 onComplete={handleStageComplete}
                 onClose={handleStageClose}
               />
-            </PhaseWrapper>
-          )}
-
-          {phase === 'boss-battle' && (
-            <PhaseWrapper key="boss">
-              <BossSequence onVictory={() => setPhase('ending')} />
             </PhaseWrapper>
           )}
 
