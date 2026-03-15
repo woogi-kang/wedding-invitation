@@ -1,6 +1,6 @@
 // Hooks barrel export
 export { useGuestSnapUpload } from './useGuestSnapUpload';
-export { useAudioPlayer, preloadAudio } from './useAudioPlayer';
+export { useAudioPlayer, preloadAudio, stopGlobalAudio } from './useAudioPlayer';
 export {
   useHapticFeedback,
   usePrefersReducedMotion,

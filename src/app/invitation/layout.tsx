@@ -7,9 +7,5 @@ interface InvitationLayoutProps {
 }
 
 export default function InvitationLayout({ children }: InvitationLayoutProps) {
-  return (
-    <div>
-      {children}
-    </div>
-  );
+  return <div>{children}</div>;
 }

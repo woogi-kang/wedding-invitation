@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { stopGlobalAudio, useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { WEDDING_INFO } from '@/lib/constants';
 
 // Animated sound bars component
@@ -45,10 +47,18 @@ function SoundBars({ isPlaying }: { isPlaying: boolean }) {
 }
 
 export function MusicPlayer() {
+  const pathname = usePathname();
+  const isGuestSnapRoute = pathname.startsWith('/guestsnap');
   const { music } = WEDDING_INFO;
-  const { isPlaying, toggle } = useAudioPlayer(music.src, music.enabled);
+  const { isPlaying, toggle } = useAudioPlayer(music.src, music.enabled && !isGuestSnapRoute);
 
-  if (!music.enabled) return null;
+  useEffect(() => {
+    if (isGuestSnapRoute) {
+      stopGlobalAudio();
+    }
+  }, [isGuestSnapRoute]);
+
+  if (!music.enabled || isGuestSnapRoute) return null;
 
   return (
     <motion.button

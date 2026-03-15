@@ -60,12 +60,92 @@ export function startGlobalAudio(): boolean {
   return false;
 }
 
+export function stopGlobalAudio() {
+  quickAudio?.pause();
+  fullAudio?.pause();
+
+  if (quickAudio) {
+    quickAudio.currentTime = 0;
+  }
+
+  if (fullAudio) {
+    fullAudio.currentTime = 0;
+  }
+}
+
 export function useAudioPlayer(src: string, enabled: boolean = true): AudioPlayerResult {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const hasStartedRef = useRef(false);
   const hasSwitchedRef = useRef(false);
+
+  const playAudio = useCallback(() => {
+    // If full audio is already ready, use it directly
+    if (fullAudio && fullAudio.readyState >= 3) {
+      currentAudioRef.current = fullAudio;
+      fullAudio.play().catch(() => {});
+      hasSwitchedRef.current = true;
+      return;
+    }
+
+    // Otherwise, start with quick audio
+    if (quickAudio && quickAudio.readyState >= 2) {
+      currentAudioRef.current = quickAudio;
+      quickAudio.play().catch(() => {});
+
+      // Set up seamless switch to full audio
+      if (fullAudio && !hasSwitchedRef.current) {
+        const switchToFull = () => {
+          if (hasSwitchedRef.current || !quickAudio || !fullAudio) return;
+
+          // Get current time from quick audio
+          const currentTime = quickAudio.currentTime;
+
+          // Only switch if we're still playing and haven't looped
+          if (currentTime < 19 && currentAudioRef.current === quickAudio) {
+            fullAudio.currentTime = currentTime;
+            fullAudio.play().then(() => {
+              quickAudio?.pause();
+              currentAudioRef.current = fullAudio;
+              hasSwitchedRef.current = true;
+            }).catch(() => {});
+          }
+
+          fullAudio.removeEventListener('canplaythrough', switchToFull);
+        };
+
+        if (fullAudio.readyState >= 4) {
+          switchToFull();
+        } else {
+          fullAudio.addEventListener('canplaythrough', switchToFull);
+        }
+
+        // Fallback: if quick audio is about to end, try to switch or loop
+        const handleTimeUpdate = () => {
+          if (!quickAudio || !fullAudio) return;
+
+          // Near the end of quick audio
+          if (quickAudio.currentTime >= 18 && !hasSwitchedRef.current) {
+            if (fullAudio.readyState >= 3) {
+              // Switch to full
+              fullAudio.currentTime = quickAudio.currentTime;
+              fullAudio.play().then(() => {
+                quickAudio?.pause();
+                currentAudioRef.current = fullAudio;
+                hasSwitchedRef.current = true;
+              }).catch(() => {});
+            } else {
+              // Loop quick audio
+              quickAudio.currentTime = 0;
+            }
+          }
+        };
+
+        quickAudio.addEventListener('timeupdate', handleTimeUpdate);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Initialize if not preloaded
@@ -150,74 +230,7 @@ export function useAudioPlayer(src: string, enabled: boolean = true): AudioPlaye
         fullAudio.removeEventListener('pause', handlePause);
       }
     };
-  }, [enabled]);
-
-  const playAudio = useCallback(() => {
-    // If full audio is already ready, use it directly
-    if (fullAudio && fullAudio.readyState >= 3) {
-      currentAudioRef.current = fullAudio;
-      fullAudio.play().catch(() => {});
-      hasSwitchedRef.current = true;
-      return;
-    }
-
-    // Otherwise, start with quick audio
-    if (quickAudio && quickAudio.readyState >= 2) {
-      currentAudioRef.current = quickAudio;
-      quickAudio.play().catch(() => {});
-
-      // Set up seamless switch to full audio
-      if (fullAudio && !hasSwitchedRef.current) {
-        const switchToFull = () => {
-          if (hasSwitchedRef.current || !quickAudio || !fullAudio) return;
-
-          // Get current time from quick audio
-          const currentTime = quickAudio.currentTime;
-
-          // Only switch if we're still playing and haven't looped
-          if (currentTime < 19 && currentAudioRef.current === quickAudio) {
-            fullAudio.currentTime = currentTime;
-            fullAudio.play().then(() => {
-              quickAudio?.pause();
-              currentAudioRef.current = fullAudio;
-              hasSwitchedRef.current = true;
-            }).catch(() => {});
-          }
-
-          fullAudio.removeEventListener('canplaythrough', switchToFull);
-        };
-
-        if (fullAudio.readyState >= 4) {
-          switchToFull();
-        } else {
-          fullAudio.addEventListener('canplaythrough', switchToFull);
-        }
-
-        // Fallback: if quick audio is about to end, try to switch or loop
-        const handleTimeUpdate = () => {
-          if (!quickAudio || !fullAudio) return;
-
-          // Near the end of quick audio
-          if (quickAudio.currentTime >= 18 && !hasSwitchedRef.current) {
-            if (fullAudio.readyState >= 3) {
-              // Switch to full
-              fullAudio.currentTime = quickAudio.currentTime;
-              fullAudio.play().then(() => {
-                quickAudio?.pause();
-                currentAudioRef.current = fullAudio;
-                hasSwitchedRef.current = true;
-              }).catch(() => {});
-            } else {
-              // Loop quick audio
-              quickAudio.currentTime = 0;
-            }
-          }
-        };
-
-        quickAudio.addEventListener('timeupdate', handleTimeUpdate);
-      }
-    }
-  }, []);
+  }, [enabled, playAudio]);
 
   const play = useCallback(() => {
     if (hasSwitchedRef.current && fullAudio) {
