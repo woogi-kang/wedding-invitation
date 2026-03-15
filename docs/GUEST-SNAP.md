@@ -130,6 +130,10 @@ src/
 - 업로드 전용: `/guestsnap`
 - 인쇄용 포스터: `/guestsnap/poster`
 
+## UI 개편 문서
+
+- `docs/GUEST-SNAP-UI-REFRESH.md`: 결혼식 전 GuestSnap 업로드 페이지 UI 개편안 / 와이어프레임
+
 ## 문제 해결
 
 ### 업로드 실패
