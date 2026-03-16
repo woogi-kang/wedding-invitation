@@ -553,7 +553,8 @@ export async function createResumableUploadSession(
   mimeType: string,
   destFolderId: string,
   fileType: GuestSnapFileType,
-  fileSize: number
+  fileSize: number,
+  origin?: string
 ): Promise<{
   success: boolean;
   uploadUrl?: string;
@@ -563,17 +564,24 @@ export async function createResumableUploadSession(
   try {
     const uniqueFileName = generateUniqueFileName(fileName, fileType);
     const accessToken = await getAccessToken();
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json; charset=UTF-8',
+      'X-Upload-Content-Type': mimeType || 'application/octet-stream',
+      'X-Upload-Content-Length': String(fileSize),
+    };
+
+    // Google Drive only adds CORS headers to the resumable upload response
+    // when the session is created with the browser's Origin header.
+    if (origin) {
+      headers.Origin = origin;
+    }
 
     const response = await fetch(
       'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true',
       {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json; charset=UTF-8',
-          'X-Upload-Content-Type': mimeType || 'application/octet-stream',
-          'X-Upload-Content-Length': String(fileSize),
-        },
+        headers,
         body: JSON.stringify({
           name: uniqueFileName,
           parents: [destFolderId],

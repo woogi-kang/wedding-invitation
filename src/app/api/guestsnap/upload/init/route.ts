@@ -106,7 +106,8 @@ export async function POST(
       body.mimeType || 'application/octet-stream',
       session.guestFolder,
       validation.type,
-      Number(body.size || 0)
+      Number(body.size || 0),
+      request.headers.get('origin') || undefined
     );
 
     if (!uploadSession.success || !uploadSession.uploadUrl || !uploadSession.fileName) {

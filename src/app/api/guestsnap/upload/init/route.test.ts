@@ -166,7 +166,8 @@ describe('GuestSnap upload init route', () => {
       'image/jpeg',
       'guest-folder-id',
       'image',
-      1024
+      1024,
+      undefined
     );
   });
 
