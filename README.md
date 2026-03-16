@@ -171,9 +171,11 @@ npx serve out
 1. 인증 방식 선택
    - 내 드라이브(My Drive): OAuth 사용자 토큰 방식 권장
    - Shared Drive: 서비스 계정 방식 권장
+   - 로컬 개발 환경은 `npm run env:pull`로 Vercel Development 환경을 그대로 받을 수 있음
 2. 환경 변수 설정:
    ```bash
-   GOOGLE_DRIVE_AUTH_MODE=service_account
+   # My Drive를 쓰면 oauth
+   GOOGLE_DRIVE_AUTH_MODE=oauth
 
    # 권장(내 드라이브)
    GOOGLE_DRIVE_OAUTH_CLIENT_ID=...
@@ -198,6 +200,8 @@ npx serve out
    ```
 
    참고: `service_account` 방식은 `Shared Drive` 루트 폴더와 함께 써야 합니다. 개인 `My Drive` 폴더에서는 Google Drive quota 제약으로 실제 업로드가 실패합니다.
+
+   참고: `.env.local`에는 실제 비밀값이 들어가므로 Git에 커밋하지 말고, 템플릿 파일과 `npm run env:pull` 흐름으로 동기화하세요.
 
 3. 업로드 폴더 구조(자동 생성):
    ```text

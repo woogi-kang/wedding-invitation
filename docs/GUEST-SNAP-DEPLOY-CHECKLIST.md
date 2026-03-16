@@ -4,18 +4,27 @@ Vercel 배포에서 `GuestSnap`이 안정적으로 동작하도록 점검하는 
 
 ## 권장 구조
 
-- 인증 방식은 `OAuth`보다 `service account`를 권장합니다.
-- 단, `service account`는 반드시 `Shared Drive` 루트 폴더와 함께 사용합니다.
-- 배포 환경에서는 `GOOGLE_DRIVE_AUTH_MODE=service_account`를 명시합니다.
+- 개인 `My Drive`를 쓰면 `OAuth`를 권장합니다.
+- `service account`는 반드시 `Shared Drive` 루트 폴더와 함께 사용합니다.
+- 배포 환경에서는 실제 저장소 구조에 맞춰 `GOOGLE_DRIVE_AUTH_MODE`를 명시합니다.
+- 로컬 `.env.local`은 `npm run env:pull`로 Vercel Development 환경과 동기화합니다.
 - 서비스 계정 JSON은 `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64` 하나로 관리합니다.
-- 사용하지 않는 `OAuth` 변수는 Vercel에서 제거합니다.
+- 사용하지 않는 다른 인증 방식 변수는 Vercel에서 제거합니다.
 
 이유:
 
+- 개인 계정에서는 `Shared Drive`를 못 쓰는 경우가 많아서 OAuth가 더 현실적입니다.
 - OAuth refresh token은 `invalid_grant`로 깨질 수 있습니다.
 - 서비스 계정은 `My Drive`에 업로드할 저장소 quota가 없어서 실제 업로드가 실패합니다.
 - Base64 문자열은 Vercel 환경변수에 넣을 때 줄바꿈/이스케이프 문제를 줄입니다.
-- `GOOGLE_DRIVE_AUTH_MODE=service_account`를 명시하면 다른 인증값이 남아 있어도 잘못된 경로로 빠지지 않습니다.
+- `GOOGLE_DRIVE_AUTH_MODE`를 명시하면 다른 인증값이 남아 있어도 잘못된 경로로 빠지지 않습니다.
+
+## 0. 저장소 유형 먼저 결정
+
+- 개인 Google 계정 + `My Drive`: `oauth`
+- Google Workspace + `Shared Drive`: `service_account`
+- `.env.local` 같은 실제 비밀값 파일은 Git에 커밋하지 않습니다.
+- 예시 파일은 `.env.example`, `.env.local.example`을 사용합니다.
 
 ## 1. Google Drive 준비
 
@@ -43,7 +52,17 @@ base64 -i guestsnap-service-account.json | tr -d '\n'
 
 ## 4. Vercel 환경변수 설정
 
-필수:
+### OAuth (`My Drive`) 필수
+
+```bash
+GOOGLE_DRIVE_AUTH_MODE=oauth
+GOOGLE_DRIVE_OAUTH_CLIENT_ID=...
+GOOGLE_DRIVE_OAUTH_CLIENT_SECRET=...
+GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN=...
+GOOGLE_DRIVE_ROOT_FOLDER_ID=...
+```
+
+### Service Account (`Shared Drive`) 필수
 
 ```bash
 GOOGLE_DRIVE_AUTH_MODE=service_account
@@ -60,9 +79,8 @@ GUEST_SNAP_DISCORD_WEBHOOK_URL=...
 
 정리:
 
-- `GOOGLE_DRIVE_OAUTH_CLIENT_ID` 삭제
-- `GOOGLE_DRIVE_OAUTH_CLIENT_SECRET` 삭제
-- `GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN` 삭제
+- OAuth를 쓰면 service account 값을 삭제
+- Service account를 쓰면 OAuth 3종을 삭제
 
 권장 환경:
 
@@ -72,11 +90,12 @@ GUEST_SNAP_DISCORD_WEBHOOK_URL=...
 
 ## 5. 배포 전 점검
 
-- `GOOGLE_DRIVE_AUTH_MODE`가 `service_account`인지 확인
+- `GOOGLE_DRIVE_AUTH_MODE`가 실제 저장소 구조와 맞는지 확인
 - `GOOGLE_DRIVE_ROOT_FOLDER_ID`가 실제 폴더 ID인지 확인
-- 서비스 계정이 해당 폴더를 열 수 있는지 확인
-- Base64 값이 JSON 원본에서 새로 생성된 값인지 확인
-- 오래된 OAuth 값이 남아 있지 않은지 확인
+- OAuth면 refresh token이 현재 client id/secret과 같은 세트인지 확인
+- Service account면 해당 폴더를 열 수 있는지 확인
+- Service account면 Base64 값이 JSON 원본에서 새로 생성된 값인지 확인
+- 사용하지 않는 반대 인증 방식 값이 남아 있지 않은지 확인
 
 ## 6. 배포 후 스모크 테스트
 
@@ -102,9 +121,11 @@ curl -sS https://your-domain.vercel.app/api/guestsnap/status
   "serviceEnabled": true,
   "storageAvailable": true,
   "configurationValid": true,
-  "authMode": "service_account"
+  "authMode": "oauth"
 }
 ```
+
+`Shared Drive` 운영이면 `authMode`는 `service_account`가 됩니다.
 
 ## 7. 장애 대응
 
@@ -134,6 +155,7 @@ curl -sS https://your-domain.vercel.app/api/guestsnap/status
 
 - GuestSnap 전용 Google Cloud 서비스 계정을 따로 유지합니다.
 - 서비스 계정 JSON 원본은 Git에 올리지 않습니다.
+- `.env.local` 같은 실제 비밀값 파일도 Git에 올리지 않습니다.
 - 환경변수 변경 전에는 기존 값을 안전한 비밀 저장소에 백업합니다.
 - 인증 방식 전환 시 `auth mode`와 실제 값 세트를 동시에 바꿉니다.
 - 배포 직후 `status` API를 항상 확인합니다.

@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:guestsnap:upload": "vitest run src/lib/guestsnap/__tests__/file-validator.test.ts src/app/api/guestsnap/session/route.test.ts src/app/api/guestsnap/upload/route.test.ts src/app/api/guestsnap/notify/route.test.ts src/app/api/guestsnap/status/route.test.ts src/hooks/useGuestSnapUpload.test.tsx"
+    "test:guestsnap:upload": "vitest run src/lib/guestsnap/__tests__/file-validator.test.ts src/app/api/guestsnap/session/route.test.ts src/app/api/guestsnap/upload/route.test.ts src/app/api/guestsnap/notify/route.test.ts src/app/api/guestsnap/status/route.test.ts src/hooks/useGuestSnapUpload.test.tsx",
+    "env:pull": "npx vercel env pull .env.local --environment=development --yes"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -42,6 +42,12 @@ Guest Snap은 아래 구조로 폴더를 자동 생성합니다.
 
 `.env.local`에 아래 값을 설정합니다.
 
+Vercel Development 환경과 로컬을 맞추려면 먼저 아래를 실행합니다.
+
+```bash
+npm run env:pull
+```
+
 ```bash
 # 선택: 업로드 알림 Discord Webhook
 GUEST_SNAP_DISCORD_WEBHOOK_URL=
@@ -74,11 +80,13 @@ GOOGLE_DRIVE_SHARED_DRIVE_ID=   # Shared Drive 사용 시 선택
 
 ### 배포 권장안
 
-- Vercel 배포는 `Shared Drive` 루트 폴더 + `GOOGLE_DRIVE_AUTH_MODE=service_account` 조합을 권장
+- 개인 `My Drive` 배포는 `GOOGLE_DRIVE_AUTH_MODE=oauth` 조합을 권장
+- `Shared Drive`를 쓸 수 있을 때만 `GOOGLE_DRIVE_AUTH_MODE=service_account`를 사용
 - 서비스 계정 JSON은 `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64`로 저장
 - 기존 OAuth 값은 남겨두지 말고 제거해서 인증 경로가 흔들리지 않게 유지
 - 배포 후 `/api/guestsnap/status`에서 `storageAvailable: true`와 `storageErrorCode`를 확인
 - `My Drive` 루트 폴더에서는 서비스 계정 업로드가 quota 문제로 실패하므로 OAuth를 사용하거나 Shared Drive로 이동
+- 실제 비밀값이 있는 `.env.local`은 Git에 커밋하지 않고, `.env.example`, `.env.local.example`, `npm run env:pull`로 동기화
 
 ### 권한 설정
 
