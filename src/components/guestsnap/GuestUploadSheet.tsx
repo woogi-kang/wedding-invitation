@@ -86,7 +86,6 @@ export function GuestUploadSheet({
     session,
     isSessionLoading,
     sessionError,
-    uploadState,
     queueState,
     createSession,
     addFiles,
@@ -128,21 +127,25 @@ export function GuestUploadSheet({
   });
 
   const trackedFiles = useMemo(
-    () => [...queueState.queue, ...queueState.completed, ...queueState.failed],
-    [queueState.queue, queueState.completed, queueState.failed]
+    () => [
+      ...queueState.activeFiles,
+      ...queueState.queue,
+      ...queueState.completed,
+      ...queueState.failed,
+    ],
+    [queueState.activeFiles, queueState.queue, queueState.completed, queueState.failed]
   );
   const isSessionReady = session?.guestName === guestName;
 
   const hasUploadState =
     startRequested ||
     queueState.isProcessing ||
-    queueState.currentFile !== null ||
+    queueState.activeFiles.length > 0 ||
     trackedFiles.length > 0;
   const isUploading =
     startRequested ||
     queueState.isProcessing ||
-    queueState.currentFile !== null ||
-    uploadState === 'uploading';
+    queueState.activeFiles.length > 0;
   const hasCompletedResults = queueState.completed.length > 0 || queueState.failed.length > 0;
   const isSuccessState = !isUploading && hasCompletedResults && failedCount === 0;
   const isFailureState = !isUploading && failedCount > 0;
@@ -175,7 +178,7 @@ export function GuestUploadSheet({
       return;
     }
 
-    if (queueState.isProcessing || queueState.currentFile) {
+    if (queueState.isProcessing || queueState.activeFiles.length > 0) {
       return;
     }
 
@@ -184,17 +187,13 @@ export function GuestUploadSheet({
     }
 
     startUpload();
-    const timer = window.setTimeout(() => {
-      setStartRequested(false);
-    }, 0);
-
-    return () => window.clearTimeout(timer);
+    setStartRequested(false);
   }, [
     startRequested,
     isSessionLoading,
     sessionError,
     queueState.isProcessing,
-    queueState.currentFile,
+    queueState.activeFiles.length,
     queueState.queue.length,
     startUpload,
   ]);
@@ -236,7 +235,7 @@ export function GuestUploadSheet({
   }, [clearQueue]);
 
   const handleClose = useCallback(() => {
-    if (queueState.isProcessing || queueState.currentFile) {
+    if (queueState.isProcessing || queueState.activeFiles.length > 0) {
       pauseUpload();
     }
 
@@ -255,7 +254,7 @@ export function GuestUploadSheet({
     guestName,
     onClose,
     pauseUpload,
-    queueState.currentFile,
+    queueState.activeFiles.length,
     queueState.isProcessing,
   ]);
 
@@ -661,13 +660,13 @@ export function GuestUploadSheet({
             {!isSuccessState && (
               <UploadProgress
                 files={trackedFiles}
-                currentFile={queueState.currentFile}
                 completedCount={uploadedCount}
                 failedCount={failedCount}
                 totalProgress={totalProgress}
                 currentRetryAttempt={
-                  queueState.currentFile?.retryCount
-                    ? queueState.currentFile.retryCount + 1
+                  queueState.activeFiles.length === 1 &&
+                  queueState.activeFiles[0]?.retryCount
+                    ? queueState.activeFiles[0].retryCount + 1
                     : undefined
                 }
                 onRetryFile={handleRetryFile}

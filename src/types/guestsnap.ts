@@ -76,6 +76,8 @@ export interface GuestSnapSession {
 export interface UploadQueueState {
   /** Whether the queue is currently processing */
   isProcessing: boolean;
+  /** Files currently being uploaded */
+  activeFiles: GuestSnapFile[];
   /** Currently uploading file */
   currentFile: GuestSnapFile | null;
   /** Files waiting to be uploaded */

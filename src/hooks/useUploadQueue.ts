@@ -83,6 +83,7 @@ export function useUploadQueue(
   // State
   const [queueState, setQueueState] = useState<UploadQueueState>({
     isProcessing: false,
+    activeFiles: [],
     currentFile: null,
     queue: [],
     completed: [],
@@ -147,6 +148,7 @@ export function useUploadQueue(
 
           setQueueState({
             isProcessing: false,
+            activeFiles: [],
             currentFile: null,
             queue: pending,
             completed,
@@ -264,6 +266,7 @@ export function useUploadQueue(
     await queueManager.clearAll();
     setQueueState({
       isProcessing: false,
+      activeFiles: [],
       currentFile: null,
       queue: [],
       completed: [],
@@ -384,6 +387,7 @@ export function useUploadQueue(
       await queueManager.updateItemStatus(nextFile.id, 'uploading');
       setQueueState((prev) => ({
         ...prev,
+        activeFiles: [{ ...nextFile, status: 'uploading', progress: 0 }],
         currentFile: { ...nextFile, status: 'uploading', progress: 0 },
         queue: prev.queue.filter((f) => f.id !== nextFile.id),
       }));
@@ -396,6 +400,7 @@ export function useUploadQueue(
         await queueManager.markItemCompleted(nextFile.id);
         setQueueState((prev) => ({
           ...prev,
+          activeFiles: [],
           currentFile: null,
           completed: [
             ...prev.completed,
@@ -408,6 +413,7 @@ export function useUploadQueue(
         await queueManager.markItemFailed(nextFile.id, result.error || '알 수 없는 오류', nextFile.retryCount);
         setQueueState((prev) => ({
           ...prev,
+          activeFiles: [],
           currentFile: null,
           failed: [
             ...prev.failed,
@@ -420,7 +426,7 @@ export function useUploadQueue(
 
     // All files processed
     isProcessingRef.current = false;
-    setQueueState((prev) => ({ ...prev, isProcessing: false, currentFile: null }));
+    setQueueState((prev) => ({ ...prev, isProcessing: false, activeFiles: [], currentFile: null }));
 
     // Check final state
     const stats = await queueManager.getQueueStats();
@@ -460,6 +466,7 @@ export function useUploadQueue(
         return {
           ...prev,
           isProcessing: false,
+          activeFiles: [],
           currentFile: null,
           queue: [{ ...prev.currentFile, status: 'pending', progress: 0 }, ...prev.queue],
         };
@@ -520,13 +527,16 @@ export function useUploadQueue(
 
   // Calculate stats
   const totalCount = queueState.queue.length + queueState.completed.length + queueState.failed.length +
-    (queueState.currentFile ? 1 : 0);
+    queueState.activeFiles.length;
   const uploadedCount = queueState.completed.length;
   const failedCount = queueState.failed.length;
   const pendingCount = queueState.queue.length;
 
   const totalProgress = totalCount === 0 ? 0 : Math.round(
-    (uploadedCount * 100 + (queueState.currentFile?.progress || 0)) / totalCount
+    (
+      uploadedCount * 100 +
+      queueState.activeFiles.reduce((sum, file) => sum + file.progress, 0)
+    ) / totalCount
   );
 
   return {

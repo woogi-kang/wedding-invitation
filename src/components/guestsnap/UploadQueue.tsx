@@ -27,8 +27,6 @@ import type { GuestSnapFile, GuestSnapFileStatus } from '@/types/guestsnap';
 interface UploadQueueProps {
   /** All files in the queue */
   files: GuestSnapFile[];
-  /** Currently uploading file */
-  currentFile: GuestSnapFile | null;
   /** Callback to retry a single file */
   onRetryFile?: (fileId: string) => void;
   /** Callback to retry all failed files */
@@ -328,7 +326,6 @@ function SectionHeader({
  */
 export function UploadQueue({
   files,
-  currentFile,
   onRetryFile,
   onRetryAllFailed,
   onRemoveFile,
@@ -342,12 +339,12 @@ export function UploadQueue({
   // Categorize files
   const categorizedFiles = useMemo(() => {
     const pending = files.filter((f) => f.status === 'pending');
-    const uploading = currentFile ? [currentFile] : [];
+    const uploading = files.filter((f) => f.status === 'uploading');
     const completed = files.filter((f) => f.status === 'completed');
     const failed = files.filter((f) => f.status === 'failed');
 
     return { pending, uploading, completed, failed };
-  }, [files, currentFile]);
+  }, [files]);
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => {
@@ -361,7 +358,7 @@ export function UploadQueue({
     });
   };
 
-  if (files.length === 0 && !currentFile) {
+  if (files.length === 0) {
     return (
       <div className="text-center py-8 text-[var(--color-text-light)]">
         <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />

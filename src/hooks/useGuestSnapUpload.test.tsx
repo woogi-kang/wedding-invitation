@@ -132,6 +132,18 @@ function jsonResponse(
   });
 }
 
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe('useGuestSnapUpload', () => {
   const fetchMock = vi.fn<typeof fetch>();
 
@@ -486,5 +498,202 @@ describe('useGuestSnapUpload', () => {
       expect.objectContaining({ id: 'file-1' }),
       '파일 형식이 올바르지 않아요'
     );
+  });
+
+  it('processes up to three uploads in parallel', async () => {
+    const files = [
+      createQueuedFile({ id: 'file-1', name: 'photo-1.jpg' }),
+      createQueuedFile({ id: 'file-2', name: 'photo-2.jpg' }),
+      createQueuedFile({ id: 'file-3', name: 'photo-3.jpg' }),
+      createQueuedFile({ id: 'file-4', name: 'photo-4.jpg' }),
+    ];
+    const deferredInits = [
+      createDeferred<Response>(),
+      createDeferred<Response>(),
+      createDeferred<Response>(),
+    ];
+    let initCount = 0;
+
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-1', name: 'IMG_001.jpg' },
+    });
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-2', name: 'IMG_002.jpg' },
+    });
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-3', name: 'IMG_003.jpg' },
+    });
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-4', name: 'IMG_004.jpg' },
+    });
+
+    fetchMock.mockImplementation(async (input, init) => {
+      const url = typeof input === 'string' ? input : input.url;
+      const method = init?.method ?? (typeof input === 'string' ? 'GET' : input.method);
+
+      if (url === '/api/guestsnap/session' && method === 'GET') {
+        return jsonResponse(
+          {
+            success: false,
+            sessionId: '',
+            guestName: '',
+            guestFolder: '',
+            uploadCount: 0,
+            uploadLimit: 50,
+            expiresAt: '',
+            error: { code: 'NO_SESSION', message: '세션이 없습니다' },
+          },
+          404
+        );
+      }
+
+      if (url === '/api/guestsnap/upload/init') {
+        initCount += 1;
+
+        if (initCount <= 3) {
+          return deferredInits[initCount - 1]!.promise;
+        }
+
+        return jsonResponse({
+          success: true,
+          uploadUrl: `https://google-upload.test/session-${initCount}`,
+          fileName: `IMG_00${initCount}.jpg`,
+        });
+      }
+
+      if (url === '/api/guestsnap/upload/complete') {
+        const completeCount = fetchMock.mock.calls.filter(([callInput, callInit]) => {
+          const callUrl = typeof callInput === 'string' ? callInput : callInput.url;
+          const callMethod =
+            callInit?.method ?? (typeof callInput === 'string' ? 'GET' : callInput.method);
+          return callUrl === '/api/guestsnap/upload/complete' && callMethod === 'POST';
+        }).length;
+
+        return jsonResponse({
+          success: true,
+          fileId: `google-file-${completeCount}`,
+          fileName: `IMG_00${completeCount}.jpg`,
+          uploadedAt: new Date().toISOString(),
+        });
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${url}`);
+    });
+
+    const { result } = renderHook(() => useGuestSnapUpload());
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    act(() => {
+      result.current.addFiles(files);
+    });
+
+    act(() => {
+      result.current.startUpload();
+    });
+
+    await waitFor(() => {
+      expect(result.current.queueState.activeFiles).toHaveLength(3);
+    });
+
+    expect(result.current.queueState.queue).toHaveLength(1);
+
+    deferredInits.forEach((deferred, index) => {
+      deferred.resolve(
+        jsonResponse({
+          success: true,
+          uploadUrl: `https://google-upload.test/session-${index + 1}`,
+          fileName: `IMG_00${index + 1}.jpg`,
+        })
+      );
+    });
+
+    await waitFor(() => {
+      expect(result.current.uploadedCount).toBe(4);
+    });
+
+    expect(initCount).toBe(4);
+    expect(result.current.failedCount).toBe(0);
+  });
+
+  it('reserves the last remaining slot before starting parallel uploads', async () => {
+    const files = [
+      createQueuedFile({ id: 'file-1', name: 'last-slot.jpg' }),
+      createQueuedFile({ id: 'file-2', name: 'overflow-1.jpg' }),
+      createQueuedFile({ id: 'file-3', name: 'overflow-2.jpg' }),
+    ];
+
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-1', name: 'IMG_last-slot.jpg' },
+    });
+
+    fetchMock.mockImplementation(async (input, init) => {
+      const url = typeof input === 'string' ? input : input.url;
+      const method = init?.method ?? (typeof input === 'string' ? 'GET' : input.method);
+
+      if (url === '/api/guestsnap/session' && method === 'GET') {
+        return jsonResponse({
+          success: true,
+          sessionId: 'gs_existing',
+          guestName: '홍길동',
+          guestFolder: 'guest-folder-id',
+          uploadCount: 49,
+          uploadLimit: 50,
+          expiresAt: new Date(Date.now() + 60_000).toISOString(),
+        });
+      }
+
+      if (url === '/api/guestsnap/upload/init') {
+        return jsonResponse({
+          success: true,
+          uploadUrl: 'https://google-upload.test/session-1',
+          fileName: 'IMG_last-slot.jpg',
+        });
+      }
+
+      if (url === '/api/guestsnap/upload/complete') {
+        return jsonResponse({
+          success: true,
+          fileId: 'google-file-1',
+          fileName: 'IMG_last-slot.jpg',
+          uploadedAt: new Date().toISOString(),
+        });
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${url}`);
+    });
+
+    const { result } = renderHook(() => useGuestSnapUpload());
+
+    await waitFor(() => {
+      expect(result.current.session?.uploadCount).toBe(49);
+    });
+
+    act(() => {
+      result.current.addFiles(files);
+      result.current.startUpload();
+    });
+
+    await waitFor(() => {
+      expect(result.current.uploadedCount).toBe(1);
+    });
+
+    expect(result.current.failedCount).toBe(2);
+    expect(result.current.queueState.failed.map((file) => file.name)).toEqual([
+      'overflow-1.jpg',
+      'overflow-2.jpg',
+    ]);
   });
 });

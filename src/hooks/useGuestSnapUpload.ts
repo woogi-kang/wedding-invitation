@@ -119,6 +119,7 @@ export function useGuestSnapUpload(
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [queueState, setQueueState] = useState<UploadQueueState>({
     isProcessing: false,
+    activeFiles: [],
     currentFile: null,
     queue: [],
     completed: [],
@@ -127,8 +128,10 @@ export function useGuestSnapUpload(
 
   // Refs for managing upload process
   const isProcessingRef = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const uploadRequestRef = useRef<XMLHttpRequest | null>(null);
+  const sessionRef = useRef<GuestSnapSession | null>(session);
+  const abortControllersRef = useRef<Map<string, AbortController>>(new Map());
+  const uploadRequestsRef = useRef<Map<string, XMLHttpRequest>>(new Map());
+  const activeRunRef = useRef<{ cancelled: boolean } | null>(null);
   const queueStateRef = useRef<UploadQueueState>(queueState);
 
   // Keep a ref to the latest queue state for async upload loop logic.
@@ -136,17 +139,45 @@ export function useGuestSnapUpload(
     queueStateRef.current = queueState;
   }, [queueState]);
 
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
+
+  const syncCurrentFile = useCallback((activeFiles: GuestSnapFile[]): GuestSnapFile | null => {
+    return activeFiles[0] || null;
+  }, []);
+
+  const updateQueueState = useCallback(
+    (updater: (prev: UploadQueueState) => UploadQueueState) => {
+      const nextState = updater(queueStateRef.current);
+      queueStateRef.current = nextState;
+      setQueueState(nextState);
+      return nextState;
+    },
+    []
+  );
+
+  const updateSessionState = useCallback(
+    (updater: (prev: GuestSnapSession | null) => GuestSnapSession | null) => {
+      const nextSession = updater(sessionRef.current);
+      sessionRef.current = nextSession;
+      setSession(nextSession);
+      return nextSession;
+    },
+    []
+  );
+
   // Calculate total progress
   const totalProgress = useCallback(() => {
-    const { queue, completed, failed, currentFile } = queueState;
-    const total = queue.length + completed.length + failed.length + (currentFile ? 1 : 0);
+    const { queue, completed, failed, activeFiles } = queueState;
+    const total = queue.length + completed.length + failed.length + activeFiles.length;
 
     if (total === 0) return 0;
 
     const completedProgress = completed.length * 100;
-    const currentProgress = currentFile?.progress || 0;
+    const activeProgress = activeFiles.reduce((sum, file) => sum + file.progress, 0);
 
-    return Math.round((completedProgress + currentProgress) / total);
+    return Math.round((completedProgress + activeProgress) / total);
   }, [queueState]);
 
   /**
@@ -162,7 +193,7 @@ export function useGuestSnapUpload(
         if (response.ok) {
           const data: SessionResponse = await response.json();
           if (data.success) {
-            setSession({
+            updateSessionState(() => ({
               id: data.sessionId,
               guestName: data.guestName,
               guestFolder: data.guestFolder,
@@ -171,7 +202,7 @@ export function useGuestSnapUpload(
               files: [],
               createdAt: new Date(),
               expiresAt: new Date(data.expiresAt),
-            });
+            }));
           }
         }
       } catch {
@@ -180,7 +211,7 @@ export function useGuestSnapUpload(
     };
 
     checkExistingSession();
-  }, []);
+  }, [updateSessionState]);
 
   /**
    * Create a new session with guest name
@@ -205,7 +236,7 @@ export function useGuestSnapUpload(
         return false;
       }
 
-      setSession({
+      updateSessionState(() => ({
         id: data.sessionId,
         guestName: data.guestName,
         guestFolder: data.guestFolder,
@@ -214,7 +245,7 @@ export function useGuestSnapUpload(
         files: [],
         createdAt: new Date(),
         expiresAt: new Date(data.expiresAt),
-      });
+      }));
 
       return true;
     } catch {
@@ -223,37 +254,35 @@ export function useGuestSnapUpload(
     } finally {
       setIsSessionLoading(false);
     }
-  }, []);
+  }, [updateSessionState]);
 
   /**
    * Add files to the upload queue
    */
   const addFiles = useCallback((files: GuestSnapFile[]) => {
-    setQueueState((prev) => {
-      const nextState: UploadQueueState = {
+    updateQueueState((prev) => ({
         ...prev,
         queue: [...prev.queue, ...files],
-      };
-      queueStateRef.current = nextState;
-      return nextState;
-    });
+      }));
     setUploadState('selecting');
-  }, []);
+  }, [updateQueueState]);
 
   /**
    * Remove a file from the queue
    */
   const removeFile = useCallback((fileId: string) => {
-    setQueueState((prev) => {
-      const nextState: UploadQueueState = {
+    updateQueueState((prev) => {
+      const activeFiles = prev.activeFiles.filter((f) => f.id !== fileId);
+      return {
         ...prev,
+        activeFiles,
+        currentFile: syncCurrentFile(activeFiles),
         queue: prev.queue.filter((f) => f.id !== fileId),
+        completed: prev.completed.filter((f) => f.id !== fileId),
         failed: prev.failed.filter((f) => f.id !== fileId),
       };
-      queueStateRef.current = nextState;
-      return nextState;
     });
-  }, []);
+  }, [syncCurrentFile, updateQueueState]);
 
   /**
    * Clear the entire queue
@@ -261,6 +290,7 @@ export function useGuestSnapUpload(
   const clearQueue = useCallback(() => {
     const nextState: UploadQueueState = {
       isProcessing: false,
+      activeFiles: [],
       currentFile: null,
       queue: [],
       completed: [],
@@ -269,6 +299,10 @@ export function useGuestSnapUpload(
     queueStateRef.current = nextState;
     setQueueState(nextState);
     setUploadState('idle');
+    activeRunRef.current = null;
+    isProcessingRef.current = false;
+    abortControllersRef.current.clear();
+    uploadRequestsRef.current.clear();
   }, []);
 
   /**
@@ -288,20 +322,28 @@ export function useGuestSnapUpload(
         try {
           // Update progress to show retry status
           if (attempt > 1) {
-            setQueueState((prev) => ({
-              ...prev,
-              currentFile: prev.currentFile
-                ? {
-                    ...prev.currentFile,
-                    retryCount: attempt - 1,
-                    status: 'uploading',
-                  }
-                : null,
-            }));
+            updateQueueState((prev) => {
+              const activeFiles = prev.activeFiles.map((activeFile) =>
+                activeFile.id === file.id
+                  ? {
+                      ...activeFile,
+                      retryCount: attempt - 1,
+                      status: 'uploading' as const,
+                    }
+                  : activeFile
+              );
+
+              return {
+                ...prev,
+                activeFiles,
+                currentFile: syncCurrentFile(activeFiles),
+              };
+            });
           }
 
           // Create abort controller for this request
-          abortControllerRef.current = new AbortController();
+          const abortController = new AbortController();
+          abortControllersRef.current.set(file.id, abortController);
 
           if (!uploadedFile) {
             const headerBuffer = await readBlobArrayBuffer(file.file.slice(0, 20));
@@ -316,7 +358,7 @@ export function useGuestSnapUpload(
                 size: file.size,
                 headerBase64: arrayBufferToBase64(headerBuffer),
               }),
-              signal: abortControllerRef.current.signal,
+              signal: abortController.signal,
             });
 
             const initData: UploadInitResponse = await initResponse.json();
@@ -339,7 +381,7 @@ export function useGuestSnapUpload(
 
             uploadedFile = await new Promise<DirectUploadResult>((resolve, reject) => {
               const xhr = new XMLHttpRequest();
-              uploadRequestRef.current = xhr;
+              uploadRequestsRef.current.set(file.id, xhr);
 
               xhr.open('PUT', uploadUrl);
               xhr.setRequestHeader(
@@ -357,27 +399,36 @@ export function useGuestSnapUpload(
                   Math.min(99, Math.round((event.loaded / event.total) * 100))
                 );
 
-                setQueueState((prev) => ({
-                  ...prev,
-                  currentFile: prev.currentFile
-                    ? {
-                        ...prev.currentFile,
-                        progress,
-                      }
-                    : null,
-                }));
+                updateQueueState((prev) => {
+                  const activeFiles = prev.activeFiles.map((activeFile) =>
+                    activeFile.id === file.id
+                      ? {
+                          ...activeFile,
+                          progress,
+                        }
+                      : activeFile
+                  );
+
+                  return {
+                    ...prev,
+                    activeFiles,
+                    currentFile: syncCurrentFile(activeFiles),
+                  };
+                });
               };
 
               xhr.onerror = () => {
+                uploadRequestsRef.current.delete(file.id);
                 reject(new UploadError('업로드 전송 중 오류가 발생했어요'));
               };
 
               xhr.onabort = () => {
+                uploadRequestsRef.current.delete(file.id);
                 reject(new DOMException('Upload aborted', 'AbortError'));
               };
 
               xhr.onload = () => {
-                uploadRequestRef.current = null;
+                uploadRequestsRef.current.delete(file.id);
 
                 if (xhr.status < 200 || xhr.status >= 300) {
                   reject(
@@ -412,7 +463,7 @@ export function useGuestSnapUpload(
               fileId: uploadedFile.fileId,
               fileName: uploadedFile.fileName,
             }),
-            signal: abortControllerRef.current.signal,
+            signal: abortController.signal,
           });
 
           const completeData: UploadResponse = await completeResponse.json();
@@ -458,93 +509,228 @@ export function useGuestSnapUpload(
 
       return { success: false, error: lastError };
     },
-    [retryConfig]
+    [retryConfig, syncCurrentFile, updateQueueState]
   );
 
   /**
-   * Process the upload queue
+   * Move queued files that no longer fit in the session capacity to failed.
+   */
+  const failRemainingQueueForLimit = useCallback(() => {
+    const message = GUEST_SNAP_CONFIG.messages.limitReached;
+    let overflowFiles: GuestSnapFile[] = [];
+
+    updateQueueState((prev) => {
+      if (prev.queue.length === 0) {
+        return prev;
+      }
+
+      overflowFiles = prev.queue.map((queuedFile) => ({
+        ...queuedFile,
+        status: 'failed' as const,
+        error: message,
+      }));
+
+      return {
+        ...prev,
+        queue: [],
+        failed: [...prev.failed, ...overflowFiles],
+        currentFile: syncCurrentFile(prev.activeFiles),
+      };
+    });
+
+    for (const file of overflowFiles) {
+      onUploadError?.(file, message);
+    }
+  }, [onUploadError, syncCurrentFile, updateQueueState]);
+
+  /**
+   * Reserve the next file and move it to the active worker pool.
+   */
+  const takeNextFileForUpload = useCallback((): GuestSnapFile | null => {
+    let nextFile: GuestSnapFile | null = null;
+    let limitReached = false;
+
+    updateQueueState((prev) => {
+      if (prev.queue.length === 0) {
+        return prev;
+      }
+
+      const sessionSnapshot = sessionRef.current;
+      const uploadLimit =
+        sessionSnapshot?.uploadLimit || GUEST_SNAP_CONFIG.limits.maxFilesPerSession;
+      const uploadCount = sessionSnapshot?.uploadCount || 0;
+
+      if (uploadCount + prev.activeFiles.length >= uploadLimit) {
+        limitReached = true;
+        return prev;
+      }
+
+      nextFile = {
+        ...prev.queue[0],
+        status: 'uploading' as const,
+        progress: 0,
+        error: undefined,
+      };
+      const activeFiles = [...prev.activeFiles, nextFile];
+
+      return {
+        ...prev,
+        activeFiles,
+        currentFile: syncCurrentFile(activeFiles),
+        queue: prev.queue.slice(1),
+      };
+    });
+
+    if (limitReached) {
+      failRemainingQueueForLimit();
+    }
+
+    return nextFile;
+  }, [failRemainingQueueForLimit, syncCurrentFile, updateQueueState]);
+
+  /**
+   * Mark a finished active upload as completed or failed.
+   */
+  const finalizeActiveFile = useCallback(
+    (
+      file: GuestSnapFile,
+      result: { success: boolean; error?: string }
+    ): boolean => {
+      let finalized = false;
+
+      if (result.success) {
+        const completedFile: GuestSnapFile = {
+          ...file,
+          status: 'completed',
+          progress: 100,
+          error: undefined,
+          uploadedAt: new Date(),
+        };
+
+        updateQueueState((prev) => {
+          const exists = prev.activeFiles.some((activeFile) => activeFile.id === file.id);
+          if (!exists) {
+            return prev;
+          }
+
+          finalized = true;
+          const activeFiles = prev.activeFiles.filter((activeFile) => activeFile.id !== file.id);
+          return {
+            ...prev,
+            activeFiles,
+            currentFile: syncCurrentFile(activeFiles),
+            completed: [...prev.completed, completedFile],
+          };
+        });
+
+        if (finalized) {
+          updateSessionState((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  uploadCount: Math.min(prev.uploadLimit, prev.uploadCount + 1),
+                  files: [...prev.files, completedFile],
+                }
+              : prev
+          );
+          onUploadComplete?.(completedFile);
+        }
+
+        return finalized;
+      }
+
+      const failedFile: GuestSnapFile = {
+        ...file,
+        status: 'failed',
+        error: result.error,
+      };
+
+      updateQueueState((prev) => {
+        const exists = prev.activeFiles.some((activeFile) => activeFile.id === file.id);
+        if (!exists) {
+          return prev;
+        }
+
+        finalized = true;
+        const activeFiles = prev.activeFiles.filter((activeFile) => activeFile.id !== file.id);
+        return {
+          ...prev,
+          activeFiles,
+          currentFile: syncCurrentFile(activeFiles),
+          failed: [...prev.failed, failedFile],
+        };
+      });
+
+      if (finalized) {
+        onUploadError?.(file, result.error || '업로드 실패');
+      }
+
+      return finalized;
+    },
+    [onUploadComplete, onUploadError, syncCurrentFile, updateQueueState, updateSessionState]
+  );
+
+  /**
+   * Process the upload queue with a bounded worker pool.
    */
   const processQueue = useCallback(async () => {
     if (isProcessingRef.current) return;
     if (queueStateRef.current.queue.length === 0) return;
 
     isProcessingRef.current = true;
+    const runToken = { cancelled: false };
+    activeRunRef.current = runToken;
 
-    const processingState: UploadQueueState = {
-      ...queueStateRef.current,
+    updateQueueState((prev) => ({
+      ...prev,
       isProcessing: true,
-    };
-    queueStateRef.current = processingState;
-    setQueueState(processingState);
+    }));
     setUploadState('uploading');
 
-    while (true) {
-      const queueSnapshot = queueStateRef.current;
-      if (queueSnapshot.queue.length === 0) {
-        break;
+    const worker = async () => {
+      while (!runToken.cancelled) {
+        const nextFile = takeNextFileForUpload();
+
+        if (!nextFile) {
+          return;
+        }
+
+        const result = await uploadFile(nextFile);
+        abortControllersRef.current.delete(nextFile.id);
+        uploadRequestsRef.current.delete(nextFile.id);
+
+        if (runToken.cancelled) {
+          return;
+        }
+
+        finalizeActiveFile(nextFile, result);
       }
+    };
 
-      const nextFile = queueSnapshot.queue[0];
-      const nextQueueState: UploadQueueState = {
-        ...queueSnapshot,
-        currentFile: { ...nextFile, status: 'uploading', progress: 0 },
-        queue: queueSnapshot.queue.slice(1),
-      };
-      queueStateRef.current = nextQueueState;
-      setQueueState(nextQueueState);
+    const workerCount = Math.min(
+      GUEST_SNAP_CONFIG.limits.maxConcurrentUploads,
+      queueStateRef.current.queue.length
+    );
 
-      // Upload the file
-      const result = await uploadFile(nextFile);
+    await Promise.all(Array.from({ length: workerCount }, () => worker()));
 
-      if (result.success) {
-        const completedFile: GuestSnapFile = {
-          ...nextFile,
-          status: 'completed',
-          progress: 100,
-          uploadedAt: new Date(),
-        };
-
-        const successState: UploadQueueState = {
-          ...queueStateRef.current,
-          currentFile: null,
-          completed: [...queueStateRef.current.completed, completedFile],
-        };
-        queueStateRef.current = successState;
-        setQueueState(successState);
-
-        // Move to completed
-        onUploadComplete?.(completedFile);
-      } else {
-        const failedFile: GuestSnapFile = {
-          ...nextFile,
-          status: 'failed',
-          error: result.error,
-        };
-
-        const failedState: UploadQueueState = {
-          ...queueStateRef.current,
-          currentFile: null,
-          failed: [...queueStateRef.current.failed, failedFile],
-        };
-        queueStateRef.current = failedState;
-        setQueueState(failedState);
-
-        // Move to failed
-        onUploadError?.(nextFile, result.error || '업로드 실패');
-      }
+    if (activeRunRef.current !== runToken) {
+      return;
     }
 
-    // All files processed
+    activeRunRef.current = null;
     isProcessingRef.current = false;
-    const finalizedState: UploadQueueState = {
-      ...queueStateRef.current,
-      isProcessing: false,
-      currentFile: null,
-    };
-    queueStateRef.current = finalizedState;
-    setQueueState(finalizedState);
 
-    // Determine final state
+    if (runToken.cancelled) {
+      return;
+    }
+
+    const finalizedState = updateQueueState((prev) => ({
+      ...prev,
+      isProcessing: false,
+      currentFile: syncCurrentFile(prev.activeFiles),
+    }));
+
     const summary = {
       uploadedCount: finalizedState.completed.length,
       failedCount: finalizedState.failed.length,
@@ -558,7 +744,14 @@ export function useGuestSnapUpload(
 
     setUploadState('completed');
     onAllComplete?.(summary);
-  }, [uploadFile, onUploadComplete, onUploadError, onAllComplete]);
+  }, [
+    finalizeActiveFile,
+    onAllComplete,
+    syncCurrentFile,
+    takeNextFileForUpload,
+    updateQueueState,
+    uploadFile,
+  ]);
 
   /**
    * Start uploading files
@@ -572,24 +765,32 @@ export function useGuestSnapUpload(
    * Pause the upload
    */
   const pauseUpload = useCallback(() => {
-    uploadRequestRef.current?.abort();
-    abortControllerRef.current?.abort();
+    if (activeRunRef.current) {
+      activeRunRef.current.cancelled = true;
+    }
+    uploadRequestsRef.current.forEach((xhr) => xhr.abort());
+    abortControllersRef.current.forEach((controller) => controller.abort());
+    uploadRequestsRef.current.clear();
+    abortControllersRef.current.clear();
     isProcessingRef.current = false;
     setUploadState('paused');
-    setQueueState((prev) => {
-      const nextState: UploadQueueState = {
+    updateQueueState((prev) => {
+      const requeuedActiveFiles = prev.activeFiles.map((file) => ({
+        ...file,
+        status: 'pending' as const,
+        progress: 0,
+        error: undefined,
+      }));
+
+      return {
         ...prev,
         isProcessing: false,
-        // Move current file back to queue
-        queue: prev.currentFile
-          ? [{ ...prev.currentFile, status: 'pending' as const, progress: 0 }, ...prev.queue]
-          : prev.queue,
+        queue: [...requeuedActiveFiles, ...prev.queue],
+        activeFiles: [],
         currentFile: null,
       };
-      queueStateRef.current = nextState;
-      return nextState;
     });
-  }, []);
+  }, [updateQueueState]);
 
   /**
    * Resume the upload
@@ -605,11 +806,11 @@ export function useGuestSnapUpload(
    */
   const retryFile = useCallback(
     (fileId: string) => {
-      setQueueState((prev) => {
+      updateQueueState((prev) => {
         const failedFile = prev.failed.find((f) => f.id === fileId);
         if (!failedFile) return prev;
 
-        const nextState: UploadQueueState = {
+        return {
           ...prev,
           failed: prev.failed.filter((f) => f.id !== fileId),
           queue: [
@@ -617,8 +818,6 @@ export function useGuestSnapUpload(
             { ...failedFile, status: 'pending' as const, progress: 0, error: undefined },
           ],
         };
-        queueStateRef.current = nextState;
-        return nextState;
       });
 
       // Start processing if not already
@@ -626,15 +825,14 @@ export function useGuestSnapUpload(
         setTimeout(processQueue, 0);
       }
     },
-    [processQueue]
+    [processQueue, updateQueueState]
   );
 
   /**
    * Retry all failed files
    */
   const retryAllFailed = useCallback(() => {
-    setQueueState((prev) => {
-      const nextState: UploadQueueState = {
+    updateQueueState((prev) => ({
         ...prev,
         queue: [
           ...prev.queue,
@@ -646,16 +844,13 @@ export function useGuestSnapUpload(
           })),
         ],
         failed: [],
-      };
-      queueStateRef.current = nextState;
-      return nextState;
-    });
+      }));
 
-    // Start processing if not already
+      // Start processing if not already
     if (!isProcessingRef.current) {
       setTimeout(processQueue, 0);
     }
-  }, [processQueue]);
+  }, [processQueue, updateQueueState]);
 
   return {
     // Session state

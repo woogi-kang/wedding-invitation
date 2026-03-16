@@ -16,8 +16,6 @@ import type { GuestSnapFile, GuestSnapFileStatus } from '@/types/guestsnap';
 interface UploadProgressProps {
   /** Files in the upload queue */
   files: GuestSnapFile[];
-  /** Currently uploading file */
-  currentFile: GuestSnapFile | null;
   /** Number of completed uploads */
   completedCount: number;
   /** Number of failed uploads */
@@ -195,7 +193,6 @@ function FileProgressItem({
  */
 export function UploadProgress({
   files,
-  currentFile,
   completedCount,
   failedCount,
   totalProgress,
@@ -208,6 +205,7 @@ export function UploadProgress({
   const { messages } = GUEST_SNAP_CONFIG;
   const totalFiles = files.length;
   const pendingCount = files.filter((f) => f.status === 'pending').length;
+  const uploadingFiles = files.filter((f) => f.status === 'uploading');
 
   // Accessibility and animation hooks
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -253,6 +251,8 @@ export function UploadProgress({
                 : currentRetryAttempt
                   ? messages.retryingText
                       .replace('{{attempt}}', currentRetryAttempt.toString())
+                  : uploadingFiles.length > 1
+                    ? `${messages.uploadingTitle} (${uploadingFiles.length}개 동시 업로드)`
                   : messages.uploadingTitle}
             </span>
           </div>
@@ -327,17 +327,18 @@ export function UploadProgress({
         initial="initial"
         animate="animate"
       >
-        {/* Current file first */}
-        {currentFile && (
+        {/* Active uploads first */}
+        {uploadingFiles.map((file) => (
           <FileProgressItem
-            file={currentFile}
+            key={file.id}
+            file={file}
             isCurrentFile
           />
-        )}
+        ))}
 
         {/* Rest of the files */}
         {files
-          .filter((f) => f.id !== currentFile?.id)
+          .filter((f) => f.status !== 'uploading')
           .map((file) => (
             <FileProgressItem
               key={file.id}
