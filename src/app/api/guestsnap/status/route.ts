@@ -15,6 +15,8 @@ export async function GET(): Promise<NextResponse<StatusResponse>> {
       return NextResponse.json({
         serviceEnabled: false,
         storageAvailable: false,
+        configurationValid: false,
+        authMode: 'unconfigured',
         currentUploads: 0,
         maxConcurrentUploads: GUEST_SNAP_CONFIG.limits.maxConcurrentUploads,
       });
@@ -26,6 +28,9 @@ export async function GET(): Promise<NextResponse<StatusResponse>> {
     return NextResponse.json({
       serviceEnabled: GUEST_SNAP_CONFIG.enabled,
       storageAvailable: storageStatus.available,
+      configurationValid: storageStatus.configurationValid,
+      authMode: storageStatus.authMode,
+      storageErrorCode: storageStatus.errorCode,
       currentUploads: 0, // Could track this with a counter if needed
       maxConcurrentUploads: GUEST_SNAP_CONFIG.limits.maxConcurrentUploads,
     });
@@ -35,6 +40,9 @@ export async function GET(): Promise<NextResponse<StatusResponse>> {
     return NextResponse.json({
       serviceEnabled: GUEST_SNAP_CONFIG.enabled,
       storageAvailable: false,
+      configurationValid: false,
+      authMode: 'unconfigured',
+      storageErrorCode: 'unknown',
       currentUploads: 0,
       maxConcurrentUploads: GUEST_SNAP_CONFIG.limits.maxConcurrentUploads,
     });

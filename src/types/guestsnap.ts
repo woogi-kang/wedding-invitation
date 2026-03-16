@@ -129,9 +129,31 @@ export interface SessionResponse {
 export interface StatusResponse {
   serviceEnabled: boolean;
   storageAvailable: boolean;
+  configurationValid?: boolean;
+  authMode?: GuestSnapStorageAuthMode;
+  storageErrorCode?: GuestSnapStorageErrorCode;
   currentUploads: number;
   maxConcurrentUploads: number;
 }
+
+export type GuestSnapStorageAuthMode =
+  | 'oauth'
+  | 'service_account'
+  | 'legacy_service_account'
+  | 'unconfigured';
+
+export type GuestSnapStorageErrorCode =
+  | 'missing_root_folder_id'
+  | 'invalid_auth_mode'
+  | 'missing_auth_configuration'
+  | 'missing_oauth_credentials'
+  | 'missing_service_account_credentials'
+  | 'invalid_service_account_json'
+  | 'drive_auth_invalid_grant'
+  | 'drive_access_failed'
+  | 'drive_root_inaccessible'
+  | 'drive_folder_creation_failed'
+  | 'unknown';
 
 /**
  * File validation result

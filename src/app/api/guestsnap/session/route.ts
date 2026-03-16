@@ -93,7 +93,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
     const folderResult = await createGuestFolder(sanitizedName);
 
     if (!folderResult.success) {
-      console.error('Failed to create guest folder:', folderResult.error);
+      console.error(
+        'Failed to create guest folder:',
+        folderResult.errorCode || 'unknown',
+        folderResult.error
+      );
 
       return NextResponse.json(
         {
@@ -105,7 +109,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
           uploadLimit: GUEST_SNAP_CONFIG.limits.maxFilesPerSession,
           expiresAt: '',
           error: {
-            code: 'FOLDER_CREATION_FAILED',
+            code: folderResult.errorCode || 'FOLDER_CREATION_FAILED',
             message: '서버 연결에 실패했어요. 잠시 후 다시 시도해주세요.',
           },
         },

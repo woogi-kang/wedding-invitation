@@ -70,6 +70,8 @@ export type {
   UploadResponse,
   SessionResponse,
   StatusResponse,
+  GuestSnapStorageAuthMode,
+  GuestSnapStorageErrorCode,
   FileValidationResult,
 } from './guestsnap';
 

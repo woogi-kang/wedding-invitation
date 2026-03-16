@@ -173,12 +173,17 @@ npx serve out
    - Shared Drive: 서비스 계정 방식 권장
 2. 환경 변수 설정:
    ```bash
+   GOOGLE_DRIVE_AUTH_MODE=service_account
+
    # 권장(내 드라이브)
    GOOGLE_DRIVE_OAUTH_CLIENT_ID=...
    GOOGLE_DRIVE_OAUTH_CLIENT_SECRET=...
    GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN=...
 
-   # 권장(Shared Drive)
+   # 권장(배포/Vercel)
+   GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64=...
+
+   # 권장(로컬)
    GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH=/absolute/path/to/guestsnap-service-account.json
 
    # 대안
@@ -212,7 +217,7 @@ npx serve out
    },
    ```
 
-자세한 설정 및 사용법은 [Guest Snap 문서](docs/GUEST-SNAP.md)를 참조하세요.
+자세한 설정 및 사용법은 [Guest Snap 문서](docs/GUEST-SNAP.md)와 [배포 체크리스트](docs/GUEST-SNAP-DEPLOY-CHECKLIST.md)를 참조하세요.
 
 ## Project Structure
 

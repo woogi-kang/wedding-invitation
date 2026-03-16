@@ -46,12 +46,19 @@ Guest Snap은 아래 구조로 폴더를 자동 생성합니다.
 # 선택: 업로드 알림 Discord Webhook
 GUEST_SNAP_DISCORD_WEBHOOK_URL=
 
+# 인증 방식 명시
+# auto | oauth | service_account
+GOOGLE_DRIVE_AUTH_MODE=auto
+
 # 권장(내 드라이브): OAuth 사용자 토큰
 GOOGLE_DRIVE_OAUTH_CLIENT_ID=
 GOOGLE_DRIVE_OAUTH_CLIENT_SECRET=
 GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN=
 
-# 권장(Shared Drive): 서비스 계정 JSON 파일 경로
+# 권장(배포/Vercel): 서비스 계정 JSON Base64
+GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64=
+
+# 권장(로컬): 서비스 계정 JSON 파일 경로
 GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH=/absolute/path/to/guestsnap-service-account.json
 
 # 대안: JSON 문자열 직접 저장
@@ -64,6 +71,13 @@ GOOGLE_DRIVE_PRIVATE_KEY=
 GOOGLE_DRIVE_ROOT_FOLDER_ID=your_google_drive_root_folder_id
 GOOGLE_DRIVE_SHARED_DRIVE_ID=   # Shared Drive 사용 시 선택
 ```
+
+### 배포 권장안
+
+- Vercel 배포는 `GOOGLE_DRIVE_AUTH_MODE=service_account`를 명시
+- 서비스 계정 JSON은 `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64`로 저장
+- 기존 OAuth 값은 남겨두지 말고 제거해서 인증 경로가 흔들리지 않게 유지
+- 배포 후 `/api/guestsnap/status`에서 `storageAvailable: true`와 `storageErrorCode`를 확인
 
 ### 권한 설정
 
@@ -133,6 +147,7 @@ src/
 ## UI 개편 문서
 
 - `docs/GUEST-SNAP-UI-REFRESH.md`: 결혼식 전 GuestSnap 업로드 페이지 UI 개편안 / 와이어프레임
+- `docs/GUEST-SNAP-DEPLOY-CHECKLIST.md`: Vercel 배포 / 환경변수 / 운영 체크리스트
 
 ## 문제 해결
 

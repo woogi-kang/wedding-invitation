@@ -7,22 +7,13 @@ import { readFile } from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { google, type drive_v3 } from 'googleapis';
 import { sanitizeGuestName, generateUniqueFileName } from './file-validator';
+import {
+  GOOGLE_DRIVE_ENV,
+  resolveGoogleDriveConfiguration,
+  type GuestSnapStorageErrorCode,
+  type GoogleDriveResolvedAuthMode,
+} from './drive-config';
 import type { GuestSnapFileType } from '@/types/guestsnap';
-
-const GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON =
-  process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON || '';
-const GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH =
-  process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH || '';
-const GOOGLE_DRIVE_OAUTH_CLIENT_ID =
-  process.env.GOOGLE_DRIVE_OAUTH_CLIENT_ID || '';
-const GOOGLE_DRIVE_OAUTH_CLIENT_SECRET =
-  process.env.GOOGLE_DRIVE_OAUTH_CLIENT_SECRET || '';
-const GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN =
-  process.env.GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN || '';
-const GOOGLE_DRIVE_CLIENT_EMAIL = process.env.GOOGLE_DRIVE_CLIENT_EMAIL || '';
-const GOOGLE_DRIVE_PRIVATE_KEY = process.env.GOOGLE_DRIVE_PRIVATE_KEY || '';
-const GOOGLE_DRIVE_ROOT_FOLDER_ID = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID || '';
-const GOOGLE_DRIVE_SHARED_DRIVE_ID = process.env.GOOGLE_DRIVE_SHARED_DRIVE_ID || '';
 
 const DRIVE_FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
 const DRIVE_SCOPE = ['https://www.googleapis.com/auth/drive'];
@@ -74,25 +65,44 @@ function parseServiceAccountJson(
 }
 
 async function getServiceAccountCredentials(): Promise<ServiceAccountCredentials> {
-  if (GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON) {
+  if (GOOGLE_DRIVE_ENV.serviceAccountJsonBase64) {
+    let decoded = '';
+
+    try {
+      decoded = Buffer.from(GOOGLE_DRIVE_ENV.serviceAccountJsonBase64, 'base64').toString(
+        'utf8'
+      );
+    } catch {
+      throw new Error(
+        'Invalid service account JSON (GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64)'
+      );
+    }
+
     return parseServiceAccountJson(
-      GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON,
+      decoded,
+      'GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64'
+    );
+  }
+
+  if (GOOGLE_DRIVE_ENV.serviceAccountJson) {
+    return parseServiceAccountJson(
+      GOOGLE_DRIVE_ENV.serviceAccountJson,
       'GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON'
     );
   }
 
-  if (GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH) {
-    const content = await readFile(GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH, 'utf8');
+  if (GOOGLE_DRIVE_ENV.serviceAccountJsonPath) {
+    const content = await readFile(GOOGLE_DRIVE_ENV.serviceAccountJsonPath, 'utf8');
     return parseServiceAccountJson(
       content,
-      `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH (${GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH})`
+      `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_PATH (${GOOGLE_DRIVE_ENV.serviceAccountJsonPath})`
     );
   }
 
-  if (GOOGLE_DRIVE_CLIENT_EMAIL && GOOGLE_DRIVE_PRIVATE_KEY) {
+  if (GOOGLE_DRIVE_ENV.clientEmail && GOOGLE_DRIVE_ENV.privateKey) {
     return {
-      clientEmail: GOOGLE_DRIVE_CLIENT_EMAIL,
-      privateKey: normalizePrivateKey(GOOGLE_DRIVE_PRIVATE_KEY),
+      clientEmail: GOOGLE_DRIVE_ENV.clientEmail,
+      privateKey: normalizePrivateKey(GOOGLE_DRIVE_ENV.privateKey),
     };
   }
 
@@ -103,27 +113,27 @@ async function getServiceAccountCredentials(): Promise<ServiceAccountCredentials
 
 function getOAuthCredentials(): OAuthCredentials | null {
   const hasAnyOAuthValue =
-    GOOGLE_DRIVE_OAUTH_CLIENT_ID ||
-    GOOGLE_DRIVE_OAUTH_CLIENT_SECRET ||
-    GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN;
+    GOOGLE_DRIVE_ENV.oauthClientId ||
+    GOOGLE_DRIVE_ENV.oauthClientSecret ||
+    GOOGLE_DRIVE_ENV.oauthRefreshToken;
 
   if (!hasAnyOAuthValue) {
     return null;
   }
 
   if (
-    !GOOGLE_DRIVE_OAUTH_CLIENT_ID ||
-    !GOOGLE_DRIVE_OAUTH_CLIENT_SECRET ||
-    !GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN
+    !GOOGLE_DRIVE_ENV.oauthClientId ||
+    !GOOGLE_DRIVE_ENV.oauthClientSecret ||
+    !GOOGLE_DRIVE_ENV.oauthRefreshToken
   ) {
     // Keep running with service-account fallback until all OAuth values are present.
     return null;
   }
 
   return {
-    clientId: GOOGLE_DRIVE_OAUTH_CLIENT_ID,
-    clientSecret: GOOGLE_DRIVE_OAUTH_CLIENT_SECRET,
-    refreshToken: GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN,
+    clientId: GOOGLE_DRIVE_ENV.oauthClientId,
+    clientSecret: GOOGLE_DRIVE_ENV.oauthClientSecret,
+    refreshToken: GOOGLE_DRIVE_ENV.oauthRefreshToken,
   };
 }
 
@@ -132,6 +142,55 @@ function getErrorMessage(error: unknown): string {
     return error.message;
   }
   return 'Unknown error';
+}
+
+function getStorageErrorCode(error: unknown): GuestSnapStorageErrorCode {
+  const message = getErrorMessage(error).toLowerCase();
+
+  if (message.includes('root folder id is missing') || message.includes('root_folder_id')) {
+    return 'missing_root_folder_id';
+  }
+
+  if (message.includes('auth mode must be auto') || message.includes('invalid auth mode')) {
+    return 'invalid_auth_mode';
+  }
+
+  if (message.includes('no google drive credentials are configured')) {
+    return 'missing_auth_configuration';
+  }
+
+  if (message.includes('oauth credentials are incomplete')) {
+    return 'missing_oauth_credentials';
+  }
+
+  if (
+    message.includes('service account credentials are incomplete') ||
+    message.includes('service account json missing')
+  ) {
+    return 'missing_service_account_credentials';
+  }
+
+  if (
+    message.includes('invalid service account json') ||
+    message.includes('missing client_email/private_key')
+  ) {
+    return 'invalid_service_account_json';
+  }
+
+  if (message.includes('invalid_grant')) {
+    return 'drive_auth_invalid_grant';
+  }
+
+  if (
+    message.includes('permission') ||
+    message.includes('forbidden') ||
+    message.includes('insufficient') ||
+    message.includes('unauthorized')
+  ) {
+    return 'drive_access_failed';
+  }
+
+  return 'unknown';
 }
 
 function buildListParams(
@@ -147,9 +206,9 @@ function buildListParams(
     spaces: 'drive',
   };
 
-  if (GOOGLE_DRIVE_SHARED_DRIVE_ID) {
+  if (GOOGLE_DRIVE_ENV.sharedDriveId) {
     params.corpora = 'drive';
-    params.driveId = GOOGLE_DRIVE_SHARED_DRIVE_ID;
+    params.driveId = GOOGLE_DRIVE_ENV.sharedDriveId;
   }
 
   return params;
@@ -160,14 +219,21 @@ async function getDriveClient(): Promise<drive_v3.Drive> {
     return cachedDriveClient;
   }
 
-  if (!GOOGLE_DRIVE_ROOT_FOLDER_ID) {
-    throw new Error('GOOGLE_DRIVE_ROOT_FOLDER_ID is not configured');
+  const configuration = resolveGoogleDriveConfiguration();
+
+  if (!configuration.configurationValid) {
+    throw new Error(configuration.error || 'Google Drive configuration is invalid');
   }
 
-  const oauthCredentials = getOAuthCredentials();
   let auth: InstanceType<typeof google.auth.JWT> | InstanceType<typeof google.auth.OAuth2>;
 
-  if (oauthCredentials) {
+  if (configuration.authMode === 'oauth') {
+    const oauthCredentials = getOAuthCredentials();
+
+    if (!oauthCredentials) {
+      throw new Error('OAuth credentials are incomplete');
+    }
+
     const oauth2Client = new google.auth.OAuth2(
       oauthCredentials.clientId,
       oauthCredentials.clientSecret
@@ -227,7 +293,12 @@ async function createFolder(
   drive: drive_v3.Drive,
   parentId: string,
   folderName: string
-): Promise<{ success: boolean; id: string; error?: string }> {
+): Promise<{
+  success: boolean;
+  id: string;
+  error?: string;
+  errorCode?: GuestSnapStorageErrorCode;
+}> {
   try {
     const response = await drive.files.create({
       requestBody: {
@@ -256,6 +327,7 @@ async function createFolder(
       success: false,
       id: '',
       error: getErrorMessage(error),
+      errorCode: getStorageErrorCode(error),
     };
   }
 }
@@ -290,17 +362,22 @@ async function getUniqueGuestFolderName(
  */
 export async function createGuestFolder(
   guestName: string
-): Promise<{ success: boolean; folderPath: string; error?: string }> {
+): Promise<{
+  success: boolean;
+  folderPath: string;
+  error?: string;
+  errorCode?: GuestSnapStorageErrorCode;
+}> {
   try {
     const drive = await getDriveClient();
     const uniqueGuestName = await getUniqueGuestFolderName(
       drive,
-      GOOGLE_DRIVE_ROOT_FOLDER_ID,
+      GOOGLE_DRIVE_ENV.rootFolderId,
       guestName
     );
     const guestFolder = await createFolder(
       drive,
-      GOOGLE_DRIVE_ROOT_FOLDER_ID,
+      GOOGLE_DRIVE_ENV.rootFolderId,
       uniqueGuestName
     );
 
@@ -309,6 +386,7 @@ export async function createGuestFolder(
         success: false,
         folderPath: '',
         error: `Failed to create guest folder: ${guestFolder.error}`,
+        errorCode: guestFolder.errorCode || 'drive_folder_creation_failed',
       };
     }
 
@@ -323,6 +401,7 @@ export async function createGuestFolder(
       success: false,
       folderPath: '',
       error: getErrorMessage(error),
+      errorCode: getStorageErrorCode(error),
     };
   }
 }
@@ -378,12 +457,27 @@ export async function uploadFile(
 export async function checkStorageStatus(): Promise<{
   available: boolean;
   error?: string;
+  errorCode?: GuestSnapStorageErrorCode;
+  authMode?: GoogleDriveResolvedAuthMode;
+  configurationValid?: boolean;
 }> {
+  const configuration = resolveGoogleDriveConfiguration();
+
+  if (!configuration.configurationValid) {
+    return {
+      available: false,
+      error: configuration.error,
+      errorCode: configuration.errorCode,
+      authMode: configuration.authMode,
+      configurationValid: false,
+    };
+  }
+
   try {
     const drive = await getDriveClient();
 
     const rootInfo = await drive.files.get({
-      fileId: GOOGLE_DRIVE_ROOT_FOLDER_ID,
+      fileId: GOOGLE_DRIVE_ENV.rootFolderId,
       fields: 'id,name,trashed',
       supportsAllDrives: true,
     });
@@ -392,14 +486,24 @@ export async function checkStorageStatus(): Promise<{
       return {
         available: false,
         error: 'Google Drive root folder is not accessible',
+        errorCode: 'drive_root_inaccessible',
+        authMode: configuration.authMode,
+        configurationValid: true,
       };
     }
 
-    return { available: true };
+    return {
+      available: true,
+      authMode: configuration.authMode,
+      configurationValid: true,
+    };
   } catch (error) {
     return {
       available: false,
       error: getErrorMessage(error),
+      errorCode: getStorageErrorCode(error),
+      authMode: configuration.authMode,
+      configurationValid: true,
     };
   }
 }
