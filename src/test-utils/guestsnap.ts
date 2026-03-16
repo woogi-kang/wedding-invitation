@@ -49,7 +49,12 @@ export function createTestFile({
 }: {
   name: string;
   type: string;
-  content?: string | Uint8Array;
+  content?: string | Uint8Array<ArrayBufferLike>;
 }): File {
-  return new File([content], name, { type });
+  const fileContent =
+    typeof content === 'string'
+      ? content
+      : new Uint8Array(Array.from(content));
+
+  return new File([fileContent], name, { type });
 }

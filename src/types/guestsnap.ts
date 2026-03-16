@@ -112,6 +112,16 @@ export interface UploadResponse {
   };
 }
 
+export interface UploadInitResponse {
+  success: boolean;
+  uploadUrl?: string;
+  fileName?: string;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
 export interface SessionResponse {
   success: boolean;
   sessionId: string;

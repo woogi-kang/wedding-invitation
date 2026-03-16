@@ -1,12 +1,15 @@
 /**
  * Guest Snap Upload API Route
- * POST: Upload a file to Google Drive
+ * POST: Legacy small-file upload proxy for Google Drive
  *
  * Handles:
  * - File validation (type, size, magic bytes)
  * - Rate limiting
  * - Session verification
- * - Chunked upload for large files (Vercel 4.5MB limit)
+ * Large uploads now use:
+ * - POST /api/guestsnap/upload/init
+ * - Direct browser upload to Google Drive
+ * - POST /api/guestsnap/upload/complete
  */
 
 import { NextRequest, NextResponse } from 'next/server';

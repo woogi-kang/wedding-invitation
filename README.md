@@ -223,6 +223,14 @@ npx serve out
    },
    ```
 
+5. 업로드 아키텍처:
+   - `POST /api/guestsnap/session`으로 게스트 폴더 생성
+   - `POST /api/guestsnap/upload/init`으로 Google Drive resumable upload URL 발급
+   - 브라우저가 Google Drive로 직접 업로드
+   - `POST /api/guestsnap/upload/complete`로 업로드 완료 검증 및 세션 카운트 반영
+
+   이 구조로 Vercel Functions request body 제한을 우회해서 `5MB+` 파일도 업로드할 수 있습니다.
+
 자세한 설정 및 사용법은 [Guest Snap 문서](docs/GUEST-SNAP.md)와 [배포 체크리스트](docs/GUEST-SNAP-DEPLOY-CHECKLIST.md)를 참조하세요.
 
 ## Project Structure

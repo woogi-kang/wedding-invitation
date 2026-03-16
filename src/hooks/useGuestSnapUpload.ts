@@ -10,6 +10,7 @@ import { GUEST_SNAP_CONFIG } from '@/lib/constants';
 import type {
   GuestSnapFile,
   GuestSnapSession,
+  UploadInitResponse,
   UploadQueueState,
   UploadState,
   SessionResponse,
@@ -53,6 +54,56 @@ interface UseGuestSnapUploadReturn {
   failedCount: number;
 }
 
+type GoogleDirectUploadResponse = {
+  id: string;
+  name: string;
+};
+
+type DirectUploadResult = {
+  fileId: string;
+  fileName: string;
+};
+
+class UploadError extends Error {
+  code?: string;
+  retryable: boolean;
+
+  constructor(message: string, options: { code?: string; retryable?: boolean } = {}) {
+    super(message);
+    this.name = 'UploadError';
+    this.code = options.code;
+    this.retryable = options.retryable ?? true;
+  }
+}
+
+function isTerminalUploadCode(code?: string): boolean {
+  return (
+    code === 'NO_SESSION' ||
+    code === 'LIMIT_REACHED' ||
+    code === 'INVALID_FILE' ||
+    code === 'NO_FILE_ID'
+  );
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+
+  for (let index = 0; index < bytes.length; index += 1) {
+    binary += String.fromCharCode(bytes[index] || 0);
+  }
+
+  return btoa(binary);
+}
+
+async function readBlobArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
+  if (typeof blob.arrayBuffer === 'function') {
+    return blob.arrayBuffer();
+  }
+
+  return new Response(blob).arrayBuffer();
+}
+
 export function useGuestSnapUpload(
   options: UseGuestSnapUploadOptions = {}
 ): UseGuestSnapUploadReturn {
@@ -77,6 +128,7 @@ export function useGuestSnapUpload(
   // Refs for managing upload process
   const isProcessingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const uploadRequestRef = useRef<XMLHttpRequest | null>(null);
   const queueStateRef = useRef<UploadQueueState>(queueState);
 
   // Keep a ref to the latest queue state for async upload loop logic.
@@ -177,10 +229,14 @@ export function useGuestSnapUpload(
    * Add files to the upload queue
    */
   const addFiles = useCallback((files: GuestSnapFile[]) => {
-    setQueueState((prev) => ({
-      ...prev,
-      queue: [...prev.queue, ...files],
-    }));
+    setQueueState((prev) => {
+      const nextState: UploadQueueState = {
+        ...prev,
+        queue: [...prev.queue, ...files],
+      };
+      queueStateRef.current = nextState;
+      return nextState;
+    });
     setUploadState('selecting');
   }, []);
 
@@ -188,24 +244,30 @@ export function useGuestSnapUpload(
    * Remove a file from the queue
    */
   const removeFile = useCallback((fileId: string) => {
-    setQueueState((prev) => ({
-      ...prev,
-      queue: prev.queue.filter((f) => f.id !== fileId),
-      failed: prev.failed.filter((f) => f.id !== fileId),
-    }));
+    setQueueState((prev) => {
+      const nextState: UploadQueueState = {
+        ...prev,
+        queue: prev.queue.filter((f) => f.id !== fileId),
+        failed: prev.failed.filter((f) => f.id !== fileId),
+      };
+      queueStateRef.current = nextState;
+      return nextState;
+    });
   }, []);
 
   /**
    * Clear the entire queue
    */
   const clearQueue = useCallback(() => {
-    setQueueState({
+    const nextState: UploadQueueState = {
       isProcessing: false,
       currentFile: null,
       queue: [],
       completed: [],
       failed: [],
-    });
+    };
+    queueStateRef.current = nextState;
+    setQueueState(nextState);
     setUploadState('idle');
   }, []);
 
@@ -218,10 +280,8 @@ export function useGuestSnapUpload(
         return { success: false, error: '파일 데이터가 없어요' };
       }
 
-      const formData = new FormData();
-      formData.append('file', file.file);
-
       let lastError = '';
+      let uploadedFile: DirectUploadResult | null = null;
 
       // Retry loop
       for (let attempt = 1; attempt <= retryConfig.maxAttempts; attempt++) {
@@ -243,26 +303,127 @@ export function useGuestSnapUpload(
           // Create abort controller for this request
           abortControllerRef.current = new AbortController();
 
-          const response = await fetch('/api/guestsnap/upload', {
+          if (!uploadedFile) {
+            const headerBuffer = await readBlobArrayBuffer(file.file.slice(0, 20));
+            const initResponse = await fetch('/api/guestsnap/upload/init', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fileName: file.name,
+                mimeType: file.mimeType,
+                size: file.size,
+                headerBase64: arrayBufferToBase64(headerBuffer),
+              }),
+              signal: abortControllerRef.current.signal,
+            });
+
+            const initData: UploadInitResponse = await initResponse.json();
+
+            if (!initData.success || !initData.uploadUrl) {
+              lastError = initData.error?.message || '업로드 준비에 실패했어요';
+
+              if (isTerminalUploadCode(initData.error?.code)) {
+                return { success: false, error: lastError };
+              }
+
+              throw new UploadError(lastError, {
+                code: initData.error?.code,
+                retryable: true,
+              });
+            }
+
+            const uploadUrl = initData.uploadUrl;
+            const resolvedFileName = initData.fileName || file.name;
+
+            uploadedFile = await new Promise<DirectUploadResult>((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              uploadRequestRef.current = xhr;
+
+              xhr.open('PUT', uploadUrl);
+              xhr.setRequestHeader(
+                'Content-Type',
+                file.mimeType || 'application/octet-stream'
+              );
+
+              xhr.upload.onprogress = (event) => {
+                if (!event.lengthComputable) {
+                  return;
+                }
+
+                const progress = Math.max(
+                  1,
+                  Math.min(99, Math.round((event.loaded / event.total) * 100))
+                );
+
+                setQueueState((prev) => ({
+                  ...prev,
+                  currentFile: prev.currentFile
+                    ? {
+                        ...prev.currentFile,
+                        progress,
+                      }
+                    : null,
+                }));
+              };
+
+              xhr.onerror = () => {
+                reject(new UploadError('업로드 전송 중 오류가 발생했어요'));
+              };
+
+              xhr.onabort = () => {
+                reject(new DOMException('Upload aborted', 'AbortError'));
+              };
+
+              xhr.onload = () => {
+                uploadRequestRef.current = null;
+
+                if (xhr.status < 200 || xhr.status >= 300) {
+                  reject(
+                    new UploadError('업로드에 실패했어요', {
+                      retryable: xhr.status === 408 || xhr.status === 429 || xhr.status >= 500,
+                    })
+                  );
+                  return;
+                }
+
+                try {
+                  const responseData = JSON.parse(xhr.responseText) as GoogleDirectUploadResponse;
+                  resolve({
+                    fileId: responseData.id,
+                    fileName: responseData.name || resolvedFileName,
+                  });
+                } catch {
+                  reject(new UploadError('업로드 결과를 읽을 수 없어요'));
+                }
+              };
+
+              xhr.send(file.file);
+            });
+          }
+
+          const completeResponse = await fetch('/api/guestsnap/upload/complete', {
             method: 'POST',
-            body: formData,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileId: uploadedFile.fileId,
+              fileName: uploadedFile.fileName,
+            }),
             signal: abortControllerRef.current.signal,
           });
 
-          const data: UploadResponse = await response.json();
+          const completeData: UploadResponse = await completeResponse.json();
 
-          if (data.success) {
+          if (completeData.success) {
             return { success: true };
           }
 
-          lastError = data.error?.message || '업로드에 실패했어요';
+          lastError = completeData.error?.message || '업로드에 실패했어요';
 
-          // Don't retry on certain errors
-          if (
-            data.error?.code === 'NO_SESSION' ||
-            data.error?.code === 'LIMIT_REACHED' ||
-            data.error?.code === 'INVALID_FILE'
-          ) {
+          if (isTerminalUploadCode(completeData.error?.code)) {
             return { success: false, error: lastError };
           }
         } catch (error) {
@@ -270,7 +431,16 @@ export function useGuestSnapUpload(
             if (error.name === 'AbortError') {
               return { success: false, error: '업로드가 취소되었어요' };
             }
-            lastError = error.message;
+
+            if (error instanceof UploadError) {
+              lastError = error.message;
+
+              if (!error.retryable) {
+                return { success: false, error: lastError };
+              }
+            } else {
+              lastError = error.message;
+            }
           } else {
             lastError = '알 수 없는 오류가 발생했어요';
           }
@@ -402,18 +572,23 @@ export function useGuestSnapUpload(
    * Pause the upload
    */
   const pauseUpload = useCallback(() => {
+    uploadRequestRef.current?.abort();
     abortControllerRef.current?.abort();
     isProcessingRef.current = false;
     setUploadState('paused');
-    setQueueState((prev) => ({
-      ...prev,
-      isProcessing: false,
-      // Move current file back to queue
-      queue: prev.currentFile
-        ? [{ ...prev.currentFile, status: 'pending', progress: 0 }, ...prev.queue]
-        : prev.queue,
-      currentFile: null,
-    }));
+    setQueueState((prev) => {
+      const nextState: UploadQueueState = {
+        ...prev,
+        isProcessing: false,
+        // Move current file back to queue
+        queue: prev.currentFile
+          ? [{ ...prev.currentFile, status: 'pending' as const, progress: 0 }, ...prev.queue]
+          : prev.queue,
+        currentFile: null,
+      };
+      queueStateRef.current = nextState;
+      return nextState;
+    });
   }, []);
 
   /**
@@ -434,11 +609,16 @@ export function useGuestSnapUpload(
         const failedFile = prev.failed.find((f) => f.id === fileId);
         if (!failedFile) return prev;
 
-        return {
+        const nextState: UploadQueueState = {
           ...prev,
           failed: prev.failed.filter((f) => f.id !== fileId),
-          queue: [...prev.queue, { ...failedFile, status: 'pending', progress: 0, error: undefined }],
+          queue: [
+            ...prev.queue,
+            { ...failedFile, status: 'pending' as const, progress: 0, error: undefined },
+          ],
         };
+        queueStateRef.current = nextState;
+        return nextState;
       });
 
       // Start processing if not already
@@ -453,19 +633,23 @@ export function useGuestSnapUpload(
    * Retry all failed files
    */
   const retryAllFailed = useCallback(() => {
-    setQueueState((prev) => ({
-      ...prev,
-      queue: [
-        ...prev.queue,
-        ...prev.failed.map((f) => ({
-          ...f,
-          status: 'pending' as const,
-          progress: 0,
-          error: undefined,
-        })),
-      ],
-      failed: [],
-    }));
+    setQueueState((prev) => {
+      const nextState: UploadQueueState = {
+        ...prev,
+        queue: [
+          ...prev.queue,
+          ...prev.failed.map((f) => ({
+            ...f,
+            status: 'pending' as const,
+            progress: 0,
+            error: undefined,
+          })),
+        ],
+        failed: [],
+      };
+      queueStateRef.current = nextState;
+      return nextState;
+    });
 
     // Start processing if not already
     if (!isProcessingRef.current) {

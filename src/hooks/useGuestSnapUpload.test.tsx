@@ -1,6 +1,11 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GuestSnapFile, SessionResponse, UploadResponse } from '@/types/guestsnap';
+import type {
+  GuestSnapFile,
+  SessionResponse,
+  UploadInitResponse,
+  UploadResponse,
+} from '@/types/guestsnap';
 import { createTestFile } from '@/test-utils/guestsnap';
 
 vi.mock('@/lib/constants', async () => {
@@ -20,6 +25,74 @@ vi.mock('@/lib/constants', async () => {
 });
 
 import { useGuestSnapUpload } from './useGuestSnapUpload';
+
+type MockXhrPlan =
+  | {
+      type: 'success';
+      status: number;
+      response: Record<string, unknown>;
+    }
+  | {
+      type: 'http-error';
+      status: number;
+      response: Record<string, unknown>;
+    }
+  | {
+      type: 'network-error';
+    };
+
+class MockXMLHttpRequest {
+  static queue: MockXhrPlan[] = [];
+
+  static enqueue(plan: MockXhrPlan) {
+    MockXMLHttpRequest.queue.push(plan);
+  }
+
+  static reset() {
+    MockXMLHttpRequest.queue = [];
+  }
+
+  status = 0;
+  responseText = '';
+  upload = {
+    onprogress: null as ((event: ProgressEvent<EventTarget>) => void) | null,
+  };
+  onload: ((event: ProgressEvent<EventTarget>) => void) | null = null;
+  onerror: ((event: ProgressEvent<EventTarget>) => void) | null = null;
+  onabort: ((event: ProgressEvent<EventTarget>) => void) | null = null;
+
+  open = vi.fn();
+  setRequestHeader = vi.fn();
+
+  send = vi.fn(() => {
+    const plan = MockXMLHttpRequest.queue.shift();
+
+    if (!plan) {
+      throw new Error('No XMLHttpRequest plan queued');
+    }
+
+    queueMicrotask(() => {
+      this.upload.onprogress?.({
+        lengthComputable: true,
+        loaded: 512,
+        total: 1024,
+      } as ProgressEvent<EventTarget>);
+
+      if (plan.type === 'network-error') {
+        this.onerror?.({} as ProgressEvent<EventTarget>);
+        return;
+      }
+
+      this.status = plan.status;
+      this.responseText = JSON.stringify(plan.response);
+      this.onload?.({} as ProgressEvent<EventTarget>);
+    });
+  });
+
+  abort = vi.fn(() => {
+    this.onabort?.({} as ProgressEvent<EventTarget>);
+  });
+}
 
 function createQueuedFile(overrides: Partial<GuestSnapFile> = {}): GuestSnapFile {
   const file =
@@ -47,7 +120,10 @@ function createQueuedFile(overrides: Partial<GuestSnapFile> = {}): GuestSnapFile
   };
 }
 
-function jsonResponse(body: SessionResponse | UploadResponse, status = 200) {
+function jsonResponse(
+  body: SessionResponse | UploadResponse | UploadInitResponse,
+  status = 200
+) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -61,7 +137,10 @@ describe('useGuestSnapUpload', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    MockXMLHttpRequest.reset();
     vi.stubGlobal('fetch', fetchMock);
+    vi.stubGlobal('XMLHttpRequest', MockXMLHttpRequest as unknown as typeof XMLHttpRequest);
+    vi.stubGlobal('btoa', (value: string) => Buffer.from(value, 'binary').toString('base64'));
   });
 
   it('restores an existing session on mount', async () => {
@@ -140,13 +219,24 @@ describe('useGuestSnapUpload', () => {
     expect(result.current.sessionError).toBe('이름은 2자 이상이어야 해요');
   });
 
-  it('uploads queued files and reports the completed summary', async () => {
+  it('uploads queued files through Google direct upload and reports the completed summary', async () => {
     const onUploadComplete = vi.fn();
     const onAllComplete = vi.fn();
     const files = [
       createQueuedFile({ id: 'file-1', name: 'photo-1.jpg' }),
       createQueuedFile({ id: 'file-2', name: 'photo-2.jpg' }),
     ];
+
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-1', name: 'IMG_001.jpg' },
+    });
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-2', name: 'IMG_002.jpg' },
+    });
 
     fetchMock.mockImplementation(async (input, init) => {
       const url = typeof input === 'string' ? input : input.url;
@@ -168,16 +258,33 @@ describe('useGuestSnapUpload', () => {
         );
       }
 
-      if (url === '/api/guestsnap/upload') {
-        const nextIndex = fetchMock.mock.calls.filter(([callInput]) => {
+      if (url === '/api/guestsnap/upload/init') {
+        const initCount = fetchMock.mock.calls.filter(([callInput, callInit]) => {
           const callUrl = typeof callInput === 'string' ? callInput : callInput.url;
-          return callUrl === '/api/guestsnap/upload';
+          const callMethod =
+            callInit?.method ?? (typeof callInput === 'string' ? 'GET' : callInput.method);
+          return callUrl === '/api/guestsnap/upload/init' && callMethod === 'POST';
         }).length;
 
         return jsonResponse({
           success: true,
-          fileId: `guest-folder/file-${nextIndex}.jpg`,
-          fileName: `file-${nextIndex}.jpg`,
+          uploadUrl: `https://google-upload.test/session-${initCount}`,
+          fileName: `IMG_00${initCount}.jpg`,
+        });
+      }
+
+      if (url === '/api/guestsnap/upload/complete') {
+        const completeCount = fetchMock.mock.calls.filter(([callInput, callInit]) => {
+          const callUrl = typeof callInput === 'string' ? callInput : callInput.url;
+          const callMethod =
+            callInit?.method ?? (typeof callInput === 'string' ? 'GET' : callInput.method);
+          return callUrl === '/api/guestsnap/upload/complete' && callMethod === 'POST';
+        }).length;
+
+        return jsonResponse({
+          success: true,
+          fileId: `google-file-${completeCount}`,
+          fileName: `IMG_00${completeCount}.jpg`,
           uploadedAt: new Date().toISOString(),
         });
       }
@@ -222,9 +329,20 @@ describe('useGuestSnapUpload', () => {
     });
   });
 
-  it('retries transient upload failures and eventually succeeds', async () => {
+  it('retries transient direct upload failures and eventually succeeds', async () => {
     const file = createQueuedFile({ id: 'file-1', name: 'retry.jpg' });
-    let uploadAttempts = 0;
+    let initAttempts = 0;
+
+    MockXMLHttpRequest.enqueue({
+      type: 'http-error',
+      status: 500,
+      response: { error: { message: 'temporary failure' } },
+    });
+    MockXMLHttpRequest.enqueue({
+      type: 'success',
+      status: 200,
+      response: { id: 'google-file-1', name: 'IMG_retry.jpg' },
+    });
 
     fetchMock.mockImplementation(async (input, init) => {
       const url = typeof input === 'string' ? input : input.url;
@@ -246,26 +364,20 @@ describe('useGuestSnapUpload', () => {
         );
       }
 
-      if (url === '/api/guestsnap/upload') {
-        uploadAttempts += 1;
-
-        if (uploadAttempts === 1) {
-          return jsonResponse(
-            {
-              success: false,
-              error: {
-                code: 'UPLOAD_FAILED',
-                message: '일시적인 오류',
-              },
-            },
-            500
-          );
-        }
-
+      if (url === '/api/guestsnap/upload/init') {
+        initAttempts += 1;
         return jsonResponse({
           success: true,
-          fileId: 'guest-folder/retry.jpg',
-          fileName: 'retry.jpg',
+          uploadUrl: `https://google-upload.test/session-${initAttempts}`,
+          fileName: 'IMG_retry.jpg',
+        });
+      }
+
+      if (url === '/api/guestsnap/upload/complete') {
+        return jsonResponse({
+          success: true,
+          fileId: 'google-file-1',
+          fileName: 'IMG_retry.jpg',
           uploadedAt: new Date().toISOString(),
         });
       }
@@ -296,13 +408,13 @@ describe('useGuestSnapUpload', () => {
     });
 
     expect(result.current.failedCount).toBe(0);
-    expect(uploadAttempts).toBe(2);
+    expect(initAttempts).toBe(2);
   });
 
-  it('does not retry terminal upload errors and moves the file to the failed queue', async () => {
+  it('does not retry terminal init errors and moves the file to the failed queue', async () => {
     const onUploadError = vi.fn();
     const file = createQueuedFile({ id: 'file-1', name: 'invalid.jpg' });
-    let uploadAttempts = 0;
+    let initAttempts = 0;
 
     fetchMock.mockImplementation(async (input, init) => {
       const url = typeof input === 'string' ? input : input.url;
@@ -324,9 +436,8 @@ describe('useGuestSnapUpload', () => {
         );
       }
 
-      if (url === '/api/guestsnap/upload') {
-        uploadAttempts += 1;
-
+      if (url === '/api/guestsnap/upload/init') {
+        initAttempts += 1;
         return jsonResponse(
           {
             success: false,
@@ -368,7 +479,7 @@ describe('useGuestSnapUpload', () => {
       expect(result.current.failedCount).toBe(1);
     });
 
-    expect(uploadAttempts).toBe(1);
+    expect(initAttempts).toBe(1);
     expect(result.current.uploadedCount).toBe(0);
     expect(result.current.queueState.failed[0]?.error).toBe('파일 형식이 올바르지 않아요');
     expect(onUploadError).toHaveBeenCalledWith(

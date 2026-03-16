@@ -1,0 +1,8 @@
+.agents
+.codex
+AGENTS.md
+output
+coverage
+.vitest
+playwright-report
+test-results

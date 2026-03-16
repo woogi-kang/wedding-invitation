@@ -18,10 +18,17 @@ export {
   validateGuestName,
 } from './file-validator';
 
+export {
+  validateUploadMetadataServer,
+  type UploadMetadataValidationResult,
+} from './upload-metadata';
+
 // Google Drive client
 export {
   createGuestFolder,
   uploadFile,
+  createResumableUploadSession,
+  verifyGuestFolderFile,
   checkStorageStatus,
   getGuestUploadCount,
 } from './google-drive-client';

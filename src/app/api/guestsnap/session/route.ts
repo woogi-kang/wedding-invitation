@@ -4,13 +4,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import {
   createGuestFolder,
   validateGuestName,
   sanitizeGuestName,
   checkRateLimit,
 } from '@/lib/guestsnap';
+import {
+  getGuestSnapSessionCookieData,
+  getGuestSnapSessionExpiry,
+  setGuestSnapSessionCookies,
+} from '@/lib/guestsnap/session-cookie';
 import { GUEST_SNAP_CONFIG } from '@/lib/constants';
 import type { SessionResponse } from '@/types/guestsnap';
 
@@ -125,37 +129,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
       );
     }
 
-    // Generate session
     const sessionId = generateSessionId();
-    const expiresAt = new Date(
-      Date.now() + GUEST_SNAP_CONFIG.session.durationHours * 60 * 60 * 1000
-    );
+    const createdAt = Date.now();
+    const expiresAt = getGuestSnapSessionExpiry(createdAt);
 
-    // Set session cookie
-    const cookieStore = await cookies();
-    cookieStore.set(GUEST_SNAP_CONFIG.session.cookieName, sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      expires: expiresAt,
-      path: '/',
-    });
-
-    // Also store session data in cookie (encrypted in production)
-    const sessionData = JSON.stringify({
+    await setGuestSnapSessionCookies({
       id: sessionId,
       guestName: sanitizedName,
       guestFolder: folderResult.folderPath,
       uploadCount: 0,
-      createdAt: Date.now(),
-    });
-
-    cookieStore.set(`${GUEST_SNAP_CONFIG.session.cookieName}_data`, sessionData, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      expires: expiresAt,
-      path: '/',
+      createdAt,
     });
 
     return NextResponse.json({
@@ -194,11 +177,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
  */
 export async function GET(): Promise<NextResponse<SessionResponse>> {
   try {
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get(GUEST_SNAP_CONFIG.session.cookieName)?.value;
-    const sessionDataStr = cookieStore.get(`${GUEST_SNAP_CONFIG.session.cookieName}_data`)?.value;
+    const sessionData = await getGuestSnapSessionCookieData();
 
-    if (!sessionId || !sessionDataStr) {
+    if (!sessionData) {
       return NextResponse.json(
         {
           success: false,
@@ -217,12 +198,7 @@ export async function GET(): Promise<NextResponse<SessionResponse>> {
       );
     }
 
-    const sessionData = JSON.parse(sessionDataStr);
-
-    // Calculate expiration
-    const expiresAt = new Date(
-      sessionData.createdAt + GUEST_SNAP_CONFIG.session.durationHours * 60 * 60 * 1000
-    );
+    const expiresAt = getGuestSnapSessionExpiry(sessionData.createdAt);
 
     // Check if session expired
     if (expiresAt < new Date()) {

@@ -19,6 +19,10 @@ const DRIVE_FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
 const DRIVE_SCOPE = ['https://www.googleapis.com/auth/drive'];
 
 let cachedDriveClient: drive_v3.Drive | null = null;
+type GoogleAuthClient =
+  | InstanceType<typeof google.auth.JWT>
+  | InstanceType<typeof google.auth.OAuth2>;
+let cachedAuthClient: GoogleAuthClient | null = null;
 
 type ServiceAccountCredentials = {
   clientEmail: string;
@@ -261,9 +265,9 @@ async function validateRootFolderForAuthMode(
   return { valid: true };
 }
 
-async function getDriveClient(): Promise<drive_v3.Drive> {
-  if (cachedDriveClient) {
-    return cachedDriveClient;
+async function getAuthClient(): Promise<GoogleAuthClient> {
+  if (cachedAuthClient) {
+    return cachedAuthClient;
   }
 
   const configuration = resolveGoogleDriveConfiguration();
@@ -271,8 +275,6 @@ async function getDriveClient(): Promise<drive_v3.Drive> {
   if (!configuration.configurationValid) {
     throw new Error(configuration.error || 'Google Drive configuration is invalid');
   }
-
-  let auth: InstanceType<typeof google.auth.JWT> | InstanceType<typeof google.auth.OAuth2>;
 
   if (configuration.authMode === 'oauth') {
     const oauthCredentials = getOAuthCredentials();
@@ -289,7 +291,8 @@ async function getDriveClient(): Promise<drive_v3.Drive> {
       refresh_token: oauthCredentials.refreshToken,
     });
     await oauth2Client.getAccessToken();
-    auth = oauth2Client;
+    cachedAuthClient = oauth2Client;
+    return oauth2Client;
   } else {
     const serviceAccountCredentials = await getServiceAccountCredentials();
     const jwtClient = new google.auth.JWT({
@@ -298,8 +301,17 @@ async function getDriveClient(): Promise<drive_v3.Drive> {
       scopes: DRIVE_SCOPE,
     });
     await jwtClient.authorize();
-    auth = jwtClient;
+    cachedAuthClient = jwtClient;
+    return jwtClient;
   }
+}
+
+async function getDriveClient(): Promise<drive_v3.Drive> {
+  if (cachedDriveClient) {
+    return cachedDriveClient;
+  }
+
+  const auth = await getAuthClient();
 
   cachedDriveClient = google.drive({
     version: 'v3',
@@ -307,6 +319,19 @@ async function getDriveClient(): Promise<drive_v3.Drive> {
   });
 
   return cachedDriveClient;
+}
+
+async function getAccessToken(): Promise<string> {
+  const auth = await getAuthClient();
+  const tokenResult = await auth.getAccessToken();
+  const accessToken =
+    typeof tokenResult === 'string' ? tokenResult : tokenResult?.token || '';
+
+  if (!accessToken) {
+    throw new Error('Failed to obtain Google Drive access token');
+  }
+
+  return accessToken;
 }
 
 async function listFolders(
@@ -514,6 +539,111 @@ export async function uploadFile(
     return {
       success: true,
       fileName: uniqueFileName,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: getErrorMessage(error),
+    };
+  }
+}
+
+export async function createResumableUploadSession(
+  fileName: string,
+  mimeType: string,
+  destFolderId: string,
+  fileType: GuestSnapFileType,
+  fileSize: number
+): Promise<{
+  success: boolean;
+  uploadUrl?: string;
+  fileName?: string;
+  error?: string;
+}> {
+  try {
+    const uniqueFileName = generateUniqueFileName(fileName, fileType);
+    const accessToken = await getAccessToken();
+
+    const response = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Upload-Content-Type': mimeType || 'application/octet-stream',
+          'X-Upload-Content-Length': String(fileSize),
+        },
+        body: JSON.stringify({
+          name: uniqueFileName,
+          parents: [destFolderId],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: `Failed to create resumable upload session (${response.status})`,
+      };
+    }
+
+    const uploadUrl = response.headers.get('location');
+    if (!uploadUrl) {
+      return {
+        success: false,
+        error: 'Google Drive did not return an upload URL',
+      };
+    }
+
+    return {
+      success: true,
+      uploadUrl,
+      fileName: uniqueFileName,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: getErrorMessage(error),
+    };
+  }
+}
+
+export async function verifyGuestFolderFile(
+  fileId: string,
+  guestFolderId: string
+): Promise<{
+  success: boolean;
+  fileName?: string;
+  error?: string;
+}> {
+  try {
+    const drive = await getDriveClient();
+    const response = await drive.files.get({
+      fileId,
+      fields: 'id,name,parents,trashed',
+      supportsAllDrives: true,
+    });
+
+    const file = response.data;
+
+    if (!file.id || file.trashed) {
+      return {
+        success: false,
+        error: 'Uploaded file was not found in Google Drive',
+      };
+    }
+
+    if (!file.parents?.includes(guestFolderId)) {
+      return {
+        success: false,
+        error: 'Uploaded file does not belong to the current guest folder',
+      };
+    }
+
+    return {
+      success: true,
+      fileName: file.name || undefined,
     };
   } catch (error) {
     return {

@@ -5,7 +5,7 @@
 ## 기능 개요
 
 - 하객이 이름 입력 후 사진/영상 업로드
-- Google Drive API 기반 서버 업로드
+- Google Drive resumable session 기반 브라우저 직접 업로드
 - 오프라인 지원 (IndexedDB 큐)
 - 파일 유효성 검사 (확장자, MIME, 매직 바이트, 크기)
 - 재시도 로직 및 진행률 표시
@@ -107,7 +107,9 @@ src/
 │   └── index.ts                # 서버 유틸 export
 ├── app/api/guestsnap/
 │   ├── session/route.ts        # 세션 생성 + 게스트 폴더 생성
-│   ├── upload/route.ts         # 파일 업로드
+│   ├── upload/init/route.ts    # Google Drive 업로드 세션 생성
+│   ├── upload/complete/route.ts # 업로드 완료 검증 + 세션 카운트 반영
+│   ├── upload/route.ts         # 레거시 소용량 업로드 프록시
 │   ├── notify/route.ts         # 업로드 완료 묶음 알림
 │   └── status/route.ts         # 저장소 상태 확인
 ├── app/guestsnap/page.tsx      # GuestSnap 전용 업로드 페이지
@@ -119,9 +121,11 @@ src/
 
 ```text
 [파일 선택]
-  -> [서버 검증]
+  -> [메타데이터 검증]
   -> [IndexedDB 큐]
-  -> [업로드 API]
+  -> [upload/init]
+  -> [Google Drive 직접 업로드]
+  -> [upload/complete]
   -> [Google Drive]
 ```
 
@@ -133,10 +137,20 @@ src/
 - 동작: 이름 검증 -> Google Drive 게스트 폴더 생성 -> 세션 쿠키 발급
 - 응답의 `guestFolder` 값은 **Google Drive 폴더 ID**입니다.
 
+### `POST /api/guestsnap/upload/init`
+
+- 입력: `fileName`, `mimeType`, `size`, `headerBase64`
+- 동작: 세션 검증 -> 업로드 제한 확인 -> 메타데이터/매직 바이트 검증 -> Google Drive resumable upload URL 발급
+
+### `POST /api/guestsnap/upload/complete`
+
+- 입력: `fileId`, `fileName`
+- 동작: Google Drive에 실제 업로드된 파일 검증 -> 세션 업로드 수 갱신
+
 ### `POST /api/guestsnap/upload`
 
 - 입력: `multipart/form-data` (`file`)
-- 동작: 세션 검증 -> 업로드 제한 확인 -> 파일 검증 -> Google Drive 업로드
+- 동작: 레거시 소용량 업로드 경로. 대용량 업로드는 `init -> direct upload -> complete` 흐름을 사용
 
 ### `POST /api/guestsnap/notify`
 
