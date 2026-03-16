@@ -177,6 +177,13 @@ function getStorageErrorCode(error: unknown): GuestSnapStorageErrorCode {
     return 'invalid_service_account_json';
   }
 
+  if (
+    message.includes('service account uploads require a shared drive') ||
+    message.includes('service accounts do not have storage quota')
+  ) {
+    return 'service_account_requires_shared_drive';
+  }
+
   if (message.includes('invalid_grant')) {
     return 'drive_auth_invalid_grant';
   }
@@ -212,6 +219,46 @@ function buildListParams(
   }
 
   return params;
+}
+
+async function getRootFolderMetadata(
+  drive: drive_v3.Drive
+): Promise<drive_v3.Schema$File | null> {
+  const response = await drive.files.get({
+    fileId: GOOGLE_DRIVE_ENV.rootFolderId,
+    fields: 'id,name,trashed,driveId',
+    supportsAllDrives: true,
+  });
+
+  return response.data;
+}
+
+async function validateRootFolderForAuthMode(
+  drive: drive_v3.Drive,
+  authMode: GoogleDriveResolvedAuthMode
+): Promise<{ valid: boolean; error?: string; errorCode?: GuestSnapStorageErrorCode }> {
+  const rootInfo = await getRootFolderMetadata(drive);
+
+  if (!rootInfo?.id || rootInfo.trashed) {
+    return {
+      valid: false,
+      error: 'Google Drive root folder is not accessible',
+      errorCode: 'drive_root_inaccessible',
+    };
+  }
+
+  if (
+    (authMode === 'service_account' || authMode === 'legacy_service_account') &&
+    !rootInfo.driveId
+  ) {
+    return {
+      valid: false,
+      error: 'Service account uploads require a Shared Drive root folder',
+      errorCode: 'service_account_requires_shared_drive',
+    };
+  }
+
+  return { valid: true };
 }
 
 async function getDriveClient(): Promise<drive_v3.Drive> {
@@ -369,7 +416,32 @@ export async function createGuestFolder(
   errorCode?: GuestSnapStorageErrorCode;
 }> {
   try {
+    const configuration = resolveGoogleDriveConfiguration();
+
+    if (!configuration.configurationValid) {
+      return {
+        success: false,
+        folderPath: '',
+        error: configuration.error || 'Google Drive configuration is invalid',
+        errorCode: configuration.errorCode,
+      };
+    }
+
     const drive = await getDriveClient();
+    const rootValidation = await validateRootFolderForAuthMode(
+      drive,
+      configuration.authMode
+    );
+
+    if (!rootValidation.valid) {
+      return {
+        success: false,
+        folderPath: '',
+        error: rootValidation.error,
+        errorCode: rootValidation.errorCode,
+      };
+    }
+
     const uniqueGuestName = await getUniqueGuestFolderName(
       drive,
       GOOGLE_DRIVE_ENV.rootFolderId,
@@ -475,18 +547,16 @@ export async function checkStorageStatus(): Promise<{
 
   try {
     const drive = await getDriveClient();
+    const rootValidation = await validateRootFolderForAuthMode(
+      drive,
+      configuration.authMode
+    );
 
-    const rootInfo = await drive.files.get({
-      fileId: GOOGLE_DRIVE_ENV.rootFolderId,
-      fields: 'id,name,trashed',
-      supportsAllDrives: true,
-    });
-
-    if (!rootInfo.data.id || rootInfo.data.trashed) {
+    if (!rootValidation.valid) {
       return {
         available: false,
-        error: 'Google Drive root folder is not accessible',
-        errorCode: 'drive_root_inaccessible',
+        error: rootValidation.error,
+        errorCode: rootValidation.errorCode,
         authMode: configuration.authMode,
         configurationValid: true,
       };

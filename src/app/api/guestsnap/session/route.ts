@@ -30,6 +30,14 @@ function getClientIp(request: NextRequest): string {
   return request.headers.get('x-real-ip') || 'unknown';
 }
 
+function getSessionCreationErrorMessage(errorCode?: string): string {
+  if (errorCode === 'service_account_requires_shared_drive') {
+    return '업로드 저장소 연결을 확인하고 있어요. 관리자에게 문의해주세요.';
+  }
+
+  return '서버 연결에 실패했어요. 잠시 후 다시 시도해주세요.';
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse<SessionResponse>> {
   try {
     // Rate limiting
@@ -110,7 +118,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
           expiresAt: '',
           error: {
             code: folderResult.errorCode || 'FOLDER_CREATION_FAILED',
-            message: '서버 연결에 실패했어요. 잠시 후 다시 시도해주세요.',
+            message: getSessionCreationErrorMessage(folderResult.errorCode),
           },
         },
         { status: 503 }

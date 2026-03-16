@@ -5,6 +5,7 @@ Vercel 배포에서 `GuestSnap`이 안정적으로 동작하도록 점검하는 
 ## 권장 구조
 
 - 인증 방식은 `OAuth`보다 `service account`를 권장합니다.
+- 단, `service account`는 반드시 `Shared Drive` 루트 폴더와 함께 사용합니다.
 - 배포 환경에서는 `GOOGLE_DRIVE_AUTH_MODE=service_account`를 명시합니다.
 - 서비스 계정 JSON은 `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64` 하나로 관리합니다.
 - 사용하지 않는 `OAuth` 변수는 Vercel에서 제거합니다.
@@ -12,14 +13,15 @@ Vercel 배포에서 `GuestSnap`이 안정적으로 동작하도록 점검하는 
 이유:
 
 - OAuth refresh token은 `invalid_grant`로 깨질 수 있습니다.
+- 서비스 계정은 `My Drive`에 업로드할 저장소 quota가 없어서 실제 업로드가 실패합니다.
 - Base64 문자열은 Vercel 환경변수에 넣을 때 줄바꿈/이스케이프 문제를 줄입니다.
 - `GOOGLE_DRIVE_AUTH_MODE=service_account`를 명시하면 다른 인증값이 남아 있어도 잘못된 경로로 빠지지 않습니다.
 
 ## 1. Google Drive 준비
 
-- GuestSnap 업로드용 루트 폴더를 1개 준비합니다.
+- GuestSnap 업로드용 루트 폴더를 `Shared Drive` 안에 1개 준비합니다.
 - 폴더 URL에서 `GOOGLE_DRIVE_ROOT_FOLDER_ID` 값을 복사합니다.
-- Shared Drive를 쓸지, 개인 My Drive를 쓸지 결정합니다.
+- `My Drive` 폴더라면 `service account`를 쓰지 말고 OAuth로 운영하거나, 폴더를 `Shared Drive`로 옮깁니다.
 
 ## 2. 서비스 계정 준비
 
@@ -122,6 +124,11 @@ curl -sS https://your-domain.vercel.app/api/guestsnap/status
 ### `storageErrorCode=missing_service_account_credentials`
 
 - Base64 값 또는 JSON 경로/문자열이 비어 있습니다.
+
+### `storageErrorCode=service_account_requires_shared_drive`
+
+- 현재 루트 폴더가 `My Drive`에 있습니다.
+- 서비스 계정 방식은 `Shared Drive` 루트 폴더로 바꾸거나, OAuth 방식으로 전환해야 합니다.
 
 ## 8. 운영 규칙
 

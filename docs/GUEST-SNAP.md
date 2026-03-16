@@ -74,15 +74,16 @@ GOOGLE_DRIVE_SHARED_DRIVE_ID=   # Shared Drive 사용 시 선택
 
 ### 배포 권장안
 
-- Vercel 배포는 `GOOGLE_DRIVE_AUTH_MODE=service_account`를 명시
+- Vercel 배포는 `Shared Drive` 루트 폴더 + `GOOGLE_DRIVE_AUTH_MODE=service_account` 조합을 권장
 - 서비스 계정 JSON은 `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON_BASE64`로 저장
 - 기존 OAuth 값은 남겨두지 말고 제거해서 인증 경로가 흔들리지 않게 유지
 - 배포 후 `/api/guestsnap/status`에서 `storageAvailable: true`와 `storageErrorCode`를 확인
+- `My Drive` 루트 폴더에서는 서비스 계정 업로드가 quota 문제로 실패하므로 OAuth를 사용하거나 Shared Drive로 이동
 
 ### 권한 설정
 
 1. OAuth 방식이면 본인 계정에 루트 폴더 생성 후 `GOOGLE_DRIVE_ROOT_FOLDER_ID`만 설정
-2. 서비스 계정 방식이면 루트 폴더를 서비스 계정 이메일에 편집자 권한으로 공유
+2. 서비스 계정 방식이면 `Shared Drive` 루트 폴더를 서비스 계정 이메일에 편집자 권한으로 공유
 3. Shared Drive를 쓰는 경우 서비스 계정을 해당 Drive 멤버로 추가
 
 ## 주요 코드 위치

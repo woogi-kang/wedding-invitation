@@ -13,6 +13,7 @@ export type GuestSnapStorageErrorCode =
   | 'missing_oauth_credentials'
   | 'missing_service_account_credentials'
   | 'invalid_service_account_json'
+  | 'service_account_requires_shared_drive'
   | 'drive_auth_invalid_grant'
   | 'drive_access_failed'
   | 'drive_root_inaccessible'

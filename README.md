@@ -197,6 +197,8 @@ npx serve out
    GOOGLE_DRIVE_SHARED_DRIVE_ID=   # Shared Drive 사용 시 선택
    ```
 
+   참고: `service_account` 방식은 `Shared Drive` 루트 폴더와 함께 써야 합니다. 개인 `My Drive` 폴더에서는 Google Drive quota 제약으로 실제 업로드가 실패합니다.
+
 3. 업로드 폴더 구조(자동 생성):
    ```text
    {GOOGLE_DRIVE_ROOT_FOLDER_ID}/
