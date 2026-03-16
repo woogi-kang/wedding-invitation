@@ -61,6 +61,12 @@ describe('GuestSnap session route', () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      '127.0.0.1',
+      GUEST_SNAP_CONFIG.rateLimits.sessionCreationsPerMinute,
+      60000,
+      'guestsnap:session'
+    );
     expect(mocks.validateGuestName).toHaveBeenCalledWith('  홍길동  ');
     expect(mocks.sanitizeGuestName).toHaveBeenCalledWith('  홍길동  ');
     expect(mocks.createGuestFolder).toHaveBeenCalledWith('홍길동');
@@ -129,6 +135,12 @@ describe('GuestSnap session route', () => {
     expect(body.error?.code).toBe('RATE_LIMITED');
     expect(response.headers.get('X-RateLimit-Remaining')).toBe('0');
     expect(response.headers.get('X-RateLimit-Reset')).toBe('123456789');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      '127.0.0.1',
+      GUEST_SNAP_CONFIG.rateLimits.sessionCreationsPerMinute,
+      60000,
+      'guestsnap:session'
+    );
   });
 
   it('GET returns 404 when no session cookies exist', async () => {

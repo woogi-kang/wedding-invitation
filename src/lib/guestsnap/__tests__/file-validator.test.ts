@@ -520,6 +520,21 @@ describe('file-validator', () => {
       expect(result.allowed).toBe(true);
     });
 
+    it('should isolate counters by scope for the same identifier', () => {
+      const id = 'test-ip-scope';
+
+      for (let i = 0; i < 30; i++) {
+        checkRateLimit(id, 30, 60000, 'upload-init');
+      }
+
+      const sameScope = checkRateLimit(id, 30, 60000, 'upload-init');
+      const otherScope = checkRateLimit(id, 30, 60000, 'upload-complete');
+
+      expect(sameScope.allowed).toBe(false);
+      expect(otherScope.allowed).toBe(true);
+      expect(otherScope.remaining).toBe(29);
+    });
+
     afterEach(() => {
       vi.useRealTimers();
     });

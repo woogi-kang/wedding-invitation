@@ -75,6 +75,7 @@ describe('GuestSnap upload init route', () => {
 
     expect(response.status).toBe(401);
     expect(body.error?.code).toBe('NO_SESSION');
+    expect(mocks.checkRateLimit).not.toHaveBeenCalled();
   });
 
   it('returns 400 when the per-session upload limit is already reached', async () => {
@@ -102,6 +103,12 @@ describe('GuestSnap upload init route', () => {
 
     expect(response.status).toBe(400);
     expect(body.error?.code).toBe('LIMIT_REACHED');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.uploadInitsPerMinute,
+      60000,
+      'guestsnap:upload-init'
+    );
     expect(mocks.validateUploadMetadataServer).not.toHaveBeenCalled();
   });
 
@@ -133,6 +140,12 @@ describe('GuestSnap upload init route', () => {
 
     expect(response.status).toBe(400);
     expect(body.error?.code).toBe('INVALID_FILE');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.uploadInitsPerMinute,
+      60000,
+      'guestsnap:upload-init'
+    );
     expect(mocks.createResumableUploadSession).not.toHaveBeenCalled();
   });
 
@@ -161,6 +174,12 @@ describe('GuestSnap upload init route', () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.uploadUrl).toBe('https://google-upload.test/session');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.uploadInitsPerMinute,
+      60000,
+      'guestsnap:upload-init'
+    );
     expect(mocks.createResumableUploadSession).toHaveBeenCalledWith(
       'photo.jpg',
       'image/jpeg',
@@ -199,5 +218,42 @@ describe('GuestSnap upload init route', () => {
 
     expect(response.status).toBe(500);
     expect(body.error?.code).toBe('UPLOAD_INIT_FAILED');
+  });
+
+  it('returns 429 when upload initialization is throttled for the session', async () => {
+    const cookieStore = createMockCookieStore({
+      [`${GUEST_SNAP_CONFIG.session.cookieName}_data`]: JSON.stringify({
+        id: 'gs_123',
+        guestName: '홍길동',
+        guestFolder: 'guest-folder-id',
+        uploadCount: 3,
+        createdAt: Date.now(),
+      }),
+    });
+    mocks.cookies.mockResolvedValue(cookieStore);
+    mocks.checkRateLimit.mockReturnValue({
+      allowed: false,
+      remaining: 0,
+      resetTime: 123456789,
+    });
+
+    const response = await POST(
+      createRequest({
+        fileName: 'photo.jpg',
+        mimeType: 'image/jpeg',
+        size: 1024,
+        headerBase64: 'abcd',
+      })
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(429);
+    expect(body.error?.code).toBe('RATE_LIMITED');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.uploadInitsPerMinute,
+      60000,
+      'guestsnap:upload-init'
+    );
   });
 });

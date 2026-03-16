@@ -46,7 +46,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<SessionRe
   try {
     // Rate limiting
     const clientIp = getClientIp(request);
-    const rateLimit = checkRateLimit(clientIp, 10, 60000); // 10 requests per minute for session creation
+    const rateLimit = checkRateLimit(
+      clientIp,
+      GUEST_SNAP_CONFIG.rateLimits.sessionCreationsPerMinute,
+      60000,
+      'guestsnap:session'
+    );
 
     if (!rateLimit.allowed) {
       return NextResponse.json(

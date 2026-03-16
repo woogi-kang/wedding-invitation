@@ -122,6 +122,12 @@ describe('GuestSnap notify route', () => {
 
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.notificationsPerMinute,
+      60000,
+      'guestsnap:notify'
+    );
     expect(mocks.notifyGuestSnapUploadBatch).toHaveBeenCalledWith({
       guestName: '홍길동',
       uploadedCount: 2,
@@ -154,5 +160,11 @@ describe('GuestSnap notify route', () => {
 
     expect(response.status).toBe(429);
     expect(body.error?.code).toBe('RATE_LIMITED');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.notificationsPerMinute,
+      60000,
+      'guestsnap:notify'
+    );
   });
 });

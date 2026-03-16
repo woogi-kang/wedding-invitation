@@ -170,6 +170,12 @@ describe('GuestSnap upload route', () => {
     expect(body.success).toBe(true);
     expect(body.fileId).toBe('guest-folder-id/IMG_001_123456789.jpg');
     expect(body.fileName).toBe('IMG_001_123456789.jpg');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.legacyUploadsPerMinute,
+      60000,
+      'guestsnap:legacy-upload'
+    );
     expect(mocks.uploadFile).toHaveBeenCalledWith(
       expect.any(ArrayBuffer),
       'photo.jpg',
@@ -232,6 +238,12 @@ describe('GuestSnap upload route', () => {
     expect(body.error?.code).toBe('RATE_LIMITED');
     expect(response.headers.get('X-RateLimit-Remaining')).toBe('0');
     expect(response.headers.get('X-RateLimit-Reset')).toBe('777');
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      'gs_123',
+      GUEST_SNAP_CONFIG.rateLimits.legacyUploadsPerMinute,
+      60000,
+      'guestsnap:legacy-upload'
+    );
   });
 
   it('OPTIONS returns the expected CORS headers', async () => {

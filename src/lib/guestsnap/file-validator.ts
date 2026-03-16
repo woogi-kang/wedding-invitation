@@ -275,10 +275,12 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 export function checkRateLimit(
   identifier: string,
   maxRequests: number = 30,
-  windowMs: number = 60000
+  windowMs: number = 60000,
+  scope: string = 'global'
 ): { allowed: boolean; remaining: number; resetTime: number } {
   const now = Date.now();
-  const record = rateLimitMap.get(identifier);
+  const rateLimitKey = `${scope}:${identifier}`;
+  const record = rateLimitMap.get(rateLimitKey);
 
   // Clean up expired entries periodically
   if (Math.random() < 0.1) {
@@ -292,7 +294,7 @@ export function checkRateLimit(
   if (!record || record.resetTime < now) {
     // New window
     const resetTime = now + windowMs;
-    rateLimitMap.set(identifier, { count: 1, resetTime });
+    rateLimitMap.set(rateLimitKey, { count: 1, resetTime });
     return { allowed: true, remaining: maxRequests - 1, resetTime };
   }
 
@@ -302,7 +304,7 @@ export function checkRateLimit(
 
   // Increment count
   record.count++;
-  rateLimitMap.set(identifier, record);
+  rateLimitMap.set(rateLimitKey, record);
 
   return {
     allowed: true,

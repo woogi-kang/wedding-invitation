@@ -270,6 +270,15 @@ export const GUEST_SNAP_CONFIG = {
     maxConcurrentUploads: 3,
   },
 
+  // API rate limits
+  rateLimits: {
+    sessionCreationsPerMinute: 60,
+    uploadInitsPerMinute: 120,
+    uploadCompletionsPerMinute: 120,
+    notificationsPerMinute: 20,
+    legacyUploadsPerMinute: 120,
+  },
+
   // UI Messages (Korean) - expressing gratitude
   messages: {
     // Section title & description

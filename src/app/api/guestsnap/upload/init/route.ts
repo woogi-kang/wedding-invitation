@@ -21,8 +21,27 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<UploadInitResponse>> {
   try {
+    const session = await getGuestSnapSessionCookieData();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'NO_SESSION',
+            message: '세션이 만료되었어요. 이름을 다시 입력해주세요.',
+          },
+        },
+        { status: 401 }
+      );
+    }
+
     const clientIp = getClientIp(request);
-    const rateLimit = checkRateLimit(clientIp, 30, 60000);
+    const rateLimit = checkRateLimit(
+      session.id || clientIp,
+      GUEST_SNAP_CONFIG.rateLimits.uploadInitsPerMinute,
+      60000,
+      'guestsnap:upload-init'
+    );
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
@@ -43,20 +62,6 @@ export async function POST(
             'X-RateLimit-Reset': String(rateLimit.resetTime),
           },
         }
-      );
-    }
-
-    const session = await getGuestSnapSessionCookieData();
-    if (!session) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'NO_SESSION',
-            message: '세션이 만료되었어요. 이름을 다시 입력해주세요.',
-          },
-        },
-        { status: 401 }
       );
     }
 

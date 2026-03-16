@@ -51,22 +51,6 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<NotifyResponse>> {
   try {
-    const clientIp = getClientIp(request);
-    const rateLimit = checkRateLimit(clientIp, 20, 60000);
-
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'RATE_LIMITED',
-            message: '잠시 후 다시 시도해주세요',
-          },
-        },
-        { status: 429 }
-      );
-    }
-
     const session = await getSession();
     if (!session) {
       return NextResponse.json(
@@ -78,6 +62,27 @@ export async function POST(
           },
         },
         { status: 401 }
+      );
+    }
+
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(
+      session.id || clientIp,
+      GUEST_SNAP_CONFIG.rateLimits.notificationsPerMinute,
+      60000,
+      'guestsnap:notify'
+    );
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'RATE_LIMITED',
+            message: '잠시 후 다시 시도해주세요',
+          },
+        },
+        { status: 429 }
       );
     }
 
@@ -136,4 +141,3 @@ export async function POST(
     );
   }
 }
-

@@ -20,8 +20,27 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<UploadResponse>> {
   try {
+    const session = await getGuestSnapSessionCookieData();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'NO_SESSION',
+            message: '세션이 만료되었어요. 이름을 다시 입력해주세요.',
+          },
+        },
+        { status: 401 }
+      );
+    }
+
     const clientIp = getClientIp(request);
-    const rateLimit = checkRateLimit(clientIp, 30, 60000);
+    const rateLimit = checkRateLimit(
+      session.id || clientIp,
+      GUEST_SNAP_CONFIG.rateLimits.uploadCompletionsPerMinute,
+      60000,
+      'guestsnap:upload-complete'
+    );
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
@@ -42,34 +61,6 @@ export async function POST(
             'X-RateLimit-Reset': String(rateLimit.resetTime),
           },
         }
-      );
-    }
-
-    const session = await getGuestSnapSessionCookieData();
-    if (!session) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'NO_SESSION',
-            message: '세션이 만료되었어요. 이름을 다시 입력해주세요.',
-          },
-        },
-        { status: 401 }
-      );
-    }
-
-    const currentCount = await getGuestUploadCount(session.guestFolder);
-    if (currentCount >= GUEST_SNAP_CONFIG.limits.maxFilesPerSession) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'LIMIT_REACHED',
-            message: GUEST_SNAP_CONFIG.messages.limitReached,
-          },
-        },
-        { status: 400 }
       );
     }
 
