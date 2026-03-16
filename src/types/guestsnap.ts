@@ -99,16 +99,6 @@ export type UploadState =
   | 'error'; // Fatal error state
 
 /**
- * Modal state for the upload flow
- */
-export type GuestSnapModalState =
-  | 'closed' // All modals closed
-  | 'name' // Name input modal (FIRST STEP)
-  | 'upload' // File upload modal (SECOND STEP)
-  | 'progress' // Upload progress view
-  | 'complete'; // Upload complete view
-
-/**
  * API Response types
  */
 export interface UploadResponse {

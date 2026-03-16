@@ -2,13 +2,10 @@
 
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Camera, Upload, Share2 } from 'lucide-react';
+import { Camera, Share2 } from 'lucide-react';
 import { Section } from '@/components/common/Section';
-import { GUEST_SNAP_CONFIG, WEDDING_INFO } from '@/lib/constants';
-import { GuestNameModal } from '@/components/guestsnap/GuestNameModal';
-import { UploadModal } from '@/components/guestsnap/UploadModal';
-
-import type { GuestSnapModalState, GuestSnapFile } from '@/types/guestsnap';
+import { GUEST_SNAP_CONFIG } from '@/lib/constants';
+import { GuestUploadSheet } from '@/components/guestsnap/GuestUploadSheet';
 
 // 디자인 선택: 'sample7' | 'sample8'
 const DESIGN_VARIANT: 'sample7' | 'sample8' = 'sample8';
@@ -20,9 +17,7 @@ export function GuestSnap() {
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   // Modal state management
-  const [modalState, setModalState] = useState<GuestSnapModalState>('closed');
-  const [guestName, setGuestName] = useState<string>('');
-  const [selectedFiles, setSelectedFiles] = useState<GuestSnapFile[]>([]);
+  const [isUploadSheetOpen, setIsUploadSheetOpen] = useState(false);
   const [showNotYetMessage, setShowNotYetMessage] = useState(false);
 
   // Check if feature is available (wedding day or after)
@@ -44,33 +39,12 @@ export function GuestSnap() {
       return;
     }
 
-    if (guestName) {
-      setModalState('upload');
-    } else {
-      setModalState('name');
-    }
-  }, [isFeatureAvailable, guestName]);
-
-  // Handle name submission
-  const handleNameSubmit = useCallback((name: string) => {
-    setGuestName(name);
-    setModalState('upload');
-  }, []);
+    setIsUploadSheetOpen(true);
+  }, [isFeatureAvailable]);
 
   // Handle modal close
   const handleCloseModal = useCallback(() => {
-    setModalState('closed');
-    setSelectedFiles([]);
-  }, []);
-
-  // Handle files selected
-  const handleFilesSelected = useCallback((files: GuestSnapFile[]) => {
-    setSelectedFiles(files);
-  }, []);
-
-  // Handle back to name modal
-  const handleBackToName = useCallback(() => {
-    setModalState('name');
+    setIsUploadSheetOpen(false);
   }, []);
 
   return (
@@ -330,24 +304,7 @@ export function GuestSnap() {
         </motion.div>
       </div>
 
-      {/* Name Input Modal */}
-      <GuestNameModal
-        isOpen={modalState === 'name'}
-        onClose={handleCloseModal}
-        onSubmit={handleNameSubmit}
-        initialName={guestName}
-      />
-
-      {/* Upload Modal */}
-      <UploadModal
-        isOpen={modalState === 'upload'}
-        onClose={handleCloseModal}
-        onBack={handleBackToName}
-        guestName={guestName}
-        selectedFiles={selectedFiles}
-        onFilesSelected={handleFilesSelected}
-      />
-
+      <GuestUploadSheet isOpen={isUploadSheetOpen} onClose={handleCloseModal} />
     </Section>
   );
 }

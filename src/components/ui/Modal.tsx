@@ -11,9 +11,25 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   className?: string;
+  contentClassName?: string;
+  hideHeader?: boolean;
+  showCloseButton?: boolean;
+  closeButtonLabel?: string;
+  ariaLabelledBy?: string;
 }
 
-export function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className,
+  contentClassName,
+  hideHeader = false,
+  showCloseButton = true,
+  closeButtonLabel = '닫기',
+  ariaLabelledBy,
+}: ModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -50,6 +66,9 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
 
           {/* Modal */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={ariaLabelledBy}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -61,23 +80,27 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             )}
           >
             {/* Header */}
-            <div className="mb-4 flex items-center justify-between">
-              {title && (
-                <h3 className="font-serif text-lg font-medium text-[var(--color-text)]">
-                  {title}
-                </h3>
-              )}
-              <button
-                onClick={onClose}
-                className="ml-auto rounded-full p-1 hover:bg-[var(--color-secondary)] transition-colors"
-                aria-label="닫기"
-              >
-                <X className="h-5 w-5 text-[var(--color-text-light)]" />
-              </button>
-            </div>
+            {!hideHeader && (
+              <div className="mb-4 flex items-center justify-between">
+                {title && (
+                  <h3 className="font-serif text-lg font-medium text-[var(--color-text)]">
+                    {title}
+                  </h3>
+                )}
+                {showCloseButton && (
+                  <button
+                    onClick={onClose}
+                    className="ml-auto rounded-full p-1 transition-colors hover:bg-[var(--color-secondary)]"
+                    aria-label={closeButtonLabel}
+                  >
+                    <X className="h-5 w-5 text-[var(--color-text-light)]" />
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Content */}
-            <div>{children}</div>
+            <div className={contentClassName}>{children}</div>
           </motion.div>
         </>
       )}

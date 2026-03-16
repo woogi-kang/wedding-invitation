@@ -67,7 +67,6 @@ export type {
   GuestSnapSession,
   UploadQueueState,
   UploadState,
-  GuestSnapModalState,
   UploadResponse,
   SessionResponse,
   StatusResponse,
