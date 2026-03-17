@@ -1390,13 +1390,13 @@ function NightField() {
 function CeremonyField() {
   const dust = useMemo(
     () =>
-      Array.from({ length: 16 }, (_, i) => ({
+      Array.from({ length: 10 }, (_, i) => ({
         id: i,
-        left: 14 + hash01(i * 19 + 3) * 72,
-        top: 12 + hash01(i * 23 + 7) * 56,
-        size: 1.6 + hash01(i * 29 + 11) * 2.2,
-        delay: hash01(i * 31 + 13) * 2,
-        duration: 3 + hash01(i * 37 + 17) * 2,
+        left: 18 + hash01(i * 19 + 3) * 64,
+        top: 8 + hash01(i * 23 + 7) * 44,
+        size: 1.4 + hash01(i * 29 + 11) * 1.8,
+        delay: hash01(i * 31 + 13) * 1.8,
+        duration: 3.8 + hash01(i * 37 + 17) * 1.8,
       })),
     [],
   );
@@ -1416,18 +1416,42 @@ function CeremonyField() {
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 36%, rgba(34,22,16,0.05) 100%)',
+          background:
+            'linear-gradient(180deg, rgba(173,206,232,0.18) 0%, rgba(255,252,245,0.06) 34%, rgba(63,39,24,0.1) 100%)',
         }}
       />
 
       <motion.div
-        className="absolute left-[40%] top-[28%] h-[19%] w-[20%]"
+        className="absolute left-[23%] top-[-4%] h-[56%] w-[19%] rotate-[11deg]"
         style={{
-          background: 'radial-gradient(circle, rgba(255,249,229,0.22) 0%, rgba(255,242,210,0.08) 52%, transparent 82%)',
-          filter: 'blur(10px)',
+          background:
+            'linear-gradient(180deg, rgba(255,250,228,0.54) 0%, rgba(255,243,216,0.2) 46%, transparent 100%)',
+          filter: 'blur(14px)',
         }}
-        animate={{ opacity: [0.12, 0.26, 0.12], scale: [0.98, 1.02, 0.98] }}
-        transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
+        animate={{ opacity: [0.16, 0.34, 0.16], x: [-4, 2, -4] }}
+        transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      <motion.div
+        className="absolute right-[23%] top-[-5%] h-[58%] w-[18%] -rotate-[10deg]"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,249,226,0.48) 0%, rgba(255,241,214,0.16) 48%, transparent 100%)',
+          filter: 'blur(14px)',
+        }}
+        animate={{ opacity: [0.12, 0.28, 0.12], x: [4, -2, 4] }}
+        transition={{ duration: 4.9, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      <motion.div
+        className="absolute left-[34%] top-[24%] h-[23%] w-[32%]"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(255,252,240,0.28) 0%, rgba(255,244,221,0.12) 54%, transparent 84%)',
+          filter: 'blur(12px)',
+        }}
+        animate={{ opacity: [0.14, 0.26, 0.14], scale: [0.98, 1.03, 0.98] }}
+        transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
       />
 
       {dust.map((sparkle) => (
@@ -1439,10 +1463,10 @@ function CeremonyField() {
             top: `${sparkle.top}%`,
             width: sparkle.size,
             height: sparkle.size,
-            background: sparkle.id % 3 === 0 ? '#fffefb' : sparkle.id % 3 === 1 ? '#fff5dd' : '#f5f0ea',
-            boxShadow: `0 0 ${sparkle.size * 4}px rgba(255,248,234,0.32)`,
+            background: sparkle.id % 3 === 0 ? '#fffefb' : sparkle.id % 3 === 1 ? '#fff4da' : '#eef6ff',
+            boxShadow: `0 0 ${sparkle.size * 4}px rgba(255,248,234,0.3)`,
           }}
-          animate={{ opacity: [0.08, 0.36, 0.08], scale: [0.7, 1.08, 0.7] }}
+          animate={{ opacity: [0.06, 0.28, 0.06], scale: [0.78, 1.08, 0.78] }}
           transition={{ duration: sparkle.duration, delay: sparkle.delay, repeat: Infinity }}
         />
       ))}

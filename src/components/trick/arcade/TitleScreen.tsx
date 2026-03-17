@@ -51,6 +51,7 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
   const animRef = useRef<number>(0);
   const starsRef = useRef(stars.map((s) => ({ ...s })));
   const prefersReducedMotion = useReducedMotion();
+  const showContinueMenu = Boolean(hasSaveData || showMenu);
 
   // Starfield animation on canvas for performance
   useEffect(() => {
@@ -111,8 +112,10 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
   }, [prefersReducedMotion]);
 
   const handleStart = useCallback(() => {
-    if (hasSaveData && !showMenu) {
-      setShowMenu(true);
+    if (hasSaveData) {
+      if (!showMenu) {
+        setShowMenu(true);
+      }
       return;
     }
     onStart();
@@ -219,7 +222,7 @@ export function TitleScreen({ onStart, hasSaveData, onContinue, onNewGame }: Tit
         {/* Press Start blinking */}
         {/* PRESS START 또는 CONTINUE/NEW GAME 메뉴 */}
         <AnimatePresence mode="wait">
-          {!showMenu ? (
+          {!showContinueMenu ? (
             <motion.p
               key="press-start"
               initial={{ opacity: 0 }}
