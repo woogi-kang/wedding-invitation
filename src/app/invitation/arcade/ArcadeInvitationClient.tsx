@@ -202,12 +202,12 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
       setHasSaveData(hasStoredProgress());
     };
 
-    const frameId = window.requestAnimationFrame(syncHasSaveData);
+    const timerId = window.setTimeout(syncHasSaveData, 0);
     window.addEventListener('storage', syncHasSaveData);
     window.addEventListener(SAVE_EVENT, syncHasSaveData);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(timerId);
       window.removeEventListener('storage', syncHasSaveData);
       window.removeEventListener(SAVE_EVENT, syncHasSaveData);
     };
