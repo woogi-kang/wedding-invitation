@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 import { TitleScreen } from '@/components/trick/arcade/TitleScreen';
 import { CharacterSelect } from '@/components/trick/arcade/CharacterSelect';
 import { WorldMap } from '@/components/trick/arcade/WorldMap';
 import { StageEvent } from '@/components/trick/arcade/StageEvent';
-import { BossSequence } from '@/components/trick/arcade/BossSequence';
 import { EndingSequence } from '@/components/trick/arcade/EndingSequence';
 import { PostGameVillage } from '@/components/trick/arcade/PostGameVillage';
 import { BattleTransition } from '@/components/trick/arcade/shared';
@@ -17,14 +17,14 @@ type GamePhase =
   | 'character-select'
   | 'world-map'
   | 'stage-event'
-  | 'boss-battle'
   | 'ending'
   | 'post-game';
 
-const TOTAL_STAGES = 4;
+const TOTAL_STAGES = 5;
 
 /* ── localStorage 진행 상태 저장 ── */
 const SAVE_KEY = 'wedding_arcade_progress';
+const SAVE_EVENT = 'wedding_arcade_progress_change';
 
 interface SaveData {
   completedStages: number[];
@@ -32,10 +32,18 @@ interface SaveData {
   phase: GamePhase;
 }
 
+interface DirectEntryState {
+  phase: GamePhase;
+  currentStage: number;
+  activeStage: number | null;
+  completedStages: number[];
+}
+
 function saveProgress(data: SaveData): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    window.dispatchEvent(new Event(SAVE_EVENT));
   } catch { /* 저장 실패 무시 */ }
 }
 
@@ -49,7 +57,118 @@ function loadProgress(): SaveData | null {
 
 function clearProgress(): void {
   if (typeof window === 'undefined') return;
-  try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    window.dispatchEvent(new Event(SAVE_EVENT));
+  } catch { /* ignore */ }
+}
+
+function buildCompletedStages(stageIndex: number): number[] {
+  return Array.from({ length: stageIndex }, (_, i) => i);
+}
+
+function parseStageParam(value: string | null): number | null {
+  if (!value) return null;
+
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+
+  switch (normalized) {
+    case '1':
+    case 'park':
+      return 0;
+    case '2':
+    case 'cafe':
+      return 1;
+    case '3':
+    case 'sunset':
+      return 2;
+    case '4':
+    case 'night':
+      return 3;
+    case '5':
+    case 'ceremony':
+    case 'chapel':
+      return 4;
+    default:
+      return null;
+  }
+}
+
+function parsePhaseParam(value: string | null): GamePhase | null {
+  if (!value) return null;
+
+  switch (value.trim().toLowerCase()) {
+    case 'title':
+      return 'title';
+    case 'select':
+    case 'character-select':
+      return 'character-select';
+    case 'map':
+    case 'world-map':
+      return 'world-map';
+    case 'stage':
+    case 'stage-event':
+      return 'stage-event';
+    case 'ending':
+      return 'ending';
+    case 'village':
+    case 'post-game':
+      return 'post-game';
+    default:
+      return null;
+  }
+}
+
+function resolveDirectEntry(searchParams: URLSearchParams): DirectEntryState | null {
+  const phaseParam = parsePhaseParam(searchParams.get('phase'));
+  const stageIndex = parseStageParam(searchParams.get('stage'));
+
+  if (stageIndex !== null) {
+    const completedStages = buildCompletedStages(stageIndex);
+    const phase = phaseParam === 'world-map' ? 'world-map' : 'stage-event';
+
+    return {
+      phase,
+      currentStage: stageIndex,
+      activeStage: phase === 'stage-event' ? stageIndex : null,
+      completedStages,
+    };
+  }
+
+  if (!phaseParam) return null;
+
+  if (phaseParam === 'ending' || phaseParam === 'post-game') {
+    const completedStages = Array.from({ length: TOTAL_STAGES }, (_, i) => i);
+
+    return {
+      phase: phaseParam,
+      currentStage: TOTAL_STAGES - 1,
+      activeStage: null,
+      completedStages,
+    };
+  }
+
+  if (phaseParam === 'stage-event') {
+    return {
+      phase: 'stage-event',
+      currentStage: 0,
+      activeStage: 0,
+      completedStages: [],
+    };
+  }
+
+  return {
+    phase: phaseParam,
+    currentStage: 0,
+    activeStage: null,
+    completedStages: [],
+  };
+}
+
+function hasStoredProgress(): boolean {
+  const saved = loadProgress();
+  return !!(saved && saved.completedStages.length > 0);
 }
 
 interface ArcadeInvitationClientProps {
@@ -57,20 +176,42 @@ interface ArcadeInvitationClientProps {
 }
 
 export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClientProps) {
-  const [phase, setPhase] = useState<GamePhase>('title');
-  const [completedStages, setCompletedStages] = useState<number[]>([]);
-  const [currentStage, setCurrentStage] = useState(0);
-  const [activeStage, setActiveStage] = useState<number | null>(null);
-  const [hasSaveData, setHasSaveData] = useState(() => {
-    const saved = loadProgress();
-    return !!(saved && saved.completedStages.length > 0);
-  });
+  const searchParams = useSearchParams();
+  const initialDirectEntry = resolveDirectEntry(new URLSearchParams(searchParams.toString()));
+  const directEntryActive = initialDirectEntry !== null;
+  const [phase, setPhase] = useState<GamePhase>(() => initialDirectEntry?.phase ?? 'title');
+  const [completedStages, setCompletedStages] = useState<number[]>(() => initialDirectEntry?.completedStages ?? []);
+  const [currentStage, setCurrentStage] = useState(() => initialDirectEntry?.currentStage ?? 0);
+  const [activeStage, setActiveStage] = useState<number | null>(() => initialDirectEntry?.activeStage ?? null);
+  const [hasSaveData, setHasSaveData] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const [pendingPhase, setPendingPhase] = useState<GamePhase | null>(null);
+  const [pendingStage, setPendingStage] = useState<number | null>(null);
 
   // 진행 상태 자동 저장 (title, character-select 제외)
   useEffect(() => {
+    if (directEntryActive) return;
     if (phase === 'title' || phase === 'character-select') return;
     saveProgress({ completedStages, currentStage, phase });
-  }, [completedStages, currentStage, phase]);
+  }, [completedStages, currentStage, phase, directEntryActive]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const syncHasSaveData = () => {
+      setHasSaveData(hasStoredProgress());
+    };
+
+    const timerId = window.setTimeout(syncHasSaveData, 0);
+    window.addEventListener('storage', syncHasSaveData);
+    window.addEventListener(SAVE_EVENT, syncHasSaveData);
+
+    return () => {
+      window.clearTimeout(timerId);
+      window.removeEventListener('storage', syncHasSaveData);
+      window.removeEventListener(SAVE_EVENT, syncHasSaveData);
+    };
+  }, []);
 
   // CONTINUE: 저장된 진행 상태 복원
   const handleContinue = useCallback(() => {
@@ -78,7 +219,7 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
     if (saved) {
       setCompletedStages(saved.completedStages);
       setCurrentStage(saved.currentStage);
-      // stage-event, boss-battle 등 중간 phase는 world-map으로 복원
+      // stage-event, ending 등 중간 phase는 world-map으로 복원
       const restorePhase = saved.phase === 'post-game' ? 'post-game' : 'world-map';
       setPhase(restorePhase);
     }
@@ -87,14 +228,8 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
   // NEW GAME: 저장 데이터 삭제 후 새 게임
   const handleNewGame = useCallback(() => {
     clearProgress();
-    setHasSaveData(false);
     setPhase('character-select');
   }, []);
-
-  // 배틀 전환 효과 상태
-  const [transitioning, setTransitioning] = useState(false);
-  const [pendingPhase, setPendingPhase] = useState<GamePhase | null>(null);
-  const [pendingStage, setPendingStage] = useState<number | null>(null);
 
   // 전환 효과와 함께 페이즈 변경
   const transitionToPhase = useCallback((nextPhase: GamePhase, stageIdx?: number) => {
@@ -132,8 +267,7 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
     setActiveStage(null);
 
     if (newCompleted.length >= TOTAL_STAGES) {
-      // 보스전 진입도 전환 효과 사용
-      transitionToPhase('boss-battle');
+      transitionToPhase('ending');
     } else {
       const nextStage = Math.min(activeStage + 1, TOTAL_STAGES - 1);
       setCurrentStage(nextStage);
@@ -197,12 +331,6 @@ export function ArcadeInvitationClient({ galleryImages }: ArcadeInvitationClient
                 onComplete={handleStageComplete}
                 onClose={handleStageClose}
               />
-            </PhaseWrapper>
-          )}
-
-          {phase === 'boss-battle' && (
-            <PhaseWrapper key="boss">
-              <BossSequence onVictory={() => setPhase('ending')} />
             </PhaseWrapper>
           )}
 

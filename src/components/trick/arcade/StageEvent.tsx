@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelCharacter, ARCADE_COLORS } from './shared';
 import type { EmotionType } from './shared';
+import { WEDDING_INFO } from '@/lib/constants';
 
 function hash01(seed: number): number {
   const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
@@ -1386,12 +1387,292 @@ function NightField() {
   );
 }
 
+function CeremonyField() {
+  const dust = useMemo(
+    () =>
+      Array.from({ length: 10 }, (_, i) => ({
+        id: i,
+        left: 18 + hash01(i * 19 + 3) * 64,
+        top: 8 + hash01(i * 23 + 7) * 44,
+        size: 1.4 + hash01(i * 29 + 11) * 1.8,
+        delay: hash01(i * 31 + 13) * 1.8,
+        duration: 3.8 + hash01(i * 37 + 17) * 1.8,
+      })),
+    [],
+  );
+
+  return (
+    <>
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/images/arcade/sky-garden-stage.svg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(173,206,232,0.18) 0%, rgba(255,252,245,0.06) 34%, rgba(63,39,24,0.1) 100%)',
+        }}
+      />
+
+      <motion.div
+        className="absolute left-[23%] top-[-4%] h-[56%] w-[19%] rotate-[11deg]"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,250,228,0.54) 0%, rgba(255,243,216,0.2) 46%, transparent 100%)',
+          filter: 'blur(14px)',
+        }}
+        animate={{ opacity: [0.16, 0.34, 0.16], x: [-4, 2, -4] }}
+        transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      <motion.div
+        className="absolute right-[23%] top-[-5%] h-[58%] w-[18%] -rotate-[10deg]"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,249,226,0.48) 0%, rgba(255,241,214,0.16) 48%, transparent 100%)',
+          filter: 'blur(14px)',
+        }}
+        animate={{ opacity: [0.12, 0.28, 0.12], x: [4, -2, 4] }}
+        transition={{ duration: 4.9, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      <motion.div
+        className="absolute left-[34%] top-[24%] h-[23%] w-[32%]"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(255,252,240,0.28) 0%, rgba(255,244,221,0.12) 54%, transparent 84%)',
+          filter: 'blur(12px)',
+        }}
+        animate={{ opacity: [0.14, 0.26, 0.14], scale: [0.98, 1.03, 0.98] }}
+        transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      {dust.map((sparkle) => (
+        <motion.div
+          key={`ceremony-sparkle-${sparkle.id}`}
+          className="absolute rounded-full"
+          style={{
+            left: `${sparkle.left}%`,
+            top: `${sparkle.top}%`,
+            width: sparkle.size,
+            height: sparkle.size,
+            background: sparkle.id % 3 === 0 ? '#fffefb' : sparkle.id % 3 === 1 ? '#fff4da' : '#eef6ff',
+            boxShadow: `0 0 ${sparkle.size * 4}px rgba(255,248,234,0.3)`,
+          }}
+          animate={{ opacity: [0.06, 0.28, 0.06], scale: [0.78, 1.08, 0.78] }}
+          transition={{ duration: sparkle.duration, delay: sparkle.delay, repeat: Infinity }}
+        />
+      ))}
+    </>
+  );
+}
+
 const STAGE_BACKGROUNDS: Record<number, { gradient: string; Field: React.FC }> = {
   0: { gradient: 'linear-gradient(180deg, #a8dcff 0%, #b8f0cc 42%, #72c26e 72%, #2f7f3c 100%)', Field: ParkField },
   1: { gradient: 'linear-gradient(180deg, #6b4730 0%, #8a5c3d 34%, #b1835e 62%, #6a452f 100%)', Field: CafeField },
   2: { gradient: 'linear-gradient(180deg, #02040d 0%, #07122f 28%, #142347 60%, #102041 82%, #0b1733 100%)', Field: AnbandegiField },
   3: { gradient: 'linear-gradient(180deg, #120321 0%, #25103e 35%, #35285a 66%, #1f173f 100%)', Field: NightField },
+  4: { gradient: 'linear-gradient(180deg, #eef7ff 0%, #fff7f0 56%, #f0e0d4 100%)', Field: CeremonyField },
 };
+
+function CeremonyHost({ active }: { active: boolean }) {
+  return (
+    <motion.div
+      className="relative flex flex-col items-center"
+      animate={{ y: [0, -2, 0] }}
+      transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+    >
+      <motion.div
+        className="absolute -top-7 px-2 py-1"
+        style={{
+          background: 'rgba(22, 18, 22, 0.85)',
+          border: '1px solid rgba(255, 238, 209, 0.65)',
+          color: '#f7e8cf',
+        }}
+        animate={{ opacity: active ? [0.45, 1, 0.45] : 0.5 }}
+        transition={{ duration: 1.6, repeat: active ? Infinity : 0 }}
+      >
+        <span className="font-['Press_Start_2P',monospace] text-[9px]">사회자</span>
+      </motion.div>
+
+      <motion.div
+        className="absolute bottom-1 rounded-full"
+        style={{
+          width: 90,
+          height: 22,
+          background: 'rgba(43, 25, 31, 0.24)',
+          filter: 'blur(2px)',
+        }}
+        animate={{ opacity: [0.16, 0.3, 0.16], scale: [0.94, 1.04, 0.94] }}
+        transition={{ duration: 2.2, repeat: Infinity }}
+      />
+
+      <div className="relative z-[2] flex flex-col items-center">
+        <div
+          className="relative"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background: 'linear-gradient(180deg, #f4dccd 0%, #e6c1b3 100%)',
+            border: '3px solid #5e4c45',
+          }}
+        >
+          <div className="absolute left-[6px] top-[9px] h-[3px] w-[4px] rounded-full bg-[#43322f]" />
+          <div className="absolute right-[6px] top-[9px] h-[3px] w-[4px] rounded-full bg-[#43322f]" />
+          <div className="absolute left-1/2 top-[15px] h-[2px] w-[8px] -translate-x-1/2 rounded-full bg-[#cc8f85]" />
+        </div>
+
+        <div
+          className="relative mt-[-3px]"
+          style={{
+            width: 46,
+            height: 44,
+            borderRadius: '10px 10px 6px 6px',
+            background: 'linear-gradient(180deg, #2f3e59 0%, #1d2638 100%)',
+            border: '3px solid #606b7b',
+          }}
+        >
+          <div className="absolute left-1/2 top-[7px] h-[16px] w-[2px] -translate-x-1/2 bg-[#ded3be]" />
+          <div className="absolute left-[50%] top-[5px] h-[6px] w-[10px] rounded-full border border-[#ded3be] bg-[#57494a]" />
+          <div className="absolute left-[11px] top-[15px] h-[3px] w-[24px] bg-[#8ea0b8]" />
+        </div>
+      </div>
+
+      <div
+        className="relative mt-[-8px]"
+        style={{
+          width: 96,
+          height: 50,
+          borderRadius: '14px 14px 6px 6px',
+          background: 'linear-gradient(180deg, rgba(255,252,248,0.94) 0%, rgba(242,230,221,0.94) 100%)',
+          border: '3px solid rgba(177, 151, 131, 0.85)',
+          boxShadow: '0 10px 24px rgba(68, 41, 43, 0.12)',
+        }}
+      >
+        <div
+          className="absolute left-1/2 top-[12px] h-[2px] w-[54px] -translate-x-1/2"
+          style={{ background: 'rgba(184, 160, 141, 0.9)' }}
+        />
+        <div
+          className="absolute left-1/2 top-[20px] h-[2px] w-[42px] -translate-x-1/2"
+          style={{ background: 'rgba(184, 160, 141, 0.7)' }}
+        />
+        <div
+          className="absolute left-[16px] bottom-[-18px] h-[18px] w-[10px]"
+          style={{ background: 'rgba(170, 145, 125, 0.82)' }}
+        />
+        <div
+          className="absolute right-[16px] bottom-[-18px] h-[18px] w-[10px]"
+          style={{ background: 'rgba(170, 145, 125, 0.82)' }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+function CeremonyPreludeOverlay({ visible }: { visible: boolean }) {
+  const dateText = `${WEDDING_INFO.dateDisplay.year}.${String(WEDDING_INFO.dateDisplay.month).padStart(2, '0')}.${String(WEDDING_INFO.dateDisplay.day).padStart(2, '0')}`;
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 pointer-events-none overflow-hidden"
+          style={{ zIndex: 18 }}
+        >
+          <motion.div
+            initial={{ y: -90 }}
+            animate={{ y: 0 }}
+            exit={{ y: -90 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="absolute left-0 top-0 w-full"
+            style={{ height: '18%', background: 'rgba(8, 8, 11, 0.88)' }}
+          />
+          <motion.div
+            initial={{ y: 90 }}
+            animate={{ y: 0 }}
+            exit={{ y: 90 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="absolute bottom-0 left-0 w-full"
+            style={{ height: '22%', background: 'rgba(8, 8, 11, 0.88)' }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0.02) 100%)',
+            }}
+          />
+          <motion.div
+            className="absolute left-[-8%] top-[26%] h-[20%] w-[116%]"
+            style={{
+              background:
+                'linear-gradient(92deg, transparent 0%, rgba(255,246,224,0.18) 44%, rgba(255,250,237,0.08) 58%, transparent 100%)',
+              filter: 'blur(10px)',
+              transform: 'rotate(-4deg)',
+            }}
+            animate={{ opacity: [0.18, 0.54, 0.18] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+
+          <div className="absolute inset-0 flex items-center justify-center px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              className="max-w-[520px] rounded-[24px] px-8 py-7 text-center"
+              style={{
+                background: 'linear-gradient(180deg, rgba(15, 12, 16, 0.28) 0%, rgba(15, 12, 16, 0.14) 100%)',
+                boxShadow: '0 0 40px rgba(10, 8, 12, 0.16)',
+              }}
+            >
+              <p
+                className="font-['Press_Start_2P',monospace] text-[10px] sm:text-[11px]"
+                style={{ color: 'rgba(255, 231, 193, 0.94)', letterSpacing: '0.26em', textShadow: '0 0 12px rgba(13, 10, 9, 0.24)' }}
+              >
+                NARRATION
+              </p>
+              <p
+                className="mt-3 font-['Press_Start_2P',monospace] text-[20px] sm:text-[24px]"
+                style={{ color: '#fffaf2', textShadow: '0 0 26px rgba(255, 236, 201, 0.3)' }}
+              >
+                {dateText}
+              </p>
+              <p
+                className="mt-2 font-['Press_Start_2P',monospace] text-[10px] leading-5 sm:text-[12px] sm:leading-6"
+                style={{ color: '#fff0d4', textShadow: '0 0 14px rgba(13, 10, 9, 0.18)' }}
+              >
+                {WEDDING_INFO.dateDisplay.dayOfWeek} {WEDDING_INFO.dateDisplay.time}
+                <br />
+                {WEDDING_INFO.venue.name}
+              </p>
+              <p
+                className="mt-4 font-['Press_Start_2P',monospace] text-[11px] leading-5 sm:text-[13px] sm:leading-6"
+                style={{ color: '#fffaf3', textShadow: '0 0 14px rgba(10, 8, 10, 0.18)' }}
+              >
+                유리 천장 아래,
+                <br />
+                웨딩마치가 시작된다.
+              </p>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 // --- 대화창 ---
 
@@ -1631,6 +1912,20 @@ const STAGE_SCRIPTS: StageScript[] = [
       { type: 'result', text: '프로포즈 클리어!' },
     ],
   },
+  // ===== STAGE 5: 예식 시작 =====
+  {
+    title: `STAGE 5: 예식 시작 (${WEDDING_INFO.dateDisplay.year}.${String(WEDDING_INFO.dateDisplay.month).padStart(2, '0')}.${String(WEDDING_INFO.dateDisplay.day).padStart(2, '0')})`,
+    steps: [
+      { type: 'dialog', speaker: 'SYSTEM', text: `${WEDDING_INFO.dateDisplay.year}.${String(WEDDING_INFO.dateDisplay.month).padStart(2, '0')}.${String(WEDDING_INFO.dateDisplay.day).padStart(2, '0')} ${WEDDING_INFO.dateDisplay.timeDetail}\n${WEDDING_INFO.venue.hall}`, groomEmotion: 'idle', brideEmotion: 'idle' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '유리 천장 아래로 빛이 쏟아지고,\n하객들의 시선이 중앙 아일로 모인다.', groomEmotion: 'surprised', brideEmotion: 'surprised' },
+      { type: 'dialog', speaker: '사회자', text: '잠시 후, 두 사람의 입장이 시작됩니다.\n따뜻한 박수로 맞이해 주세요.', groomEmotion: 'happy', brideEmotion: 'happy' },
+      { type: 'dialog', speaker: '사회자', text: '이제 오늘의 주인공,\n신랑과 신부가 입장합니다.', groomEmotion: 'love', brideEmotion: 'love' },
+      { type: 'choice', prompt: '하객 모드 선택', options: ['박수 친다', '미소 짓는다', '사진을 준비한다'] },
+      { type: 'effect', effectType: 'hearts' },
+      { type: 'dialog', speaker: 'SYSTEM', text: '이후의 장면은 현실의 홀에서 이어집니다.\n다음 컷은 직접 함께해 주세요.', groomEmotion: 'love', brideEmotion: 'love' },
+      { type: 'result', text: '예식 오프닝!' },
+    ],
+  },
 ];
 
 // --- 메인 StageEvent 컴포넌트 ---
@@ -1644,10 +1939,12 @@ interface StageEventProps {
 export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps) {
   const script = STAGE_SCRIPTS[stageIndex] || STAGE_SCRIPTS[0];
   const bg = STAGE_BACKGROUNDS[stageIndex] || STAGE_BACKGROUNDS[0];
+  const isCeremonyStage = stageIndex === 4;
   const [stepIdx, setStepIdx] = useState(0);
   const [showClear, setShowClear] = useState(false);
   const [escapeAttempt, setEscapeAttempt] = useState(false);
   const [escapeCount, setEscapeCount] = useState(0);
+  const [showCinematicIntro, setShowCinematicIntro] = useState(isCeremonyStage);
   const escapeResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 캐릭터 상태
@@ -1682,7 +1979,18 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
     [stageIndex],
   );
 
+  const ceremonyEntranceOffset = stepIdx <= 1 ? 194 : stepIdx === 2 ? 146 : stepIdx === 3 ? 108 : 82;
+  const ceremonyEntranceY = stepIdx <= 1 ? 26 : stepIdx === 2 ? 16 : stepIdx === 3 ? 8 : 0;
+  const ceremonyScale = stepIdx <= 1 ? 1.08 : stepIdx === 2 ? 1.14 : stepIdx === 3 ? 1.2 : 1.26;
+  const ceremonyBrideOffset = stepIdx <= 1 ? 176 : stepIdx === 2 ? 134 : stepIdx === 3 ? 98 : 72;
+  const ceremonyBrideY = stepIdx <= 1 ? 22 : stepIdx === 2 ? 14 : stepIdx === 3 ? 6 : -2;
   const currentStep = script.steps[stepIdx];
+
+  useEffect(() => {
+    if (!isCeremonyStage) return undefined;
+    const timer = setTimeout(() => setShowCinematicIntro(false), 3200);
+    return () => clearTimeout(timer);
+  }, [isCeremonyStage]);
 
   // 대사에 따른 감정 업데이트
   useEffect(() => {
@@ -1863,6 +2171,7 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
       <div className="flex-1 relative overflow-hidden min-h-0" style={{ background: bg.gradient }}>
         {/* 배경 요소 */}
         <bg.Field />
+        {isCeremonyStage && <CeremonyPreludeOverlay visible={showCinematicIntro} />}
 
         {/* 지면 라인 */}
         <div className="absolute bottom-0 w-full h-[3px]" style={{ background: 'rgba(0,0,0,0.3)' }} />
@@ -1923,61 +2232,152 @@ export function StageEvent({ stageIndex, onComplete, onClose }: StageEventProps)
         )}
 
         {/* 캐릭터 + 말풍선: 중앙 고정폭 레인으로 데스크톱/모바일 간격 일관화 */}
-        <div className="absolute inset-x-0 z-[5] pointer-events-none" style={{ bottom: '5%' }}>
-          <div className="mx-auto flex items-end justify-between" style={{ width: 'min(92vw, 440px)' }}>
-            <div className="relative flex w-[116px] sm:w-[128px] items-end justify-center">
-              <AnimatePresence>
-                {groomVisible && (
-                  <motion.div
-                    initial={{ x: -80, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-                  >
-                    <PixelCharacter character="groom" size="full" scale={4} emotion={groomEmotion} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+        {isCeremonyStage ? (
+          <div className="absolute inset-x-0 z-[5] pointer-events-none" style={{ bottom: '2.8%' }}>
+            <div className="mx-auto relative" style={{ width: 'min(98vw, 760px)', height: 280 }}>
+              <motion.div
+                className="absolute left-1/2 top-[4%]"
+                style={{
+                  width: 240,
+                  height: 160,
+                  transform: 'translateX(-50%)',
+                  background: 'radial-gradient(circle, rgba(255,252,239,0.42) 0%, rgba(255,245,221,0.12) 58%, transparent 100%)',
+                  filter: 'blur(4px)',
+                }}
+                animate={{ opacity: [0.22, 0.46, 0.22], scale: [0.96, 1.04, 0.96] }}
+                transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+              />
 
-              <AnimatePresence>
-                {groomBubble && groomVisible && (
-                  <motion.div
-                    key={`groom-bubble-${groomBubble}`}
-                    className="absolute z-10 left-1/2 -translate-x-1/2"
-                    style={{ bottom: 96 }}
-                  >
-                    <SpeechBubble emoticon={groomBubble} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+              <div
+                className="absolute left-1/2 bottom-[25.5%] -translate-x-1/2"
+                style={{ width: '54%', height: '18%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(87,69,57,0.18) 0%, rgba(87,69,57,0.04) 56%, transparent 100%)', filter: 'blur(5px)' }}
+              />
 
-            <div className="relative flex w-[116px] sm:w-[128px] items-end justify-center">
-              <AnimatePresence>
-                {brideVisible && (
-                  <motion.div
-                    initial={{ x: 80, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 15, delay: script.brideEntrance ? 0.5 : 0 }}
-                  >
-                    <PixelCharacter character="bride" size="full" scale={4} emotion={brideEmotion} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div className="absolute left-1/2 bottom-[31.5%] -translate-x-1/2">
+                <div style={{ transform: 'scale(0.94)', transformOrigin: 'bottom center' }}>
+                  <CeremonyHost active={stepIdx >= 2} />
+                </div>
+              </div>
 
-              <AnimatePresence>
-                {brideBubble && brideVisible && (
-                  <motion.div
-                    key={`bride-bubble-${brideBubble}`}
-                    className="absolute z-10 left-1/2 -translate-x-1/2"
-                    style={{ bottom: 96 }}
-                  >
-                    <SpeechBubble emoticon={brideBubble} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div
+                className="absolute left-1/2 bottom-[2%] h-[74%] w-[2px] -translate-x-1/2"
+                style={{ background: 'rgba(255, 255, 255, 0.24)' }}
+              />
+
+              <div className="absolute left-1/2 bottom-[0.8%] flex w-full -translate-x-1/2 items-end justify-center">
+                <div className="relative flex h-[226px] w-[520px] items-end justify-center">
+                  <AnimatePresence>
+                    {groomVisible && (
+                      <motion.div
+                        initial={{ x: -250, y: 36, opacity: 0 }}
+                        animate={{ x: -ceremonyEntranceOffset, y: ceremonyEntranceY, opacity: 1, scale: ceremonyScale }}
+                        transition={{ type: 'spring', stiffness: 110, damping: 16 }}
+                        className="absolute bottom-0 left-1/2"
+                        style={{ filter: 'drop-shadow(0 10px 18px rgba(77, 58, 49, 0.28)) drop-shadow(0 0 6px rgba(255,255,255,0.18))' }}
+                      >
+                        <PixelCharacter character="groom" size="full" scale={5} emotion={groomEmotion} facing="back" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {groomBubble && groomVisible && (
+                      <motion.div
+                        key={`groom-bubble-${groomBubble}`}
+                        className="absolute z-10"
+                        style={{ left: 'calc(50% - 184px)', bottom: 138 }}
+                      >
+                        <SpeechBubble emoticon={groomBubble} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {brideVisible && (
+                      <motion.div
+                        initial={{ x: 250, y: 36, opacity: 0 }}
+                        animate={{ x: ceremonyBrideOffset, y: ceremonyBrideY, opacity: 1, scale: ceremonyScale }}
+                        transition={{ type: 'spring', stiffness: 110, damping: 16, delay: script.brideEntrance ? 0.5 : 0 }}
+                        className="absolute bottom-0 left-1/2"
+                        style={{ filter: 'drop-shadow(0 10px 18px rgba(77, 58, 49, 0.28)) drop-shadow(0 0 6px rgba(255,255,255,0.18))' }}
+                      >
+                        <PixelCharacter character="bride" size="full" scale={5} emotion={brideEmotion} facing="back" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {brideBubble && brideVisible && (
+                      <motion.div
+                        key={`bride-bubble-${brideBubble}`}
+                        className="absolute z-10"
+                        style={{ left: 'calc(50% + 104px)', bottom: 142 }}
+                      >
+                        <SpeechBubble emoticon={brideBubble} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="absolute inset-x-0 z-[5] pointer-events-none" style={{ bottom: '5%' }}>
+            <div className="mx-auto flex items-end justify-between" style={{ width: 'min(92vw, 440px)' }}>
+              <div className="relative flex w-[116px] sm:w-[128px] items-end justify-center">
+                <AnimatePresence>
+                  {groomVisible && (
+                    <motion.div
+                      initial={{ x: -80, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+                    >
+                      <PixelCharacter character="groom" size="full" scale={4} emotion={groomEmotion} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {groomBubble && groomVisible && (
+                    <motion.div
+                      key={`groom-bubble-${groomBubble}`}
+                      className="absolute z-10 left-1/2 -translate-x-1/2"
+                      style={{ bottom: 96 }}
+                    >
+                      <SpeechBubble emoticon={groomBubble} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="relative flex w-[116px] sm:w-[128px] items-end justify-center">
+                <AnimatePresence>
+                  {brideVisible && (
+                    <motion.div
+                      initial={{ x: 80, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 120, damping: 15, delay: script.brideEntrance ? 0.5 : 0 }}
+                    >
+                      <PixelCharacter character="bride" size="full" scale={4} emotion={brideEmotion} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {brideBubble && brideVisible && (
+                    <motion.div
+                      key={`bride-bubble-${brideBubble}`}
+                      className="absolute z-10 left-1/2 -translate-x-1/2"
+                      style={{ bottom: 96 }}
+                    >
+                      <SpeechBubble emoticon={brideBubble} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 대화/선택 영역 (하단 ~45%) */}

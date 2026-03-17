@@ -280,13 +280,88 @@ function NightScene() {
   );
 }
 
-type LandmarkType = 'park' | 'cafe' | 'sunset' | 'night';
+function ChapelScene() {
+  return (
+    <div className="relative flex items-end justify-center w-16 h-14">
+      <motion.div
+        className="absolute inset-x-3 bottom-0 rounded-t-[18px]"
+        style={{
+          height: 34,
+          background: 'linear-gradient(180deg, rgba(255,248,237,0.95) 0%, rgba(247,227,202,0.92) 100%)',
+          border: '2px solid rgba(255,220,178,0.8)',
+        }}
+        animate={{
+          boxShadow: [
+            '0 0 6px rgba(255,214,164,0.18)',
+            '0 0 12px rgba(255,214,164,0.34)',
+            '0 0 6px rgba(255,214,164,0.18)',
+          ],
+        }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <div
+        className="absolute left-1/2 bottom-[14px] -translate-x-1/2"
+        style={{
+          width: 14,
+          height: 18,
+          background: 'linear-gradient(180deg, #a06f59 0%, #7b5644 100%)',
+          border: '2px solid rgba(86, 50, 35, 0.5)',
+        }}
+      />
+      <div
+        className="absolute left-1/2 bottom-[30px] -translate-x-1/2"
+        style={{
+          width: 10,
+          height: 10,
+          borderRadius: '999px',
+          background: 'radial-gradient(circle, rgba(255,233,182,0.95) 0%, rgba(255,208,132,0.55) 100%)',
+        }}
+      />
+      <div
+        className="absolute left-1/2 bottom-[38px] -translate-x-1/2"
+        style={{
+          width: 4,
+          height: 22,
+          background: 'rgba(255,236,214,0.9)',
+        }}
+      />
+      <div
+        className="absolute left-1/2 bottom-[50px] -translate-x-1/2"
+        style={{
+          width: 16,
+          height: 16,
+          clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+          background: 'linear-gradient(135deg, rgba(255,240,214,0.95) 0%, rgba(255,214,164,0.85) 100%)',
+        }}
+      />
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            left: `${22 + i * 18}%`,
+            top: `${8 + (i % 2) * 10}%`,
+            width: 4,
+            height: 4,
+            background: i === 1 ? '#ffcc00' : '#ff6b9d',
+            boxShadow: `0 0 8px ${i === 1 ? '#ffcc00' : '#ff6b9d'}80`,
+          }}
+          animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+          transition={{ duration: 1.7 + i * 0.3, repeat: Infinity }}
+        />
+      ))}
+    </div>
+  );
+}
+
+type LandmarkType = 'park' | 'cafe' | 'sunset' | 'night' | 'chapel';
 
 const LANDMARK_COMPONENTS: Record<LandmarkType, React.FC> = {
   park: ParkScene,
   cafe: CafeScene,
   sunset: SunsetScene,
   night: NightScene,
+  chapel: ChapelScene,
 };
 
 // --- Zone ambient particles ---
@@ -307,6 +382,7 @@ function createZoneParticles(theme: LandmarkType, count: number): Particle[] {
     cafe: ['#8B6E4E60', '#FFE4B540', '#FFFFFF30'],
     sunset: ['#FF8C32', '#FF6B9D', '#FFD700', '#FFB07040'],
     night: ['#FFFFFF', '#4A9EFF80', '#FFE4B560'],
+    chapel: ['#FFD98A', '#FFB7C5', '#FFFFFF', '#FFEBD2'],
   };
   const colors = colorSets[theme] || colorSets.park;
   return Array.from({ length: count }, (_, i) => ({
@@ -423,9 +499,18 @@ const STAGE_INFO: StageInfo[] = [
     name: '프로포즈',
     subtitle: '2026',
     description: '수많은 계절을 지나,\n이제 평생을 말하는 순간.',
-    difficulty: 5,
+    difficulty: 4,
     reward: '영원의 반지',
     warning: '눈물 주의',
+  },
+  {
+    id: 4,
+    name: '예식 시작',
+    subtitle: '2026.04.05 14:10',
+    description: '화면 밖에서 진짜 이야기가 열린다.\n하객의 축복으로 다음 챕터가 시작된다.',
+    difficulty: 5,
+    reward: 'TO BE CONTINUED...',
+    warning: '손수건 준비',
   },
 ];
 
@@ -652,6 +737,14 @@ const ZONES: StageZone[] = [
     icon: '♛',
     landmark: 'sunset',
     bgGradient: 'linear-gradient(180deg, #050508 0%, #0a0a18 50%, #050508 100%)',
+  },
+  {
+    id: 4,
+    name: '예식 시작',
+    subtitle: '2026.04.05',
+    icon: '✿',
+    landmark: 'chapel',
+    bgGradient: 'linear-gradient(180deg, #1d1021 0%, #37203b 42%, #5a3048 72%, #27141d 100%)',
   },
 ];
 
@@ -901,7 +994,7 @@ export function WorldMap({
                   <div className="flex-1 flex flex-col items-center gap-1">
                     {/* 커플 워킹 - 스테이지 진행에 따라 간격 좁아짐 */}
                     {isCurrent && (
-                      <div className="mb-1 flex items-end" style={{ gap: ['8px', '5px', '2px', '0px'][zone.id] ?? '8px' }}>
+                      <div className="mb-1 flex items-end" style={{ gap: ['8px', '5px', '2px', '0px', '0px'][zone.id] ?? '8px' }}>
                         <PixelCharacterWalking character="groom" scale={2} />
                         <PixelCharacterWalking character="bride" scale={2} />
                       </div>
