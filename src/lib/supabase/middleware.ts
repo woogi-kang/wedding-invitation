@@ -6,6 +6,14 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  // Supabase 환경 변수가 없으면 미들웨어를 건너뛴다 (개발 환경)
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
