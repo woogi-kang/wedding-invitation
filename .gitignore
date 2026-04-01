@@ -175,3 +175,4 @@ secret-*.*
 # Linux
 *.secret.*
 .env*.local
+.orchestration/
