@@ -80,7 +80,7 @@ export const WEDDING_INFO = {
     navigation: {
       naver: 'https://map.naver.com/p/search/%EB%9D%BC%EB%A7%88%EB%8B%A4%20%EC%84%9C%EC%9A%B8%20%EC%8B%A0%EB%8F%84%EB%A6%BC%20%ED%98%B8%ED%85%94',
       kakao: 'https://map.kakao.com/link/to/라마다서울신도림호텔,37.5064,126.8853',
-      tmap: 'https://apis.openapi.sk.com/tmap/app/routes?appKey=&name=라마다서울신도림호텔&lon=126.8853&lat=37.5064',
+      tmap: 'https://tmap.life/ace0e4c6',
     },
     // 네이버 지도 정적 이미지 (썸네일)
     mapImage: `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=600&h=400&center=126.8853,37.5064&level=16&markers=type:d|size:mid|pos:126.8853%2037.5064|color:red`,
@@ -212,7 +212,7 @@ export const WEDDING_INFO = {
 
   // RSVP Google Forms URL
   rsvp: {
-    enabled: true,
+    enabled: false,
     formUrl: 'https://forms.gle/your-form-id',
   },
 
