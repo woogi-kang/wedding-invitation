@@ -14,6 +14,7 @@ import {
 } from '@/components/sections';
 import { MouseTrail } from '@/components/ui/MouseTrail';
 import { RSVPDialog } from '@/components/ui/RSVPDialog';
+import { WeddingInfoPopup } from '@/components/ui/WeddingInfoPopup';
 import { GuestSnapDialog } from '@/components/ui/GuestSnapDialog';
 import { SecretRoutePrompt } from '@/components/ui/SecretRoutePrompt';
 import { galleryImages } from '@/lib/gallery';
@@ -24,8 +25,11 @@ export default function InvitationPage() {
       {/* Mouse Trail - petal effect following cursor */}
       <MouseTrail />
 
-      {/* RSVP Dialog - 결혼식 시작 전까지 2초 후 자동 표시 */}
+      {/* RSVP Dialog - 비활성화 */}
       <RSVPDialog />
+
+      {/* 결혼식 장소/시간 안내 팝업 */}
+      <WeddingInfoPopup />
 
       {/* GuestSnap Dialog - 결혼식 시작 후 2초 후 자동 표시 */}
       <GuestSnapDialog />
