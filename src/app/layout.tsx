@@ -84,9 +84,13 @@ export default function RootLayout({
           as="audio"
           type="audio/mp4"
         />
-        {/* Wedding Fonts - Elegant & Classic */}
+        {/* Pretendard + Wedding Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Press+Start+2P&display=swap"
           rel="stylesheet"
