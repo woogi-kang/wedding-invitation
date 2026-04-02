@@ -104,16 +104,10 @@ export function WeddingInfoPopup() {
                 이번 주 일요일이에요!
               </motion.p>
 
-              {/* 하단 웨이브 장식 */}
-              <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 360 20" fill="none" className="w-full block">
-                  <path d="M0 20V8C60 20 120 0 180 8C240 16 300 0 360 8V20H0Z" fill="white" />
-                </svg>
-              </div>
             </div>
 
             {/* 본문 */}
-            <div className="px-6 pt-2 pb-4 space-y-3.5">
+            <div className="px-6 pt-5 pb-4 space-y-3.5">
               {/* 날짜/시간 */}
               <div className="flex items-start gap-3">
                 <div
