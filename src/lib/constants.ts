@@ -265,8 +265,6 @@ export const GUEST_SNAP_CONFIG = {
   // Upload limits
   limits: {
     maxFilesPerSession: 50,
-    maxImageSizeMB: 30,
-    maxVideoSizeMB: 500,
     maxConcurrentUploads: 3,
   },
 

@@ -333,28 +333,13 @@ export function GuestUploadSheet({
         return { valid: false, error: messages.invalidFileType };
       }
 
-      const sizeMB = file.size / (1024 * 1024);
-      if (fileType === 'image' && sizeMB > limits.maxImageSizeMB) {
-        return {
-          valid: false,
-          error: `사진 파일이 너무 커요 (최대 ${limits.maxImageSizeMB}MB)`,
-        };
-      }
-
-      if (fileType === 'video' && sizeMB > limits.maxVideoSizeMB) {
-        return {
-          valid: false,
-          error: `영상 파일이 너무 커요 (최대 ${limits.maxVideoSizeMB}MB)`,
-        };
-      }
-
       if (file.size === 0) {
         return { valid: false, error: '파일이 비어있어요' };
       }
 
       return { valid: true, type: fileType };
     },
-    [allowedExtensions, getFileType, limits.maxImageSizeMB, limits.maxVideoSizeMB, messages]
+    [allowedExtensions, getFileType, messages]
   );
 
   const createThumbnail = useCallback((file: File): Promise<string | undefined> => {
@@ -796,12 +781,6 @@ export function GuestUploadSheet({
             </div>
 
             <div className="mb-5 flex flex-wrap justify-center gap-2">
-              <div className="rounded-full bg-[var(--color-secondary)] px-4 py-2 text-xs text-[var(--color-primary)] sm:text-sm">
-                사진 {limits.maxImageSizeMB}MB 이하
-              </div>
-              <div className="rounded-full bg-[var(--color-secondary)] px-4 py-2 text-xs text-[var(--color-primary)] sm:text-sm">
-                영상 {limits.maxVideoSizeMB}MB 이하
-              </div>
               <div className="rounded-full bg-[var(--color-secondary)] px-4 py-2 text-xs text-[var(--color-primary)] sm:text-sm">
                 최대 {limits.maxFilesPerSession}개
               </div>

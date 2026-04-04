@@ -3,17 +3,9 @@
 import { useCallback, useState } from 'react';
 import { Camera, Upload } from 'lucide-react';
 import { GuestUploadSheet } from './GuestUploadSheet';
-import { GUEST_SNAP_CONFIG } from '@/lib/constants';
 
 export function GuestSnapStandalone() {
-  const { limits } = GUEST_SNAP_CONFIG;
   const [isUploadSheetOpen, setIsUploadSheetOpen] = useState(false);
-
-  const limitItems = [
-    `사진 ${limits.maxImageSizeMB}MB 이하`,
-    `영상 ${limits.maxVideoSizeMB}MB 이하`,
-    `최대 ${limits.maxFilesPerSession}개`,
-  ];
 
   const handleUploadClick = useCallback(() => {
     setIsUploadSheetOpen(true);
@@ -86,20 +78,6 @@ export function GuestSnapStandalone() {
                 </button>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-                {limitItems.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-full border border-[var(--color-border)] bg-white/80 px-4 py-2 text-xs sm:text-sm"
-                    style={{
-                      color: 'var(--color-text-light)',
-                      fontFamily: 'var(--font-body)',
-                    }}
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
             </div>
           </section>
         </div>

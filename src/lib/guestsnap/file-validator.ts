@@ -138,22 +138,6 @@ export function validateFileSize(
     return { valid: false, error: '파일이 비어있어요' };
   }
 
-  const sizeMB = size / (1024 * 1024);
-
-  if (fileType === 'image' && sizeMB > limits.maxImageSizeMB) {
-    return {
-      valid: false,
-      error: `사진 파일이 너무 커요 (최대 ${limits.maxImageSizeMB}MB)`,
-    };
-  }
-
-  if (fileType === 'video' && sizeMB > limits.maxVideoSizeMB) {
-    return {
-      valid: false,
-      error: `영상 파일이 너무 커요 (최대 ${limits.maxVideoSizeMB}MB)`,
-    };
-  }
-
   return { valid: true };
 }
 
