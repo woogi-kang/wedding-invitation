@@ -532,25 +532,7 @@ export function GuestUploadSheet({
   const renderSheetHeader = () => {
     if (hasUploadState) {
       return (
-        <div className="flex items-center justify-between border-b border-[var(--color-secondary)] px-5 py-4 sm:px-6">
-          <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-[var(--color-primary)]">
-              Upload Status
-            </p>
-            <h3
-              className="mt-2 text-lg"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                color: 'var(--color-text)',
-              }}
-            >
-              {isSuccessState
-                ? messages.uploadComplete
-                : isFailureState
-                  ? '일부 파일 업로드가 완료되지 않았어요'
-                  : '추억을 전달받고 있어요'}
-            </h3>
-          </div>
+        <div className="flex items-center justify-end border-b border-[var(--color-secondary)] px-5 py-4 sm:px-6">
           <button
             onClick={handleClose}
             className="rounded-full p-2 transition-colors hover:bg-[var(--color-secondary)]"
